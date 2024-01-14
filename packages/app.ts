@@ -1,7 +1,7 @@
-import { UserController } from "./controller";
+import { IUserController, UserController } from "./controller";
 import { Database } from "./database";
-import { UserRepository } from "./repositories";
-import { UserService } from "./services";
+import { IUserRepository, UserRepository } from "./repositories";
+import { IUserService, UserService } from "./services";
 import { Nullable } from "./types";
 
 class AppManager {
@@ -44,7 +44,7 @@ class AppManager {
 }
 
 class AppRepository {
-  private _userRepository: UserRepository;
+  private _userRepository: IUserRepository;
 
   constructor(database: Database) {
     this._userRepository = UserRepository.getInstance(database);
@@ -56,7 +56,7 @@ class AppRepository {
 }
 
 class AppService {
-  private _userService: UserService;
+  private _userService: IUserService;
 
   constructor(appRepository: AppRepository) {
     this._userService = UserService.getInstance(appRepository.userRepository);
@@ -68,7 +68,7 @@ class AppService {
 }
 
 class AppController {
-  private _userController: UserController;
+  private _userController: IUserController;
 
   constructor(appService: AppService) {
     this._userController = UserController.getInstance(appService.userService);

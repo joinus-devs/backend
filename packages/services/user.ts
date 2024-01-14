@@ -1,16 +1,25 @@
 import { UserCreate, UserUpdate } from "../models";
-import { UserRepository } from "../repositories";
+import { IUserRepository } from "../repositories";
 import { Nullable } from "../types";
+import { User } from "./../models/user";
 
-class UserService {
+export interface IUserService {
+  find(id: number): Promise<User>;
+  findAll(): Promise<User[]>;
+  create(userCreate: UserCreate): Promise<User>;
+  update(id: number, userUpdate: UserUpdate): Promise<User>;
+  delete(id: number): Promise<void>;
+}
+
+export class UserService implements IUserService {
   private static _instance: Nullable<UserService> = null;
-  private _repository: UserRepository;
+  private _repository: IUserRepository;
 
-  private constructor(repository: UserRepository) {
+  private constructor(repository: IUserRepository) {
     this._repository = repository;
   }
 
-  static getInstance(repository: UserRepository) {
+  static getInstance(repository: IUserRepository) {
     if (!this._instance) {
       this._instance = new UserService(repository);
     }
@@ -63,5 +72,3 @@ class UserService {
     }
   };
 }
-
-export default UserService;

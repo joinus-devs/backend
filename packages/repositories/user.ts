@@ -3,8 +3,16 @@ import { Database } from "../database";
 import { UserCreate, UserUpdate } from "../models";
 import { Nullable } from "../types";
 
-class UserRepository {
-  private static _instance: Nullable<UserRepository> = null;
+export interface IUserRepository {
+  find(id: number): Promise<any>;
+  findAll(): Promise<any>;
+  create(userCreate: UserCreate): Promise<any>;
+  update(id: number, userUpdate: UserUpdate): Promise<any>;
+  delete(id: number): Promise<void>;
+}
+
+export class UserRepository implements IUserRepository {
+  private static _instance: Nullable<IUserRepository> = null;
   private _db: Database;
 
   private constructor(database: Database) {
@@ -77,5 +85,3 @@ class UserRepository {
     }
   };
 }
-
-export default UserRepository;

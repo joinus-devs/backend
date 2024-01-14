@@ -1,17 +1,25 @@
 import { NextFunction, Request, Response } from "express";
 import { ErrorResponse, SuccessResponse } from "../models/response";
-import { UserService } from "../services";
+import { IUserService } from "../services";
 import { Nullable } from "../types";
 
-class UserController {
-  private static _instance: Nullable<UserController> = null;
-  private _service: UserService;
+export interface IUserController {
+  find(req: Request, res: Response, next: NextFunction): Promise<void>;
+  findAll(req: Request, res: Response, next: NextFunction): Promise<void>;
+  create(req: Request, res: Response, next: NextFunction): Promise<void>;
+  update(req: Request, res: Response, next: NextFunction): Promise<void>;
+  delete(req: Request, res: Response, next: NextFunction): Promise<void>;
+}
 
-  private constructor(service: UserService) {
+export class UserController {
+  private static _instance: Nullable<UserController> = null;
+  private _service: IUserService;
+
+  private constructor(service: IUserService) {
     this._service = service;
   }
 
-  static getInstance(service: UserService) {
+  static getInstance(service: IUserService) {
     if (!this._instance) {
       this._instance = new UserController(service);
     }
@@ -86,5 +94,3 @@ class UserController {
     }
   };
 }
-
-export default UserController;
