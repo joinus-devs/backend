@@ -18,7 +18,7 @@ class MysqlDatabase implements Database {
     return this._instance;
   }
 
-  public getPool() {
+  get pool() {
     return this._pool;
   }
 }

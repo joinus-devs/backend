@@ -6,6 +6,7 @@ import { MysqlDatabase } from "./packages/database";
 import { errorHandler, logger } from "./packages/middleware";
 import initRoutes from "./packages/routes";
 import swaggerFile from "./swagger-output.json";
+import bodyParser = require("body-parser");
 
 dotenv.config();
 const app = express();
@@ -19,6 +20,8 @@ const database = MysqlDatabase.getInstance({
 });
 const appManager = AppManager.getInstance(database);
 
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use(logger);
 app.use(initRoutes(appManager));
 app.use(errorHandler);

@@ -6,3 +6,9 @@ export interface User {
   phone: string;
   email: string;
 }
+
+export type UserCreate = Omit<User, "id">;
+
+export type UserUpdate = Partial<
+  Pick<UserCreate, "name" | "sex" | "phone" | "email">
+>;

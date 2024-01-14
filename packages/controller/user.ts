@@ -19,14 +19,67 @@ class UserController {
     return this._instance;
   }
 
-  getUsers = async (req: Request, res: Response, next: NextFunction) => {
+  find = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const users = await this._service.getUsers();
+      const id = Number(req.params.id);
+      const user = await this._service.find(id);
+      res
+        .status(200)
+        .json(new SuccessResponse(user, "User retrieved successfully").toDTO());
+    } catch (err) {
+      if (!(err instanceof Error)) return;
+      next(new ErrorResponse(500, err.message));
+    }
+  };
+
+  findAll = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const users = await this._service.findAll();
       res
         .status(200)
         .json(
           new SuccessResponse(users, "Users retrieved successfully").toDTO()
         );
+    } catch (err) {
+      if (!(err instanceof Error)) return;
+      next(new ErrorResponse(500, err.message));
+    }
+  };
+
+  create = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userCreate = req.body;
+      const user = await this._service.create(userCreate);
+      res
+        .status(201)
+        .json(new SuccessResponse(user, "User created successfully").toDTO());
+    } catch (err) {
+      if (!(err instanceof Error)) return;
+      next(new ErrorResponse(500, err.message));
+    }
+  };
+
+  update = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = Number(req.params.id);
+      const userUpdate = req.body;
+      const user = await this._service.update(id, userUpdate);
+      res
+        .status(200)
+        .json(new SuccessResponse(user, "User updated successfully").toDTO());
+    } catch (err) {
+      if (!(err instanceof Error)) return;
+      next(new ErrorResponse(500, err.message));
+    }
+  };
+
+  delete = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = Number(req.params.id);
+      await this._service.delete(id);
+      res
+        .status(200)
+        .json(new SuccessResponse(null, "User deleted successfully").toDTO());
     } catch (err) {
       if (!(err instanceof Error)) return;
       next(new ErrorResponse(500, err.message));

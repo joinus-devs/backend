@@ -9,6 +9,7 @@
   "author": "Lee Minhoon",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.20.2",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "mysql2": "^3.7.0",
@@ -16,7 +17,6 @@
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
-    "@types/mysql": "^2.15.25",
     "@types/node": "^20.11.0",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.6",
