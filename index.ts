@@ -1,9 +1,11 @@
 import dotenv from "dotenv";
 import express from "express";
+import swaggerUi from "swagger-ui-express";
 import AppManager from "./packages/app";
 import { MysqlDatabase } from "./packages/database";
 import { errorHandler, logger } from "./packages/middleware";
-import { UserRouter } from "./packages/routes";
+import initRoutes from "./packages/routes";
+import swaggerFile from "./swagger-output.json";
 
 dotenv.config();
 const app = express();
@@ -16,11 +18,11 @@ const database = MysqlDatabase.getInstance({
   connectionLimit: 10,
 });
 const appManager = AppManager.getInstance(database);
-const userRouter = UserRouter.getInstance(appManager);
 
 app.use(logger);
-app.use("/users", userRouter.initRouter());
+app.use(initRoutes(appManager));
 app.use(errorHandler);
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 app.listen(port, function () {
   console.log(`Server is listening on port ${port}`);
