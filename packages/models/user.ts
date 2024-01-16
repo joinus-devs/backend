@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToMany } from "typeorm";
 import { Scheme } from "./common";
+import { Club } from "./club";
 
 export interface UserScheme extends Scheme {
   password: string;
@@ -12,7 +13,7 @@ export interface UserScheme extends Scheme {
 
 export type UserDto = Omit<UserScheme, "password">;
 
-export type UserCreate = Omit<UserScheme, "id">;
+export type UserCreate = Omit<UserScheme, keyof Scheme>;
 
 export type UserUpdate = Partial<
   Pick<UserCreate, "name" | "sex" | "phone" | "email">
@@ -20,9 +21,6 @@ export type UserUpdate = Partial<
 
 @Entity("users")
 export class User extends Scheme implements UserScheme {
-  @PrimaryGeneratedColumn()
-  id: number;
-
   @Column()
   password: string;
 
@@ -40,6 +38,9 @@ export class User extends Scheme implements UserScheme {
 
   @Column()
   email: string;
+
+  @ManyToMany(() => Club)
+  clubs: Club[];
 
   public toDto = (): UserDto => {
     const { password, ...dto } = this;

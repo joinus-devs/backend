@@ -9,4 +9,7 @@ export abstract class Scheme {
 
   @Column()
   updated_at: Date;
+
+  @Column()
+  deleted_at: Date;
 }
