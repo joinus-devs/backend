@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { ErrorResponse } from "../models/response";
+import { ErrorResponse } from "./response";
 
 export type MiddelWare = (
   req: Request,

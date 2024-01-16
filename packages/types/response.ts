@@ -22,13 +22,14 @@ export class SuccessResponse<T> {
 
 export class ErrorResponse extends Error {
   private _status: number;
-  private _data = null;
   private _message: string;
+  private _data: Nullable<object> = null;
 
-  constructor(status: number, message: string) {
+  constructor(status: number, message: string, data?: object) {
     super(message);
     this._status = status;
     this._message = message;
+    this._data = data ?? null;
   }
 
   get status() {

@@ -1,17 +1,16 @@
-import { NextFunction, Request, Response } from "express";
-import { ErrorResponse, SuccessResponse } from "../models/response";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import { IUserService } from "../services";
-import { Nullable } from "../types";
+import { ErrorResponse, Nullable, SuccessResponse } from "../types";
 
 export interface IUserController {
-  find(req: Request, res: Response, next: NextFunction): Promise<void>;
-  findAll(req: Request, res: Response, next: NextFunction): Promise<void>;
-  create(req: Request, res: Response, next: NextFunction): Promise<void>;
-  update(req: Request, res: Response, next: NextFunction): Promise<void>;
-  delete(req: Request, res: Response, next: NextFunction): Promise<void>;
+  find: RequestHandler;
+  findAll: RequestHandler;
+  create: RequestHandler;
+  update: RequestHandler;
+  delete: RequestHandler;
 }
 
-export class UserController {
+export class UserController implements IUserController {
   private static _instance: Nullable<UserController> = null;
   private _service: IUserService;
 
@@ -35,8 +34,8 @@ export class UserController {
         .status(200)
         .json(new SuccessResponse(user, "User retrieved successfully").toDTO());
     } catch (err) {
-      if (!(err instanceof Error)) return;
-      next(new ErrorResponse(500, err.message));
+      if (!(err instanceof ErrorResponse)) return;
+      next(err);
     }
   };
 
@@ -49,8 +48,8 @@ export class UserController {
           new SuccessResponse(users, "Users retrieved successfully").toDTO()
         );
     } catch (err) {
-      if (!(err instanceof Error)) return;
-      next(new ErrorResponse(500, err.message));
+      if (!(err instanceof ErrorResponse)) return;
+      next(err);
     }
   };
 
@@ -62,8 +61,8 @@ export class UserController {
         .status(201)
         .json(new SuccessResponse(user, "User created successfully").toDTO());
     } catch (err) {
-      if (!(err instanceof Error)) return;
-      next(new ErrorResponse(500, err.message));
+      if (!(err instanceof ErrorResponse)) return;
+      next(err);
     }
   };
 
@@ -76,21 +75,23 @@ export class UserController {
         .status(200)
         .json(new SuccessResponse(user, "User updated successfully").toDTO());
     } catch (err) {
-      if (!(err instanceof Error)) return;
-      next(new ErrorResponse(500, err.message));
+      if (!(err instanceof ErrorResponse)) return;
+      next(err);
     }
   };
 
   delete = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = Number(req.params.id);
-      await this._service.delete(id);
+      const deletedId = await this._service.delete(id);
       res
         .status(200)
-        .json(new SuccessResponse(null, "User deleted successfully").toDTO());
+        .json(
+          new SuccessResponse(deletedId, "User deleted successfully").toDTO()
+        );
     } catch (err) {
-      if (!(err instanceof Error)) return;
-      next(new ErrorResponse(500, err.message));
+      if (!(err instanceof ErrorResponse)) return;
+      next(err);
     }
   };
 }

@@ -1,27 +1,26 @@
-import { ResultSetHeader, format } from "mysql2";
-import { Database } from "../database";
-import { UserCreate, UserUpdate } from "../models";
-import { Nullable } from "../types";
+import { DataSource, Repository } from "typeorm";
+import { User, UserCreate, UserUpdate } from "../models";
+import { Maybe, Nullable } from "../types";
 
 export interface IUserRepository {
-  find(id: number): Promise<any>;
-  findAll(): Promise<any>;
-  create(userCreate: UserCreate): Promise<any>;
-  update(id: number, userUpdate: UserUpdate): Promise<any>;
-  delete(id: number): Promise<void>;
+  find(id: number): Promise<Nullable<User>>;
+  findAll(): Promise<User[]>;
+  create(userCreate: UserCreate): Promise<Nullable<User>>;
+  update(id: number, userUpdate: UserUpdate): Promise<Nullable<User>>;
+  delete(id: number): Promise<Maybe<number>>;
 }
 
 export class UserRepository implements IUserRepository {
   private static _instance: Nullable<IUserRepository> = null;
-  private _db: Database;
+  private _db: Repository<User>;
 
-  private constructor(database: Database) {
-    this._db = database;
+  private constructor(datasource: DataSource) {
+    this._db = datasource.getRepository(User);
   }
 
-  static getInstance(database: Database) {
+  static getInstance(datasource: DataSource) {
     if (!this._instance) {
-      this._instance = new UserRepository(database);
+      this._instance = new UserRepository(datasource);
     }
 
     return this._instance;
@@ -29,10 +28,7 @@ export class UserRepository implements IUserRepository {
 
   find = async (id: number) => {
     try {
-      const query = format("SELECT * FROM users WHERE id = ?", [id]);
-      const [rows] = await this._db.pool.query(query);
-
-      return rows;
+      return await this._db.findOne({ where: { id } });
     } catch (err) {
       console.log(err);
       throw err;
@@ -41,10 +37,7 @@ export class UserRepository implements IUserRepository {
 
   findAll = async () => {
     try {
-      const query = format("SELECT * FROM users");
-      const [rows] = await this._db.pool.query(query);
-
-      return rows;
+      return await this._db.find();
     } catch (err) {
       console.log(err);
       throw err;
@@ -53,10 +46,9 @@ export class UserRepository implements IUserRepository {
 
   create = async (userCreate: UserCreate) => {
     try {
-      const query = format("INSERT INTO users SET ?", userCreate);
-      const [results] = await this._db.pool.execute<ResultSetHeader>(query);
-
-      return this.find(results.insertId);
+      const result = await this._db.insert(userCreate);
+      const insertedId = result.identifiers[0].id as number;
+      return this.find(insertedId);
     } catch (err) {
       console.log(err);
       throw err;
@@ -65,9 +57,7 @@ export class UserRepository implements IUserRepository {
 
   update = async (id: number, userUpdate: UserUpdate) => {
     try {
-      const query = format("UPDATE users SET ? WHERE id = ?", [userUpdate, id]);
-      await this._db.pool.execute<ResultSetHeader>(query);
-
+      await this._db.update(id, userUpdate);
       return this.find(id);
     } catch (err) {
       console.log(err);
@@ -77,8 +67,8 @@ export class UserRepository implements IUserRepository {
 
   delete = async (id: number) => {
     try {
-      const query = format("DELETE FROM users WHERE id = ?", [id]);
-      await this._db.pool.execute<ResultSetHeader>(query);
+      await this._db.delete(id);
+      return id;
     } catch (err) {
       console.log(err);
       throw err;

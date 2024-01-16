@@ -1,24 +1,24 @@
+import { DataSource } from "typeorm";
 import { IUserController, UserController } from "./controller";
-import { Database } from "./database";
 import { IUserRepository, UserRepository } from "./repositories";
 import { IUserService, UserService } from "./services";
 import { Nullable } from "./types";
 
 class AppManager {
   private static _instance: Nullable<AppManager> = null;
-  private _database: Database;
+  private _datasource: DataSource;
   private _appRepository: AppRepository;
   private _appService: AppService;
   private _appController: AppController;
 
-  private constructor(database: Database) {
-    this._database = database;
+  private constructor(datasource: DataSource) {
+    this._datasource = datasource;
     this._appRepository = this.initRepository();
     this._appService = this.initService();
     this._appController = this.initController();
   }
 
-  static getInstance(database: Database) {
+  static getInstance(database: DataSource) {
     if (!this._instance) {
       this._instance = new AppManager(database);
     }
@@ -27,7 +27,7 @@ class AppManager {
   }
 
   private initRepository() {
-    return new AppRepository(this._database);
+    return new AppRepository(this._datasource);
   }
 
   private initService() {
@@ -46,8 +46,8 @@ class AppManager {
 class AppRepository {
   private _userRepository: IUserRepository;
 
-  constructor(database: Database) {
-    this._userRepository = UserRepository.getInstance(database);
+  constructor(datasource: DataSource) {
+    this._userRepository = UserRepository.getInstance(datasource);
   }
 
   get userRepository() {
