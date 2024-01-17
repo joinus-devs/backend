@@ -1,13 +1,13 @@
-import { DataSource, Repository } from "typeorm";
-import { Club, ClubCreate, ClubUpdate } from "../models";
-import { Maybe, Nullable } from "../types";
+import { DataSource, QueryFailedError, Repository } from "typeorm";
+import { Club } from "../models";
+import { ErrorResponse, Nullable } from "../types";
 
 export interface IClubRepository {
   find(id: number): Promise<Nullable<Club>>;
   findAll(): Promise<Club[]>;
-  create(clubCreate: ClubCreate): Promise<Nullable<Club>>;
-  update(id: number, clubUpdate: ClubUpdate): Promise<Nullable<Club>>;
-  delete(id: number): Promise<Maybe<number>>;
+  create(club: Club): Promise<number>;
+  update(club: Club): Promise<number>;
+  delete(id: number): Promise<number>;
 }
 
 export class ClubRepository implements IClubRepository {
@@ -44,21 +44,23 @@ export class ClubRepository implements IClubRepository {
     }
   };
 
-  create = async (clupCreate: ClubCreate) => {
+  create = async (club: Club) => {
     try {
-      const result = await this._db.insert(clupCreate);
-      const insertedId = result.identifiers[0].id as number;
-      return this.find(insertedId);
+      const result = await this._db.save(club);
+      return result.id;
     } catch (err) {
       console.log(err);
+      if (err instanceof QueryFailedError && err.driverError.errno === 1062) {
+        throw new ErrorResponse(409, "Unique constraint error");
+      }
       throw err;
     }
   };
 
-  update = async (id: number, clubUpdate: ClubUpdate) => {
+  update = async (club: Club) => {
     try {
-      await this._db.update(id, clubUpdate);
-      return this.find(id);
+      const result = await this._db.save(club);
+      return result.id;
     } catch (err) {
       console.log(err);
       throw err;

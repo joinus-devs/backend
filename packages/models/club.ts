@@ -27,8 +27,21 @@ export class Club extends Scheme implements ClubScheme {
 
   @ManyToMany(() => User)
   users: User[];
+}
 
-  public toDto = (): ClubDto => {
-    return { ...this };
+export class ClubConverter {
+  public static toDto = (club: Club): ClubDto => {
+    const dto = { ...club };
+    return dto;
+  };
+
+  public static toEntityFromCreate = (dto: ClubCreate): Club => {
+    const club = new Club();
+    return Object.assign(club, dto);
+  };
+
+  public static toEntityFromUpdate = (id: number, dto: ClubUpdate): Club => {
+    const club = new Club();
+    return Object.assign(club, { id, ...dto });
   };
 }
