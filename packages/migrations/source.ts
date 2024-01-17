@@ -15,7 +15,7 @@ export default new DataSource({
   password: "",
   database: process.env.DB_NAME,
   synchronize: false,
-  // logging: true,
+  logging: true,
   entities: [User, Club],
   migrations: [CreateUsersTable1705424568911, CreateClubTable1705433210498],
 });

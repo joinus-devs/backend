@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToMany } from "typeorm";
-import { Scheme } from "./common";
 import { Club } from "./club";
+import { Scheme } from "./common";
 
 export interface UserScheme extends Scheme {
   password: string;
@@ -24,7 +24,7 @@ export class User extends Scheme implements UserScheme {
   @Column()
   password: string;
 
-  @Column()
+  @Column({ unique: true })
   social_id: string;
 
   @Column()
@@ -36,14 +36,26 @@ export class User extends Scheme implements UserScheme {
   @Column()
   phone: string;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   @ManyToMany(() => Club)
   clubs: Club[];
+}
 
-  public toDto = (): UserDto => {
-    const { password, ...dto } = this;
+export class UserConverter {
+  public static toDto = (user: User): UserDto => {
+    const { password, ...dto } = user;
     return dto;
+  };
+
+  public static toEntityFromCreate = (dto: UserCreate): User => {
+    const user = new User();
+    return Object.assign(user, dto);
+  };
+
+  public static toEntityFromUpdate = (id: number, dto: UserUpdate): User => {
+    const user = new User();
+    return Object.assign(user, { id, ...dto });
   };
 }

@@ -37,7 +37,7 @@ class Swagger {
         responses: {
           UserResponse: getSuccessDoc(UserCreateDoc),
           UsersResponse: getSuccessDoc([UserCreateDoc]),
-          DeleteResponse: getSuccessDoc({ type: "number", example: 1 }, false),
+          NumberResponse: getSuccessDoc({ type: "number", example: 1 }, false),
         },
       },
       schemes: ["http"],

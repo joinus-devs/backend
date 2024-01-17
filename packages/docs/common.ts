@@ -2,11 +2,12 @@ import { cloneDeep } from "lodash";
 import swaggerJSDoc from "swagger-jsdoc";
 
 export const schemeDoc = {
-  description: "common properties",
+  description: "common scheme",
   properties: {
-    id: { type: "number" },
-    created_at: { type: "string" },
-    updated_at: { type: "string" },
+    id: { type: "number", exmaple: 1 },
+    created_at: { type: "string", example: "2020-01-01T00:00:00.000Z" },
+    updated_at: { type: "string", example: "2020-01-01T00:00:00.000Z" },
+    deleted_at: { type: "string", example: "2020-01-01T00:00:00.000Z" },
   },
 };
 

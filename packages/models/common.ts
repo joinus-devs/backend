@@ -1,15 +1,20 @@
-import { Column, PrimaryGeneratedColumn } from "typeorm";
+import {
+  CreateDateColumn,
+  DeleteDateColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
 export abstract class Scheme {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @CreateDateColumn()
   created_at: Date;
 
-  @Column()
+  @UpdateDateColumn()
   updated_at: Date;
 
-  @Column()
+  @DeleteDateColumn({ nullable: true })
   deleted_at: Date;
 }

@@ -41,7 +41,7 @@ swagger.add({
       summary: "Create a user",
       tags: ["User"],
       parameters: [{ $ref: "#/components/parameters/UserCreate" }],
-      responses: { 200: { $ref: "#/components/responses/UserResponse" } },
+      responses: { 200: { $ref: "#/components/responses/NumberResponse" } },
     },
   },
   "/users/{id}": {
@@ -54,12 +54,12 @@ swagger.add({
       summary: "Update a user",
       tags: ["User"],
       parameters: [{ $ref: "#/components/parameters/UserUpdate" }],
-      responses: { 200: { $ref: "#/components/responses/UserResponse" } },
+      responses: { 200: { $ref: "#/components/responses/NumberResponse" } },
     },
     delete: {
       summary: "Delete a user",
       tags: ["User"],
-      responses: { 200: { $ref: "#/components/responses/DeleteResponse" } },
+      responses: { 200: { $ref: "#/components/responses/NumberResponse" } },
     },
   },
 });

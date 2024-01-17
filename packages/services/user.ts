@@ -1,13 +1,13 @@
-import { UserCreate, UserDto, UserUpdate } from "../models";
+import { UserConverter, UserCreate, UserDto, UserUpdate } from "../models";
 import { IUserRepository } from "../repositories";
-import { ErrorResponse, Maybe, Nullable } from "../types";
+import { ErrorResponse, Nullable } from "../types";
 
 export interface IUserService {
   find(id: number): Promise<Nullable<UserDto>>;
   findAll(): Promise<UserDto[]>;
-  create(userCreate: UserCreate): Promise<Nullable<UserDto>>;
-  update(id: number, userUpdate: UserUpdate): Promise<Nullable<UserDto>>;
-  delete(id: number): Promise<Maybe<number>>;
+  create(userCreate: UserCreate): Promise<number>;
+  update(id: number, userUpdate: UserUpdate): Promise<number>;
+  delete(id: number): Promise<number>;
 }
 
 export class UserService implements IUserService {
@@ -36,13 +36,13 @@ export class UserService implements IUserService {
     if (!user) {
       throw new ErrorResponse(404, "User not found");
     }
-    return user.toDto();
+    return UserConverter.toDto(user);
   };
 
   findAll = async () => {
     try {
       const users = await this._repository.findAll();
-      return users;
+      return users.map((user) => UserConverter.toDto(user));
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }
@@ -50,17 +50,22 @@ export class UserService implements IUserService {
 
   create = async (userCreate: UserCreate) => {
     try {
-      const user = await this._repository.create(userCreate);
-      return user;
+      return await this._repository.create(
+        UserConverter.toEntityFromCreate(userCreate)
+      );
     } catch (err) {
+      if (err instanceof ErrorResponse) {
+        throw err;
+      }
       throw new ErrorResponse(500, "Internal Server Error");
     }
   };
 
   update = async (id: number, userUpdate: UserUpdate) => {
     try {
-      const user = await this._repository.update(id, userUpdate);
-      return user;
+      return await this._repository.update(
+        UserConverter.toEntityFromUpdate(id, userUpdate)
+      );
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }
@@ -68,8 +73,7 @@ export class UserService implements IUserService {
 
   delete = async (id: number) => {
     try {
-      const deletedId = await this._repository.delete(id);
-      return deletedId;
+      return await this._repository.delete(id);
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }

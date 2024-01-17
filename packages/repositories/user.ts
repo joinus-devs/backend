@@ -1,13 +1,13 @@
-import { DataSource, Repository } from "typeorm";
-import { User, UserCreate, UserUpdate } from "../models";
-import { Maybe, Nullable } from "../types";
+import { DataSource, QueryFailedError, Repository } from "typeorm";
+import { User } from "../models";
+import { ErrorResponse, Nullable } from "../types";
 
 export interface IUserRepository {
   find(id: number): Promise<Nullable<User>>;
   findAll(): Promise<User[]>;
-  create(userCreate: UserCreate): Promise<Nullable<User>>;
-  update(id: number, userUpdate: UserUpdate): Promise<Nullable<User>>;
-  delete(id: number): Promise<Maybe<number>>;
+  create(user: User): Promise<number>;
+  update(user: User): Promise<number>;
+  delete(id: number): Promise<number>;
 }
 
 export class UserRepository implements IUserRepository {
@@ -44,21 +44,23 @@ export class UserRepository implements IUserRepository {
     }
   };
 
-  create = async (userCreate: UserCreate) => {
+  create = async (user: User) => {
     try {
-      const result = await this._db.insert(userCreate);
-      const insertedId = result.identifiers[0].id as number;
-      return this.find(insertedId);
+      const result = await this._db.save(user);
+      return result.id;
     } catch (err) {
       console.log(err);
+      if (err instanceof QueryFailedError && err.driverError.errno === 1062) {
+        throw new ErrorResponse(409, "Unique constraint error");
+      }
       throw err;
     }
   };
 
-  update = async (id: number, userUpdate: UserUpdate) => {
+  update = async (user: User) => {
     try {
-      await this._db.update(id, userUpdate);
-      return this.find(id);
+      const result = await this._db.save(user);
+      return result.id;
     } catch (err) {
       console.log(err);
       throw err;
