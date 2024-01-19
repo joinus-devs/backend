@@ -29,10 +29,10 @@ export class ClubController implements IClubController {
   find = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = Number(req.params.id);
-      const user = await this._service.find(id);
+      const club = await this._service.findWithUsers(id);
       res
         .status(200)
-        .json(new SuccessResponse(user, "Club retrieved successfully").toDTO());
+        .json(new SuccessResponse(club, "Club retrieved successfully").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -41,11 +41,11 @@ export class ClubController implements IClubController {
 
   findAll = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const users = await this._service.findAll();
+      const clubs = await this._service.findAll();
       res
         .status(200)
         .json(
-          new SuccessResponse(users, "Clubs retrieved successfully").toDTO()
+          new SuccessResponse(clubs, "Clubs retrieved successfully").toDTO()
         );
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
@@ -55,11 +55,11 @@ export class ClubController implements IClubController {
 
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userCreate = req.body;
-      const user = await this._service.create(userCreate);
+      const clubCreate = req.body;
+      const club = await this._service.create(clubCreate);
       res
         .status(201)
-        .json(new SuccessResponse(user, "Club created successfully").toDTO());
+        .json(new SuccessResponse(club, "Club created successfully").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -69,11 +69,11 @@ export class ClubController implements IClubController {
   update = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = Number(req.params.id);
-      const userUpdate = req.body;
-      const user = await this._service.update(id, userUpdate);
+      const clubUpdate = req.body;
+      const club = await this._service.update(id, clubUpdate);
       res
         .status(200)
-        .json(new SuccessResponse(user, "Club updated successfully").toDTO());
+        .json(new SuccessResponse(club, "Club updated successfully").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);

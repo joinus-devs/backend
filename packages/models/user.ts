@@ -1,8 +1,9 @@
-import { Column, Entity, ManyToMany } from "typeorm";
+import { Column, Entity, JoinTable, OneToMany } from "typeorm";
 import { Club } from "./club";
-import { Scheme } from "./common";
+import { IdEntity } from "./common";
+import { UserInClub } from "./userInClub";
 
-export interface UserScheme extends Scheme {
+export interface UserScheme extends IdEntity {
   password: string;
   social_id: string;
   name: string;
@@ -13,14 +14,14 @@ export interface UserScheme extends Scheme {
 
 export type UserDto = Omit<UserScheme, "password">;
 
-export type UserCreate = Omit<UserScheme, keyof Scheme>;
+export type UserCreate = Omit<UserScheme, keyof IdEntity>;
 
 export type UserUpdate = Partial<
   Pick<UserCreate, "name" | "sex" | "phone" | "email">
 >;
 
 @Entity("users")
-export class User extends Scheme implements UserScheme {
+export class User extends IdEntity implements UserScheme {
   @Column()
   password: string;
 
@@ -39,7 +40,8 @@ export class User extends Scheme implements UserScheme {
   @Column({ unique: true })
   email: string;
 
-  @ManyToMany(() => Club)
+  @OneToMany(() => UserInClub, (usersInClubs) => usersInClubs.club)
+  @JoinTable({ name: "club" })
   clubs: Club[];
 }
 

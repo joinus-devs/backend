@@ -2,8 +2,8 @@ import dotenv from "dotenv";
 import { DataSource } from "typeorm";
 import { User } from "../models";
 import { Club } from "../models/club";
-import CreateClubTable1705433210498 from "./club";
-import CreateUsersTable1705424568911 from "./user";
+import { UserInClub } from "../models/userInClub";
+import CreateTables1705433210498 from "./creates";
 
 dotenv.config();
 
@@ -16,6 +16,6 @@ export default new DataSource({
   database: process.env.DB_NAME,
   synchronize: false,
   logging: true,
-  entities: [User, Club],
-  migrations: [CreateUsersTable1705424568911, CreateClubTable1705433210498],
+  entities: [User, UserInClub, Club],
+  migrations: [CreateTables1705433210498],
 });

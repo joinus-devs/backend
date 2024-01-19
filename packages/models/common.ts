@@ -5,10 +5,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 
-export abstract class Scheme {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export abstract class TimesEntity {
   @CreateDateColumn()
   created_at: Date;
 
@@ -17,4 +14,9 @@ export abstract class Scheme {
 
   @DeleteDateColumn({ nullable: true })
   deleted_at: Date;
+}
+
+export abstract class IdEntity extends TimesEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
 }

@@ -1,8 +1,9 @@
-import { Column, Entity, ManyToMany } from "typeorm";
-import { Scheme } from "./common";
+import { Column, Entity, JoinTable, ManyToMany, OneToMany } from "typeorm";
+import { IdEntity } from "./common";
 import { User } from "./user";
+import { UserInClub } from "./userInClub";
 
-export interface ClubScheme extends Scheme {
+export interface ClubScheme extends IdEntity {
   name: string;
   description: string;
   capacity: number;
@@ -10,12 +11,14 @@ export interface ClubScheme extends Scheme {
 
 export type ClubDto = ClubScheme;
 
-export type ClubCreate = Omit<ClubScheme, keyof Scheme>;
+export type ClubWithUsersDto = ClubDto & { users: User[] };
+
+export type ClubCreate = Omit<ClubScheme, keyof IdEntity>;
 
 export type ClubUpdate = ClubCreate;
 
 @Entity("clubs")
-export class Club extends Scheme implements ClubScheme {
+export class Club extends IdEntity implements ClubScheme {
   @Column()
   name: string;
 
@@ -25,12 +28,18 @@ export class Club extends Scheme implements ClubScheme {
   @Column()
   capacity: number;
 
-  @ManyToMany(() => User)
+  @OneToMany(() => UserInClub, (usersInClubs) => usersInClubs.club)
+  @JoinTable({ name: "user" })
   users: User[];
 }
 
 export class ClubConverter {
   public static toDto = (club: Club): ClubDto => {
+    const dto = { ...club };
+    return dto;
+  };
+
+  public static toDtoWithUsers = (club: Club): ClubWithUsersDto => {
     const dto = { ...club };
     return dto;
   };
