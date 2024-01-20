@@ -5,6 +5,7 @@ import {
   ClubUpdate,
   ClubWithUsersDto,
 } from "../models";
+import { IUserRepository } from "../repositories";
 import { IClubRepository } from "../repositories/club";
 import { ErrorResponse, Nullable } from "../types";
 
@@ -19,15 +20,23 @@ export interface IClubService {
 
 export class ClubService implements IClubService {
   private static _instance: Nullable<ClubService> = null;
-  private _repository: IClubRepository;
+  private _clubRepository: IClubRepository;
+  private _userRepository: IUserRepository;
 
-  private constructor(repository: IClubRepository) {
-    this._repository = repository;
+  private constructor(
+    clubRepository: IClubRepository,
+    userRepository: IUserRepository
+  ) {
+    this._clubRepository = clubRepository;
+    this._userRepository = userRepository;
   }
 
-  static getInstance(repository: IClubRepository) {
+  static getInstance(
+    clubRepository: IClubRepository,
+    userRepository: IUserRepository
+  ) {
     if (!this._instance) {
-      this._instance = new ClubService(repository);
+      this._instance = new ClubService(clubRepository, userRepository);
     }
 
     return this._instance;
@@ -36,7 +45,7 @@ export class ClubService implements IClubService {
   find = async (id: number) => {
     let club;
     try {
-      club = await this._repository.find(id);
+      club = await this._clubRepository.find(id);
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }
@@ -49,7 +58,7 @@ export class ClubService implements IClubService {
   findWithUsers = async (id: number) => {
     let club;
     try {
-      club = await this._repository.findWithUsers(id);
+      club = await this._clubRepository.findWithUsers(id);
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }
@@ -61,7 +70,7 @@ export class ClubService implements IClubService {
 
   findAll = async () => {
     try {
-      const clubs = await this._repository.findAll();
+      const clubs = await this._clubRepository.findAll();
       return clubs.map((club) => ClubConverter.toDto(club));
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
@@ -70,9 +79,13 @@ export class ClubService implements IClubService {
 
   create = async (clubCreate: ClubCreate) => {
     try {
-      return await this._repository.create(
-        ClubConverter.toEntityFromCreate(clubCreate)
-      );
+      const user = await this._userRepository.find(clubCreate.user);
+      if (!user) {
+        throw new ErrorResponse(404, "User not found");
+      }
+      const club = ClubConverter.toEntityFromCreate(clubCreate);
+      club.users = [user];
+      return await this._clubRepository.create(club);
     } catch (err) {
       if (err instanceof ErrorResponse) {
         throw err;
@@ -83,7 +96,7 @@ export class ClubService implements IClubService {
 
   update = async (id: number, clubUpdate: ClubUpdate) => {
     try {
-      return await this._repository.update(
+      return await this._clubRepository.update(
         ClubConverter.toEntityFromUpdate(id, clubUpdate)
       );
     } catch (err) {
@@ -93,7 +106,7 @@ export class ClubService implements IClubService {
 
   delete = async (id: number) => {
     try {
-      return await this._repository.delete(id);
+      return await this._clubRepository.delete(id);
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }

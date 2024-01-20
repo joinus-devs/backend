@@ -1,5 +1,5 @@
 import { DataSource, QueryFailedError, Repository } from "typeorm";
-import { Club } from "../models";
+import { Club, User } from "../models";
 import { ErrorResponse, Nullable } from "../types";
 
 export interface IClubRepository {
@@ -38,11 +38,10 @@ export class ClubRepository implements IClubRepository {
 
   findWithUsers = async (id: number) => {
     try {
-      return await this._db
-        .createQueryBuilder("club")
-        .leftJoinAndSelect("club.users", "user")
-        .where("club.id = :id", { id })
-        .getOne();
+      return await this._db.findOne({
+        where: { id },
+        relations: ["users"],
+      });
     } catch (err) {
       console.log(err);
       throw err;
@@ -60,7 +59,8 @@ export class ClubRepository implements IClubRepository {
 
   create = async (club: Club) => {
     try {
-      const result = await this._db.save(club);
+      const newClub = this._db.create(club);
+      const result = await this._db.save(newClub);
       return result.id;
     } catch (err) {
       console.log(err);

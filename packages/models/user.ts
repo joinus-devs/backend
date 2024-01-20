@@ -14,6 +14,8 @@ export interface UserScheme extends IdEntity {
 
 export type UserDto = Omit<UserScheme, "password">;
 
+export type UserWithClubsDto = UserDto & { clubs: Club[] };
+
 export type UserCreate = Omit<UserScheme, keyof IdEntity>;
 
 export type UserUpdate = Partial<
@@ -41,12 +43,17 @@ export class User extends IdEntity implements UserScheme {
   email: string;
 
   @OneToMany(() => UserInClub, (usersInClubs) => usersInClubs.club)
-  @JoinTable({ name: "club" })
+  @JoinTable({ name: "clubs" })
   clubs: Club[];
 }
 
 export class UserConverter {
   public static toDto = (user: User): UserDto => {
+    const { password, ...dto } = user;
+    return dto;
+  };
+
+  public static toDtoWithClubs = (user: User): UserWithClubsDto => {
     const { password, ...dto } = user;
     return dto;
   };

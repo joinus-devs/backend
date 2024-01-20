@@ -29,7 +29,7 @@ export class UserController implements IUserController {
   find = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = Number(req.params.id);
-      const user = await this._service.find(id);
+      const user = await this._service.findWithClubs(id);
       res
         .status(200)
         .json(new SuccessResponse(user, "User retrieved successfully").toDTO());

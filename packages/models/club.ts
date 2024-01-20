@@ -1,4 +1,4 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToMany } from "typeorm";
+import { Column, Entity, JoinTable, OneToMany } from "typeorm";
 import { IdEntity } from "./common";
 import { User } from "./user";
 import { UserInClub } from "./userInClub";
@@ -13,7 +13,9 @@ export type ClubDto = ClubScheme;
 
 export type ClubWithUsersDto = ClubDto & { users: User[] };
 
-export type ClubCreate = Omit<ClubScheme, keyof IdEntity>;
+export type ClubCreate = Omit<ClubScheme, keyof IdEntity> & {
+  user: number;
+};
 
 export type ClubUpdate = ClubCreate;
 
@@ -29,7 +31,7 @@ export class Club extends IdEntity implements ClubScheme {
   capacity: number;
 
   @OneToMany(() => UserInClub, (usersInClubs) => usersInClubs.club)
-  @JoinTable({ name: "user" })
+  @JoinTable({ name: "users" })
   users: User[];
 }
 

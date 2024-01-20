@@ -70,7 +70,10 @@ class AppService {
 
   constructor(appRepository: AppRepository) {
     this._userService = UserService.getInstance(appRepository.userRepository);
-    this._clubService = ClubService.getInstance(appRepository.clubRepository);
+    this._clubService = ClubService.getInstance(
+      appRepository.clubRepository,
+      appRepository.userRepository
+    );
   }
 
   get userService() {
