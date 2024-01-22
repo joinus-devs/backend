@@ -38,10 +38,12 @@ export class ClubRepository implements IClubRepository {
 
   findWithUsers = async (id: number) => {
     try {
-      return await this._db.findOne({
-        where: { id },
-        relations: ["users"],
-      });
+      return await this._db
+        .createQueryBuilder("club")
+        .leftJoinAndSelect("club.users", "users")
+        .leftJoinAndSelect("users.user", "user")
+        .where("club.id = :id", { id })
+        .getOne();
     } catch (err) {
       console.log(err);
       throw err;

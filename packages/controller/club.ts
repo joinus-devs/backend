@@ -1,10 +1,16 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { IClubService } from "../services/club";
-import { ErrorResponse, Nullable, SuccessResponse } from "../types";
+import {
+  ErrorResponse,
+  IdQueryParams,
+  Nullable,
+  PageQueryParams,
+  SuccessResponse,
+} from "../types";
 
 export interface IClubController {
-  find: RequestHandler;
-  findAll: RequestHandler;
+  find: RequestHandler<IdQueryParams>;
+  findAll: RequestHandler<PageQueryParams>;
   create: RequestHandler;
   update: RequestHandler;
   delete: RequestHandler;
@@ -26,7 +32,11 @@ export class ClubController implements IClubController {
     return this._instance;
   }
 
-  find = async (req: Request, res: Response, next: NextFunction) => {
+  find = async (
+    req: Request<IdQueryParams>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const id = Number(req.params.id);
       const club = await this._service.findWithUsers(id);
@@ -39,7 +49,11 @@ export class ClubController implements IClubController {
     }
   };
 
-  findAll = async (req: Request, res: Response, next: NextFunction) => {
+  findAll = async (
+    req: Request<PageQueryParams>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const clubs = await this._service.findAll();
       res

@@ -2,10 +2,10 @@ import bodyParser from "body-parser";
 import express from "express";
 import "reflect-metadata";
 import swaggerUi from "swagger-ui-express";
-import AppManager from "./packages/app";
 import Swagger from "./packages/docs";
 import { errorHandler, logger } from "./packages/middleware";
 import { DataSource } from "./packages/migrations";
+import { AppProvider } from "./packages/modules";
 import initRoutes from "./packages/routes";
 
 const main = async () => {
@@ -13,7 +13,7 @@ const main = async () => {
   const port = 8000;
 
   await DataSource.initialize();
-  const appManager = AppManager.getInstance(DataSource);
+  const appManager = AppProvider.getInstance(DataSource);
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
   app.use(logger);

@@ -1,21 +1,24 @@
 import { DataSource } from "typeorm";
-import { IUserController, UserController } from "./controller";
-import { ClubController, IClubController } from "./controller/club";
-import { IUserRepository, UserRepository } from "./repositories";
-import { ClubRepository, IClubRepository } from "./repositories/club";
-import { IUserService, UserService } from "./services";
-import { ClubService, IClubService } from "./services/club";
-import { Nullable } from "./types";
+import { TransactionManager } from ".";
+import { IUserController, UserController } from "../controller";
+import { ClubController, IClubController } from "../controller/club";
+import { IUserRepository, UserRepository } from "../repositories";
+import { ClubRepository, IClubRepository } from "../repositories/club";
+import { IUserService, UserService } from "../services";
+import { ClubService, IClubService } from "../services/club";
+import { Nullable } from "../types";
 
-class AppManager {
-  private static _instance: Nullable<AppManager> = null;
+class AppProvider {
+  private static _instance: Nullable<AppProvider> = null;
   private _datasource: DataSource;
+  private _transactionManager: TransactionManager;
   private _appRepository: AppRepository;
   private _appService: AppService;
   private _appController: AppController;
 
   private constructor(datasource: DataSource) {
     this._datasource = datasource;
+    this._transactionManager = this.initTransactionManager();
     this._appRepository = this.initRepository();
     this._appService = this.initService();
     this._appController = this.initController();
@@ -23,10 +26,14 @@ class AppManager {
 
   static getInstance(database: DataSource) {
     if (!this._instance) {
-      this._instance = new AppManager(database);
+      this._instance = new AppProvider(database);
     }
 
     return this._instance;
+  }
+
+  private initTransactionManager() {
+    return new TransactionManager(this._datasource);
   }
 
   private initRepository() {
@@ -34,7 +41,7 @@ class AppManager {
   }
 
   private initService() {
-    return new AppService(this._appRepository);
+    return new AppService(this._appRepository, this._transactionManager);
   }
 
   private initController() {
@@ -68,9 +75,13 @@ class AppService {
   private _userService: IUserService;
   private _clubService: IClubService;
 
-  constructor(appRepository: AppRepository) {
+  constructor(
+    appRepository: AppRepository,
+    transactionManager: TransactionManager
+  ) {
     this._userService = UserService.getInstance(appRepository.userRepository);
     this._clubService = ClubService.getInstance(
+      transactionManager,
       appRepository.clubRepository,
       appRepository.userRepository
     );
@@ -103,4 +114,4 @@ class AppController {
   }
 }
 
-export default AppManager;
+export default AppProvider;

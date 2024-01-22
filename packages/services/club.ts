@@ -6,6 +6,7 @@ import {
   ClubWithUsersDto,
 } from "../models";
 import { UserInClub } from "../models/userInClub";
+import { TransactionManager } from "../modules";
 import { IUserRepository } from "../repositories";
 import { IClubRepository } from "../repositories/club";
 import { ErrorResponse, Nullable } from "../types";
@@ -21,23 +22,31 @@ export interface IClubService {
 
 export class ClubService implements IClubService {
   private static _instance: Nullable<ClubService> = null;
+  private _transactionManager: TransactionManager;
   private _clubRepository: IClubRepository;
   private _userRepository: IUserRepository;
 
   private constructor(
+    transactionManager: TransactionManager,
     clubRepository: IClubRepository,
     userRepository: IUserRepository
   ) {
+    this._transactionManager = transactionManager;
     this._clubRepository = clubRepository;
     this._userRepository = userRepository;
   }
 
   static getInstance(
+    transactionManager: TransactionManager,
     clubRepository: IClubRepository,
     userRepository: IUserRepository
   ) {
     if (!this._instance) {
-      this._instance = new ClubService(clubRepository, userRepository);
+      this._instance = new ClubService(
+        transactionManager,
+        clubRepository,
+        userRepository
+      );
     }
 
     return this._instance;
@@ -80,16 +89,18 @@ export class ClubService implements IClubService {
 
   create = async (clubCreate: ClubCreate) => {
     try {
-      const user = await this._userRepository.findWithClubs(clubCreate.user);
-      if (!user) {
-        throw new ErrorResponse(404, "User not found");
-      }
-      const club = ClubConverter.toEntityFromCreate(clubCreate);
-      const userInClub = new UserInClub();
-      userInClub.user = user;
-      userInClub.club = club;
-      club.users = [userInClub];
-      return await this._clubRepository.create(club);
+      return this._transactionManager.withTransaction(async () => {
+        const user = await this._userRepository.findWithClubs(clubCreate.user);
+        if (!user) {
+          throw new ErrorResponse(404, "User not found");
+        }
+        const club = ClubConverter.toEntityFromCreate(clubCreate);
+        const userInClub = new UserInClub();
+        userInClub.user = user;
+        userInClub.club = club;
+        club.users = [userInClub];
+        return await this._clubRepository.create(club);
+      });
     } catch (err) {
       if (err instanceof ErrorResponse) {
         throw err;
