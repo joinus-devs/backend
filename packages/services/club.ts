@@ -5,6 +5,7 @@ import {
   ClubUpdate,
   ClubWithUsersDto,
 } from "../models";
+import { UserInClub } from "../models/userInClub";
 import { IUserRepository } from "../repositories";
 import { IClubRepository } from "../repositories/club";
 import { ErrorResponse, Nullable } from "../types";
@@ -79,12 +80,15 @@ export class ClubService implements IClubService {
 
   create = async (clubCreate: ClubCreate) => {
     try {
-      const user = await this._userRepository.find(clubCreate.user);
+      const user = await this._userRepository.findWithClubs(clubCreate.user);
       if (!user) {
         throw new ErrorResponse(404, "User not found");
       }
       const club = ClubConverter.toEntityFromCreate(clubCreate);
-      club.users = [user];
+      const userInClub = new UserInClub();
+      userInClub.user = user;
+      userInClub.club = club;
+      club.users = [userInClub];
       return await this._clubRepository.create(club);
     } catch (err) {
       if (err instanceof ErrorResponse) {

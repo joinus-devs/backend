@@ -1,5 +1,4 @@
-import { Column, Entity, JoinTable, OneToMany } from "typeorm";
-import { Club } from "./club";
+import { Column, Entity, OneToMany } from "typeorm";
 import { IdEntity } from "./common";
 import { UserInClub } from "./userInClub";
 
@@ -14,7 +13,7 @@ export interface UserScheme extends IdEntity {
 
 export type UserDto = Omit<UserScheme, "password">;
 
-export type UserWithClubsDto = UserDto & { clubs: Club[] };
+export type UserWithClubsDto = UserDto & { clubs: UserInClub[] };
 
 export type UserCreate = Omit<UserScheme, keyof IdEntity>;
 
@@ -42,9 +41,10 @@ export class User extends IdEntity implements UserScheme {
   @Column({ unique: true })
   email: string;
 
-  @OneToMany(() => UserInClub, (usersInClubs) => usersInClubs.club)
-  @JoinTable({ name: "clubs" })
-  clubs: Club[];
+  @OneToMany(() => UserInClub, (userInClub) => userInClub.user, {
+    cascade: true,
+  })
+  public clubs: UserInClub[];
 }
 
 export class UserConverter {

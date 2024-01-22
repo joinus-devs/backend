@@ -1,5 +1,5 @@
 import { DataSource, QueryFailedError, Repository } from "typeorm";
-import { Club, User } from "../models";
+import { Club } from "../models";
 import { ErrorResponse, Nullable } from "../types";
 
 export interface IClubRepository {
@@ -59,11 +59,9 @@ export class ClubRepository implements IClubRepository {
 
   create = async (club: Club) => {
     try {
-      const newClub = this._db.create(club);
-      const result = await this._db.save(newClub);
+      const result = await this._db.save(club);
       return result.id;
     } catch (err) {
-      console.log(err);
       if (err instanceof QueryFailedError && err.driverError.errno === 1062) {
         throw new ErrorResponse(409, "Unique constraint error");
       }
