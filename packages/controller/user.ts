@@ -5,7 +5,6 @@ import { ErrorResponse, Nullable, SuccessResponse } from "../types";
 export interface IUserController {
   find: RequestHandler;
   findAll: RequestHandler;
-  create: RequestHandler;
   update: RequestHandler;
   delete: RequestHandler;
 }
@@ -47,19 +46,6 @@ export class UserController implements IUserController {
         .json(
           new SuccessResponse(users, "Users retrieved successfully").toDTO()
         );
-    } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
-      next(err);
-    }
-  };
-
-  create = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const userCreate = req.body;
-      const user = await this._service.create(userCreate);
-      res
-        .status(201)
-        .json(new SuccessResponse(user, "User created successfully").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);

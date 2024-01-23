@@ -7,8 +7,7 @@ import {
 } from "../models";
 import { UserInClub } from "../models/userInClub";
 import { TransactionManager } from "../modules";
-import { IUserRepository } from "../repositories";
-import { IClubRepository } from "../repositories/club";
+import { IClubRepository, IUserRepository } from "../repositories";
 import { ErrorResponse, Nullable } from "../types";
 
 export interface IClubService {

@@ -3,7 +3,7 @@ import express from "express";
 import "reflect-metadata";
 import swaggerUi from "swagger-ui-express";
 import Swagger from "./packages/docs";
-import { errorHandler, logger } from "./packages/middleware";
+import { authenticator, errorHandler, logger } from "./packages/middleware";
 import { DataSource } from "./packages/migrations";
 import { AppProvider } from "./packages/modules";
 import initRoutes from "./packages/routes";
@@ -17,6 +17,7 @@ const main = async () => {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
   app.use(logger);
+  app.use(authenticator);
   app.use(initRoutes(appManager));
   app.use(errorHandler);
   app.use(

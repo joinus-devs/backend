@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { IClubController } from "../controller/club";
+import { IClubController } from "../controller";
 import Swagger from "../docs";
 
 const clubRoutes = (controller: IClubController) => {

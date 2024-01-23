@@ -4,6 +4,7 @@ import { ErrorResponse, Nullable } from "../types";
 
 export interface IUserRepository {
   find(id: number): Promise<Nullable<User>>;
+  findByEmail(email: string): Promise<Nullable<User>>;
   findWithClubs(id: number): Promise<Nullable<User>>;
   findAll(): Promise<User[]>;
   create(user: User): Promise<number>;
@@ -30,6 +31,15 @@ export class UserRepository implements IUserRepository {
   find = async (id: number) => {
     try {
       return await this._db.findOne({ where: { id } });
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  };
+
+  findByEmail = async (email: string) => {
+    try {
+      return await this._db.findOne({ where: { email } });
     } catch (err) {
       console.log(err);
       throw err;

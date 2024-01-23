@@ -1,7 +1,8 @@
 import { cloneDeep } from "lodash";
 import swaggerJSDoc, { Parameter, Response, Schema } from "swagger-jsdoc";
-import { ClubCreateDoc, ClubUpdateDoc } from "./club";
-import { UserCreateDoc, UserUpdateDoc } from "./user";
+import { SigninParmasDoc, SignupParamsDoc, SinginResponseDoc } from "./auth";
+import { ClubCreateDoc, ClubDoc, ClubDtoDoc, ClubUpdateDoc } from "./club";
+import { UserDoc, UserDtoDoc, UserUpdateDoc } from "./user";
 
 class Swagger {
   private static _instance: Swagger;
@@ -47,21 +48,25 @@ class Swagger {
           Scheme: Swagger._scheme,
           SuccessResponse: Swagger._successResponse,
           ErrorResponse: Swagger._errorResponse,
-          User: Swagger.makeScheme(UserCreateDoc),
+          User: Swagger.makeScheme(UserDoc),
+          Club: Swagger.makeScheme(ClubDoc),
         },
         parameters: {
-          UserCreate: Swagger.makeBody(UserCreateDoc),
+          SigninParams: Swagger.makeBody(SigninParmasDoc),
+          SignupParams: Swagger.makeBody(SignupParamsDoc),
           UserUpdate: Swagger.makeBody(UserUpdateDoc),
           ClubCreate: Swagger.makeBody(ClubCreateDoc),
           ClubUpdate: Swagger.makeBody(ClubUpdateDoc),
         },
         responses: {
-          UserResponse: Swagger.makeSuccessResponse(UserCreateDoc),
-          UsersResponse: Swagger.makeSuccessResponse([UserCreateDoc]),
-          ClubResponse: Swagger.makeSuccessResponse(ClubCreateDoc),
-          ClubsResponse: Swagger.makeSuccessResponse([ClubCreateDoc]),
+          SigninResponse: Swagger.makeSuccessResponse(SinginResponseDoc, false),
+          UserResponse: Swagger.makeSuccessResponse(UserDtoDoc),
+          UsersResponse: Swagger.makeSuccessResponse([UserDtoDoc]),
+          ClubResponse: Swagger.makeSuccessResponse(ClubDtoDoc),
+          ClubsResponse: Swagger.makeSuccessResponse([ClubDtoDoc]),
           NumberResponse: Swagger.makeSuccessResponse(
             { type: "number", example: 1 },
+            false,
             false
           ),
         },
@@ -94,15 +99,27 @@ class Swagger {
     },
   });
 
-  static makeSuccessResponse = (data: any, withScheme = true): Response => {
+  static makeSuccessResponse = (
+    data: any,
+    withScheme = true,
+    isObject = true
+  ): Response => {
     const newData = { ...cloneDeep(Swagger._successResponse) };
     if (Array.isArray(data)) {
       newData.properties.data = {
         type: "array",
-        items: withScheme ? this.makeScheme(data[0]) : data,
+        items: withScheme
+          ? this.makeScheme(data[0])
+          : isObject
+            ? { properties: { ...cloneDeep(data) } }
+            : data,
       };
     } else {
-      newData.properties.data = withScheme ? this.makeScheme(data) : data;
+      newData.properties.data = withScheme
+        ? this.makeScheme(data)
+        : isObject
+          ? { properties: { ...cloneDeep(data) } }
+          : data;
     }
     return {
       description: "success",
@@ -114,15 +131,27 @@ class Swagger {
     };
   };
 
-  static makeErrorResponse = (data: any, withScheme = true): Response => {
+  static makeErrorResponse = (
+    data: any,
+    withScheme = true,
+    isObject = true
+  ): Response => {
     const newData = { ...cloneDeep(Swagger._errorResponse) };
     if (Array.isArray(data)) {
       newData.properties.data = {
         type: "array",
-        items: withScheme ? this.makeScheme(data[0]) : data,
+        items: withScheme
+          ? this.makeScheme(data[0])
+          : isObject
+            ? { properties: { ...cloneDeep(data) } }
+            : data,
       };
     } else {
-      newData.properties.data = withScheme ? this.makeScheme(data) : data;
+      newData.properties.data = withScheme
+        ? this.makeScheme(data)
+        : isObject
+          ? { properties: { ...cloneDeep(data) } }
+          : data;
     }
     return {
       description: "error",

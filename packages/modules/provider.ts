@@ -1,11 +1,27 @@
 import { DataSource } from "typeorm";
 import { TransactionManager } from ".";
-import { IUserController, UserController } from "../controller";
-import { ClubController, IClubController } from "../controller/club";
-import { IUserRepository, UserRepository } from "../repositories";
-import { ClubRepository, IClubRepository } from "../repositories/club";
-import { IUserService, UserService } from "../services";
-import { ClubService, IClubService } from "../services/club";
+import {
+  AuthController,
+  ClubController,
+  IAuthController,
+  IClubController,
+  IUserController,
+  UserController,
+} from "../controller";
+import {
+  ClubRepository,
+  IClubRepository,
+  IUserRepository,
+  UserRepository,
+} from "../repositories";
+import {
+  AuthService,
+  ClubService,
+  IAuthService,
+  IClubService,
+  IUserService,
+  UserService,
+} from "../services";
 import { Nullable } from "../types";
 
 class AppProvider {
@@ -72,6 +88,7 @@ class AppRepository {
 }
 
 class AppService {
+  private _authService: IAuthService;
   private _userService: IUserService;
   private _clubService: IClubService;
 
@@ -79,12 +96,17 @@ class AppService {
     appRepository: AppRepository,
     transactionManager: TransactionManager
   ) {
+    this._authService = AuthService.getInstance(appRepository.userRepository);
     this._userService = UserService.getInstance(appRepository.userRepository);
     this._clubService = ClubService.getInstance(
       transactionManager,
       appRepository.clubRepository,
       appRepository.userRepository
     );
+  }
+
+  get authService() {
+    return this._authService;
   }
 
   get userService() {
@@ -97,12 +119,21 @@ class AppService {
 }
 
 class AppController {
+  private _authController: IAuthController;
   private _userController: IUserController;
   private _clubController: IClubController;
 
   constructor(appService: AppService) {
+    this._authController = AuthController.getInstance(
+      appService.authService,
+      appService.userService
+    );
     this._userController = UserController.getInstance(appService.userService);
     this._clubController = ClubController.getInstance(appService.clubService);
+  }
+
+  get authController() {
+    return this._authController;
   }
 
   get userController() {

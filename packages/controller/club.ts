@@ -1,5 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
-import { IClubService } from "../services/club";
+import { IClubService } from "../services";
 import {
   ErrorResponse,
   IdQueryParams,
