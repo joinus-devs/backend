@@ -17,9 +17,7 @@ export type UserWithClubsDto = UserDto & { clubs: UserInClub[] };
 
 export type UserCreate = Omit<UserScheme, keyof IdEntity>;
 
-export type UserUpdate = Partial<
-  Pick<UserCreate, "name" | "sex" | "phone" | "email">
->;
+export type UserUpdate = UserCreate;
 
 @Entity("users")
 export class User extends IdEntity implements UserScheme {

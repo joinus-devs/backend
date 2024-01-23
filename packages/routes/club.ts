@@ -19,34 +19,34 @@ export default clubRoutes;
 
 const swagger = Swagger.getInstance();
 swagger.add({
-  "/users/": {
+  "/clubs/": {
     get: {
-      summary: "Get all users",
-      tags: ["User"],
-      responses: { 200: { $ref: "#/components/responses/UsersResponse" } },
+      summary: "Get all club",
+      tags: ["Club"],
+      responses: { 200: { $ref: "#/components/responses/ClubsResponse" } },
     },
     post: {
-      summary: "Create a user",
-      tags: ["User"],
-      parameters: [{ $ref: "#/components/parameters/UserCreate" }],
+      summary: "Create a club",
+      tags: ["Club"],
+      parameters: [{ $ref: "#/components/parameters/ClubCreate" }],
       responses: { 200: { $ref: "#/components/responses/NumberResponse" } },
     },
   },
-  "/users/{id}": {
+  "/clubs/{id}": {
     get: {
-      summary: "Get a user",
-      tags: ["User"],
-      responses: { 200: { $ref: "#/components/responses/UserResponse" } },
+      summary: "Get a club",
+      tags: ["Club"],
+      responses: { 200: { $ref: "#/components/responses/ClubResponse" } },
     },
     put: {
-      summary: "Update a user",
-      tags: ["User"],
-      parameters: [{ $ref: "#/components/parameters/UserUpdate" }],
+      summary: "Update a club",
+      tags: ["Club"],
+      parameters: [{ $ref: "#/components/parameters/ClubUpdate" }],
       responses: { 200: { $ref: "#/components/responses/NumberResponse" } },
     },
     delete: {
-      summary: "Delete a user",
-      tags: ["User"],
+      summary: "Delete a club",
+      tags: ["Club"],
       responses: { 200: { $ref: "#/components/responses/NumberResponse" } },
     },
   },
