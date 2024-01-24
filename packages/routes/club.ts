@@ -19,7 +19,7 @@ export default clubRoutes;
 
 const swagger = Swagger.getInstance();
 swagger.add({
-  "/clubs/": {
+  "/clubs": {
     get: {
       summary: "Get all club",
       tags: ["Club"],

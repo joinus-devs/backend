@@ -19,7 +19,7 @@ export default userRoutes;
 
 const swagger = Swagger.getInstance();
 swagger.add({
-  "/users/": {
+  "/users": {
     get: {
       summary: "Get all users",
       tags: ["User"],

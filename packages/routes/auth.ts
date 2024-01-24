@@ -33,7 +33,7 @@ export default authRoutes;
 
 const swagger = Swagger.getInstance();
 swagger.add({
-  me: {
+  "/me": {
     get: {
       summary: "Get current user",
       tags: ["Auth"],
