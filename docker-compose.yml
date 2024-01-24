@@ -3,24 +3,33 @@ services:
   db:
     image: mysql:8.0
     ports:
-      - "3306:3306"
+      - 3306:3306
     volumes:
       - db-data:/var/lib/mysql
-    network_mode: host
     environment:
       - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_ALLOW_EMPTY_PASSWORD=1
+    networks:
+      - backend
 
   backend:
     build:
       context: .
+    ports:
+      - 8000:8000
     environment:
-      - DB_HOST=localhost
+      - DB_HOST=host.docker.internal
       - DB_PORT=3306
       - DB_USER=root
+      - DB_PASSWORD=root
       - DB_NAME=joinus
       - JWT_SECRET=sunioj
-    network_mode: host
+    networks:
+      - backend
+    depends_on:
+      - db
 
 volumes:
   db-data:
+
+networks:
+  backend:
