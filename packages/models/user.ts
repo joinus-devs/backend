@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany } from "typeorm";
 import { IdEntity } from "./common";
+import { Feed } from "./feed";
 import { UserInClub } from "./userInClub";
 
 export interface UserScheme extends IdEntity {
@@ -43,6 +44,9 @@ export class User extends IdEntity implements UserScheme {
     cascade: true,
   })
   public clubs: UserInClub[];
+
+  @OneToMany(() => Feed, (feed) => feed.user)
+  public feeds: Feed[];
 }
 
 export class UserConverter {

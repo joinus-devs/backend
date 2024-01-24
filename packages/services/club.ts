@@ -14,7 +14,7 @@ export interface IClubService {
   find(id: number): Promise<Nullable<ClubDto>>;
   findWithUsers(id: number): Promise<Nullable<ClubWithUsersDto>>;
   findAll(): Promise<ClubDto[]>;
-  create(clubCreate: ClubCreate): Promise<number>;
+  create(userId: number, clubCreate: ClubCreate): Promise<number>;
   update(id: number, clubUpdate: ClubUpdate): Promise<number>;
   delete(id: number): Promise<number>;
 }
@@ -86,10 +86,10 @@ export class ClubService implements IClubService {
     }
   };
 
-  create = async (clubCreate: ClubCreate) => {
+  create = async (userId: number, clubCreate: ClubCreate) => {
     try {
       return this._transactionManager.withTransaction(async () => {
-        const user = await this._userRepository.findWithClubs(clubCreate.user);
+        const user = await this._userRepository.findWithClubs(userId);
         if (!user) {
           throw new ErrorResponse(404, "User not found");
         }

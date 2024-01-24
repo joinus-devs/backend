@@ -1,27 +1,27 @@
 import { DataSource, QueryFailedError, Repository } from "typeorm";
-import { Club } from "../models";
+import { Feed } from "../models";
 import { ErrorResponse, Nullable } from "../types";
 
-export interface IClubRepository {
-  find(id: number): Promise<Nullable<Club>>;
-  findWithUsers(id: number): Promise<Nullable<Club>>;
-  findAll(): Promise<Club[]>;
-  create(club: Club): Promise<number>;
-  update(club: Club): Promise<number>;
+export interface IFeedRepository {
+  find(id: number): Promise<Nullable<Feed>>;
+  findAll(): Promise<Feed[]>;
+  findAllByClubId(clubId: number): Promise<Feed[]>;
+  create(feed: Feed): Promise<number>;
+  update(feed: Feed): Promise<number>;
   delete(id: number): Promise<number>;
 }
 
-export class ClubRepository implements IClubRepository {
-  private static _instance: Nullable<IClubRepository> = null;
-  private _db: Repository<Club>;
+export class FeedRepository implements IFeedRepository {
+  private static _instance: Nullable<IFeedRepository> = null;
+  private _db: Repository<Feed>;
 
   private constructor(datasource: DataSource) {
-    this._db = datasource.getRepository(Club);
+    this._db = datasource.getRepository(Feed);
   }
 
   static getInstance(datasource: DataSource) {
     if (!this._instance) {
-      this._instance = new ClubRepository(datasource);
+      this._instance = new FeedRepository(datasource);
     }
 
     return this._instance;
@@ -36,11 +36,11 @@ export class ClubRepository implements IClubRepository {
     }
   };
 
-  findWithUsers = async (id: number) => {
+  findAll = async () => {
     try {
-      return await this._db.findOne({
-        where: { id },
-        relations: ["users"],
+      return await this._db.find({
+        where: { deleted_at: undefined },
+        relations: ["user", "club"],
       });
     } catch (err) {
       console.log(err);
@@ -48,18 +48,21 @@ export class ClubRepository implements IClubRepository {
     }
   };
 
-  findAll = async () => {
+  findAllByClubId = async (clubId: number) => {
     try {
-      return await this._db.find({ where: { deleted_at: undefined } });
+      return await this._db.find({
+        where: { club_id: clubId, deleted_at: undefined },
+        relations: ["user"],
+      });
     } catch (err) {
       console.log(err);
       throw err;
     }
   };
 
-  create = async (club: Club) => {
+  create = async (feed: Feed) => {
     try {
-      const result = await this._db.save(club);
+      const result = await this._db.save(feed);
       return result.id;
     } catch (err) {
       if (err instanceof QueryFailedError && err.driverError.errno === 1062) {
@@ -69,9 +72,9 @@ export class ClubRepository implements IClubRepository {
     }
   };
 
-  update = async (club: Club) => {
+  update = async (feed: Feed) => {
     try {
-      const result = await this._db.save(club);
+      const result = await this._db.save(feed);
       return result.id;
     } catch (err) {
       console.log(err);

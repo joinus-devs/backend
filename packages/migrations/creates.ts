@@ -40,18 +40,45 @@ class CreateTables1705433210498 implements MigrationInterface {
     `);
 
     await queryRunner.query(`
-    create table users_in_clubs (
-      ${timesQuery}
-      user_id int not null,
-      club_id int not null,
-      primary key (user_id, club_id),
-      foreign key (user_id) references users(id),
-      foreign key (club_id) references clubs(id)
-    );
-  `);
+      create table users_in_clubs (
+        ${timesQuery}
+        user_id int not null,
+        club_id int not null,
+        primary key (user_id, club_id),
+        foreign key (user_id) references users(id),
+        foreign key (club_id) references clubs(id)
+      );
+    `);
+
+    await queryRunner.query(`
+      create table feeds (
+        ${idQuery}
+        ${timesQuery}
+        user_id int not null,
+        club_id int not null,
+        title varchar(255) not null,
+        content text not null,
+        foreign key (user_id) references users(id),
+        foreign key (club_id) references clubs(id)
+      )
+    `);
+
+    await queryRunner.query(`
+      create table comments (
+        ${idQuery}
+        ${timesQuery}
+        user_id int not null,
+        feed_id int not null,
+        content text not null,
+        foreign key (user_id) references users(id),
+        foreign key (feed_id) references feeds(id)
+      )
+    `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`drop table comments;`);
+    await queryRunner.query(`drop table feed;`);
     await queryRunner.query(`drop table users_in_clubs;`);
     await queryRunner.query(`drop table users;`);
     await queryRunner.query(`drop table clubs;`);

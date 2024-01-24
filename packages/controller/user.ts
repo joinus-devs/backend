@@ -56,10 +56,10 @@ export class UserController implements IUserController {
     try {
       const id = Number(req.params.id);
       const userUpdate = req.body;
-      const user = await this._service.update(id, userUpdate);
+      const userId = await this._service.update(id, userUpdate);
       res
         .status(200)
-        .json(new SuccessResponse(user, "User updated successfully").toDTO());
+        .json(new SuccessResponse(userId, "User updated successfully").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);

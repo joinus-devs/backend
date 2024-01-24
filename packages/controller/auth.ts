@@ -70,10 +70,10 @@ export class AuthController implements IAuthController {
   ) => {
     try {
       const userCreate = req.body;
-      const user = await this._userService.create(userCreate);
+      const userId = await this._userService.create(userCreate);
       res
         .status(201)
-        .json(new SuccessResponse(user, "User created successfully").toDTO());
+        .json(new SuccessResponse(userId, "User created successfully").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);

@@ -1,59 +1,59 @@
 import { Router } from "express";
-import { IClubController, IFeedController } from "../controller";
+import { IFeedController } from "../controller";
 import Swagger from "../docs";
 
-const clubRoutes = (
-  clubController: IClubController,
-  feedController: IFeedController
-) => {
+const feedRoutes = (controller: IFeedController) => {
   const router = Router();
 
-  router.route("/").get(clubController.findAll).post(clubController.create);
+  router.route("/").get(controller.findAll);
   router
     .route("/:id")
-    .get(clubController.find)
-    .put(clubController.update)
-    .delete(clubController.delete);
-  router
-    .route("/:id/feeds")
-    .get(feedController.findAllByClub)
-    .post(feedController.create);
+    .get(controller.find)
+    .put(controller.update)
+    .delete(controller.delete);
 
   return router;
 };
 
-export default clubRoutes;
+export default feedRoutes;
 
 const swagger = Swagger.getInstance();
 swagger.add({
-  "/clubs": {
+  "/clubs/{id}/feeds": {
     get: {
-      summary: "Get all club",
-      tags: ["Club"],
+      summary: "Get all feed of a club",
+      tags: ["Feed"],
       responses: { 200: { $ref: "#/components/responses/ClubsResponse" } },
     },
     post: {
-      summary: "Create a club",
-      tags: ["Club"],
+      summary: "Create a feed",
+      tags: ["Feed"],
       parameters: [{ $ref: "#/components/parameters/ClubCreate" }],
       responses: { 200: { $ref: "#/components/responses/NumberResponse" } },
     },
   },
-  "/clubs/{id}": {
+  "/feeds": {
     get: {
-      summary: "Get a club",
-      tags: ["Club"],
+      summary: "Get all feed",
+      tags: ["Feed"],
+      responses: { 200: { $ref: "#/components/responses/ClubsResponse" } },
+    },
+  },
+  "/feeds/{id}": {
+    get: {
+      summary: "Get a feed",
+      tags: ["Feed"],
       responses: { 200: { $ref: "#/components/responses/ClubResponse" } },
     },
     put: {
-      summary: "Update a club",
-      tags: ["Club"],
+      summary: "Update a feed",
+      tags: ["Feed"],
       parameters: [{ $ref: "#/components/parameters/ClubUpdate" }],
       responses: { 200: { $ref: "#/components/responses/NumberResponse" } },
     },
     delete: {
-      summary: "Delete a club",
-      tags: ["Club"],
+      summary: "Delete a feed",
+      tags: ["Feed"],
       responses: { 200: { $ref: "#/components/responses/NumberResponse" } },
     },
   },

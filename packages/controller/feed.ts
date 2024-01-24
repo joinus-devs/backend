@@ -1,5 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
-import { IClubService } from "../services";
+import { IFeedService } from "../services";
 import {
   ErrorResponse,
   IdQueryParams,
@@ -8,25 +8,26 @@ import {
   SuccessResponse,
 } from "../types";
 
-export interface IClubController {
+export interface IFeedController {
   find: RequestHandler<IdQueryParams>;
   findAll: RequestHandler<PageQueryParams>;
+  findAllByClub: RequestHandler<IdQueryParams>;
   create: RequestHandler;
   update: RequestHandler;
   delete: RequestHandler;
 }
 
-export class ClubController implements IClubController {
-  private static _instance: Nullable<ClubController> = null;
-  private _service: IClubService;
+export class FeedController implements IFeedController {
+  private static _instance: Nullable<FeedController> = null;
+  private _service: IFeedService;
 
-  private constructor(service: IClubService) {
+  private constructor(service: IFeedService) {
     this._service = service;
   }
 
-  static getInstance(service: IClubService) {
+  static getInstance(service: IFeedService) {
     if (!this._instance) {
-      this._instance = new ClubController(service);
+      this._instance = new FeedController(service);
     }
 
     return this._instance;
@@ -39,10 +40,10 @@ export class ClubController implements IClubController {
   ) => {
     try {
       const id = Number(req.params.id);
-      const club = await this._service.findWithUsers(id);
+      const feed = await this._service.find(id);
       res
         .status(200)
-        .json(new SuccessResponse(club, "Club retrieved successfully").toDTO());
+        .json(new SuccessResponse(feed, "Club retrieved successfully").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -55,11 +56,30 @@ export class ClubController implements IClubController {
     next: NextFunction
   ) => {
     try {
-      const clubs = await this._service.findAll();
+      const feeds = await this._service.findAll();
       res
         .status(200)
         .json(
-          new SuccessResponse(clubs, "Clubs retrieved successfully").toDTO()
+          new SuccessResponse(feeds, "Feeds retrieved successfully").toDTO()
+        );
+    } catch (err) {
+      if (!(err instanceof ErrorResponse)) return;
+      next(err);
+    }
+  };
+
+  findAllByClub = async (
+    req: Request<IdQueryParams>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const clubId = Number(req.params.id);
+      const feeds = await this._service.findAllByClub(clubId);
+      res
+        .status(200)
+        .json(
+          new SuccessResponse(feeds, "Feeds retrieved successfully").toDTO()
         );
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
@@ -70,11 +90,12 @@ export class ClubController implements IClubController {
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = (req as any)?.decoded?.id;
-      const clubCreate = req.body;
-      const clubId = await this._service.create(userId, clubCreate);
+      const clubId = Number(req.params.id);
+      const feedCreate = req.body;
+      const feedId = await this._service.create(userId, clubId, feedCreate);
       res
         .status(201)
-        .json(new SuccessResponse(clubId, "Club created successfully").toDTO());
+        .json(new SuccessResponse(feedId, "Feed created successfully").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -84,11 +105,11 @@ export class ClubController implements IClubController {
   update = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = Number(req.params.id);
-      const clubUpdate = req.body;
-      const clubId = await this._service.update(id, clubUpdate);
+      const feedUpdate = req.body;
+      const feedId = await this._service.update(id, feedUpdate);
       res
         .status(200)
-        .json(new SuccessResponse(clubId, "Club updated successfully").toDTO());
+        .json(new SuccessResponse(feedId, "Feed updated successfully").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -102,7 +123,7 @@ export class ClubController implements IClubController {
       res
         .status(200)
         .json(
-          new SuccessResponse(deletedId, "Club deleted successfully").toDTO()
+          new SuccessResponse(deletedId, "Feed deleted successfully").toDTO()
         );
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;

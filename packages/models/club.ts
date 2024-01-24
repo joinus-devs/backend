@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany } from "typeorm";
 import { IdEntity } from "./common";
+import { Feed } from "./feed";
 import { UserInClub } from "./userInClub";
 
 export interface ClubScheme extends IdEntity {
@@ -12,9 +13,7 @@ export type ClubDto = ClubScheme;
 
 export type ClubWithUsersDto = ClubDto & { users: UserInClub[] };
 
-export type ClubCreate = Omit<ClubScheme, keyof IdEntity> & {
-  user: number;
-};
+export type ClubCreate = Omit<ClubScheme, keyof IdEntity>;
 
 export type ClubUpdate = ClubCreate;
 
@@ -33,6 +32,9 @@ export class Club extends IdEntity implements ClubScheme {
     cascade: true,
   })
   public users: UserInClub[];
+
+  @OneToMany(() => Feed, (feed) => feed.club)
+  public feeds: Feed[];
 }
 
 export class ClubConverter {
