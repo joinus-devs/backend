@@ -29,32 +29,32 @@ swagger.add({
   "/clubs": {
     get: {
       summary: "Get all club",
-      tags: ["Club"],
-      responses: { 200: { $ref: "#/components/responses/ClubsResponse" } },
+      tags: ["Clubs"],
+      responses: { 200: { $ref: "#/components/responses/clubsResponse" } },
     },
     post: {
       summary: "Create a club",
-      tags: ["Club"],
-      parameters: [{ $ref: "#/components/parameters/ClubCreate" }],
-      responses: { 200: { $ref: "#/components/responses/NumberResponse" } },
+      tags: ["Clubs"],
+      parameters: [{ $ref: "#/components/parameters/clubCreate" }],
+      responses: { 200: { $ref: "#/components/responses/numberResponse" } },
     },
   },
   "/clubs/{id}": {
     get: {
       summary: "Get a club",
-      tags: ["Club"],
-      responses: { 200: { $ref: "#/components/responses/ClubResponse" } },
+      tags: ["Clubs"],
+      responses: { 200: { $ref: "#/components/responses/clubResponse" } },
     },
     put: {
       summary: "Update a club",
-      tags: ["Club"],
-      parameters: [{ $ref: "#/components/parameters/ClubUpdate" }],
-      responses: { 200: { $ref: "#/components/responses/NumberResponse" } },
+      tags: ["Clubs"],
+      parameters: [{ $ref: "#/components/parameters/clubUpdate" }],
+      responses: { 200: { $ref: "#/components/responses/numberResponse" } },
     },
     delete: {
       summary: "Delete a club",
-      tags: ["Club"],
-      responses: { 200: { $ref: "#/components/responses/NumberResponse" } },
+      tags: ["Clubs"],
+      responses: { 200: { $ref: "#/components/responses/numberResponse" } },
     },
   },
 });

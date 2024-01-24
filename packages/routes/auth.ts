@@ -37,23 +37,23 @@ swagger.add({
     get: {
       summary: "Get current user",
       tags: ["Auth"],
-      responses: { 200: { $ref: "#/components/responses/UserResponse" } },
+      responses: { 200: { $ref: "#/components/responses/userResponse" } },
     },
   },
   "/signin": {
     post: {
       summary: "Sign in",
       tags: ["Auth"],
-      parameters: [{ $ref: "#/components/parameters/SigninParams" }],
-      responses: { 200: { $ref: "#/components/responses/SigninResponse" } },
+      parameters: [{ $ref: "#/components/parameters/signinParams" }],
+      responses: { 200: { $ref: "#/components/responses/signinResponse" } },
     },
   },
   "/signup": {
     post: {
       summary: "Sign up",
       tags: ["Auth"],
-      parameters: [{ $ref: "#/components/parameters/SignupParams" }],
-      responses: { 200: { $ref: "#/components/responses/NumberResponse" } },
+      parameters: [{ $ref: "#/components/parameters/signupParams" }],
+      responses: { 200: { $ref: "#/components/responses/numberResponse" } },
     },
   },
 });

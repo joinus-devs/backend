@@ -5,6 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node index.ts",
     "migration": "typeorm-ts-node-esm migration:run -d ./packages/migrations/source.ts",
     "revert": "typeorm-ts-node-esm migration:revert -d ./packages/migrations/source.ts"
   },

@@ -22,26 +22,26 @@ swagger.add({
   "/users": {
     get: {
       summary: "Get all users",
-      tags: ["User"],
-      responses: { 200: { $ref: "#/components/responses/UsersResponse" } },
+      tags: ["Users"],
+      responses: { 200: { $ref: "#/components/responses/usersResponse" } },
     },
   },
   "/users/{id}": {
     get: {
       summary: "Get a user",
-      tags: ["User"],
-      responses: { 200: { $ref: "#/components/responses/UserResponse" } },
+      tags: ["Users"],
+      responses: { 200: { $ref: "#/components/responses/userResponse" } },
     },
     put: {
       summary: "Update a user",
-      tags: ["User"],
-      parameters: [{ $ref: "#/components/parameters/UserUpdate" }],
-      responses: { 200: { $ref: "#/components/responses/NumberResponse" } },
+      tags: ["Users"],
+      parameters: [{ $ref: "#/components/parameters/userUpdate" }],
+      responses: { 200: { $ref: "#/components/responses/numberResponse" } },
     },
     delete: {
       summary: "Delete a user",
-      tags: ["User"],
-      responses: { 200: { $ref: "#/components/responses/NumberResponse" } },
+      tags: ["Users"],
+      responses: { 200: { $ref: "#/components/responses/numberResponse" } },
     },
   },
 });

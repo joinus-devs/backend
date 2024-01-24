@@ -1,8 +1,21 @@
 import { cloneDeep } from "lodash";
 import swaggerJSDoc, { Parameter, Response, Schema } from "swagger-jsdoc";
-import { SigninParmasDoc, SignupParamsDoc, SinginResponseDoc } from "./auth";
-import { ClubCreateDoc, ClubDoc, ClubDtoDoc, ClubUpdateDoc } from "./club";
-import { UserDoc, UserDtoDoc, UserUpdateDoc } from "./user";
+import {
+  signinParmasDoc,
+  signupParamsDoc,
+  singinResponseDoc,
+  clubCreateDoc,
+  clubDoc,
+  clubDtoDoc,
+  clubUpdateDoc,
+  feedCreateDoc,
+  feedDoc,
+  feedDtoDoc,
+  feedUpdateDoc,
+  userDoc,
+  userDtoDoc,
+  userUpdateDoc,
+} from "./docs";
 
 class Swagger {
   private static _instance: Swagger;
@@ -45,26 +58,31 @@ class Swagger {
       basePath: "/",
       components: {
         schemas: {
-          Scheme: Swagger._scheme,
-          SuccessResponse: Swagger._successResponse,
-          ErrorResponse: Swagger._errorResponse,
-          User: Swagger.makeScheme(UserDoc),
-          Club: Swagger.makeScheme(ClubDoc),
+          scheme: Swagger._scheme,
+          successResponse: Swagger._successResponse,
+          errorResponse: Swagger._errorResponse,
+          user: Swagger.makeScheme(userDoc),
+          club: Swagger.makeScheme(clubDoc),
+          feed: Swagger.makeScheme(feedDoc),
         },
         parameters: {
-          SigninParams: Swagger.makeBody(SigninParmasDoc),
-          SignupParams: Swagger.makeBody(SignupParamsDoc),
-          UserUpdate: Swagger.makeBody(UserUpdateDoc),
-          ClubCreate: Swagger.makeBody(ClubCreateDoc),
-          ClubUpdate: Swagger.makeBody(ClubUpdateDoc),
+          signinParams: Swagger.makeBody(signinParmasDoc),
+          signupParams: Swagger.makeBody(signupParamsDoc),
+          userUpdate: Swagger.makeBody(userUpdateDoc),
+          clubCreate: Swagger.makeBody(clubCreateDoc),
+          clubUpdate: Swagger.makeBody(clubUpdateDoc),
+          feedCreate: Swagger.makeBody(feedCreateDoc),
+          feedUpdate: Swagger.makeBody(feedUpdateDoc),
         },
         responses: {
-          SigninResponse: Swagger.makeSuccessResponse(SinginResponseDoc, false),
-          UserResponse: Swagger.makeSuccessResponse(UserDtoDoc),
-          UsersResponse: Swagger.makeSuccessResponse([UserDtoDoc]),
-          ClubResponse: Swagger.makeSuccessResponse(ClubDtoDoc),
-          ClubsResponse: Swagger.makeSuccessResponse([ClubDtoDoc]),
-          NumberResponse: Swagger.makeSuccessResponse(
+          signinResponse: Swagger.makeSuccessResponse(singinResponseDoc, false),
+          userResponse: Swagger.makeSuccessResponse(userDtoDoc),
+          usersResponse: Swagger.makeSuccessResponse([userDtoDoc]),
+          clubResponse: Swagger.makeSuccessResponse(clubDtoDoc),
+          clubsResponse: Swagger.makeSuccessResponse([clubDtoDoc]),
+          feedResponse: Swagger.makeSuccessResponse(feedDtoDoc),
+          feedsResponse: Swagger.makeSuccessResponse([feedDtoDoc]),
+          numberResponse: Swagger.makeSuccessResponse(
             { type: "number", example: 1 },
             false,
             false
@@ -104,21 +122,21 @@ class Swagger {
     withScheme = true,
     isObject = true
   ): Response => {
-    const newData = { ...cloneDeep(Swagger._successResponse) };
+    const newData = cloneDeep(Swagger._successResponse);
     if (Array.isArray(data)) {
       newData.properties.data = {
         type: "array",
         items: withScheme
           ? this.makeScheme(data[0])
           : isObject
-            ? { properties: { ...cloneDeep(data) } }
+            ? { properties: cloneDeep(data) }
             : data,
       };
     } else {
       newData.properties.data = withScheme
         ? this.makeScheme(data)
         : isObject
-          ? { properties: { ...cloneDeep(data) } }
+          ? { properties: cloneDeep(data) }
           : data;
     }
     return {
@@ -136,21 +154,21 @@ class Swagger {
     withScheme = true,
     isObject = true
   ): Response => {
-    const newData = { ...cloneDeep(Swagger._errorResponse) };
+    const newData = cloneDeep(Swagger._errorResponse);
     if (Array.isArray(data)) {
       newData.properties.data = {
         type: "array",
         items: withScheme
           ? this.makeScheme(data[0])
           : isObject
-            ? { properties: { ...cloneDeep(data) } }
+            ? { properties: cloneDeep(data) }
             : data,
       };
     } else {
       newData.properties.data = withScheme
         ? this.makeScheme(data)
         : isObject
-          ? { properties: { ...cloneDeep(data) } }
+          ? { properties: cloneDeep(data) }
           : data;
     }
     return {

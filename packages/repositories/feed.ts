@@ -29,7 +29,10 @@ export class FeedRepository implements IFeedRepository {
 
   find = async (id: number) => {
     try {
-      return await this._db.findOne({ where: { id } });
+      return await this._db.findOne({
+        where: { id },
+        relations: ["user", "club"],
+      });
     } catch (err) {
       console.log(err);
       throw err;

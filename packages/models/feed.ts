@@ -1,14 +1,17 @@
 import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
-import { Club } from "./club";
+import { Club, ClubDto } from "./club";
 import { IdEntity } from "./common";
-import { User } from "./user";
+import { User, UserDto } from "./user";
 
 export interface FeedScheme extends IdEntity {
   user_id: number;
   club_id: number;
 }
 
-export type FeedDto = FeedScheme;
+export type FeedDto = FeedScheme & {
+  user: UserDto;
+  club: ClubDto;
+};
 
 export type FeedCreate = Omit<FeedScheme, keyof IdEntity>;
 
@@ -43,8 +46,8 @@ export class Feed extends IdEntity implements FeedScheme {
 
 export class FeedConverter {
   public static toDto = (feed: Feed): FeedDto => {
-    const { ...dto } = feed;
-    return dto;
+    const { password, ...user } = feed.user;
+    return { ...feed, user };
   };
 
   public static toEntityFromCreate = (dto: FeedCreate): Feed => {
