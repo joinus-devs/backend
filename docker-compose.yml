@@ -27,7 +27,7 @@ services:
     networks:
       - backend
     depends_on:
-      - db
+      - joinus_db
 
 volumes:
   db-data:
