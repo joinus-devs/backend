@@ -12,22 +12,22 @@ services:
     networks:
       - backend
 
-  # backend:
-  #   build:
-  #     context: .
-  #   ports:
-  #     - "80:8000"
-  #   environment:
-  #     - DB_HOST=joinus_db
-  #     - DB_PORT=3306
-  #     - DB_USER=root
-  #     - DB_PASSWORD=root
-  #     - DB_NAME=joinus
-  #     - JWT_SECRET=sunioj
-  #   networks:
-  #     - backend
-  #   depends_on:
-  #     - joinus_db
+  backend:
+    build:
+      context: .
+    ports:
+      - "80:8000"
+    environment:
+      - DB_HOST=joinus_db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=joinus
+      - JWT_SECRET=sunioj
+    networks:
+      - backend
+    depends_on:
+      - joinus_db
 
 volumes:
   db-data:
