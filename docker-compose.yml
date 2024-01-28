@@ -3,10 +3,10 @@ services:
   joinus_db:
     image: mysql:8.0
     ports:
-      - 3306:3306
+      - "3307:3306"
     volumes:
       - db-data:/var/lib/mysql
-      - init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       - MYSQL_ROOT_PASSWORD=root
     networks:
@@ -16,7 +16,7 @@ services:
     build:
       context: .
     ports:
-      - 8000:8000
+      - "80:8000"
     environment:
       - DB_HOST=joinus_db
       - DB_PORT=3306
