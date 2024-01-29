@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { body } from "express-validator";
 import {
   IClubController,
   IFeedController,
@@ -13,7 +14,18 @@ const clubRoutes = (
 ) => {
   const router = Router();
 
-  router.route("/").get(clubController.findAll).post(clubController.create);
+  router
+    .route("/")
+    .get(clubController.findAll)
+    .post(
+      body("name").isString(),
+      body("description").isString(),
+      body("capacity").isNumeric(),
+      body("sex").isBoolean(),
+      body("mininum_age").isNumeric(),
+      body("maximum_age").isNumeric(),
+      clubController.create
+    );
   router
     .route("/:id")
     .get(clubController.find)

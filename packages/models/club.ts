@@ -29,6 +29,15 @@ export class Club extends IdEntity implements ClubScheme {
   @Column()
   capacity: number;
 
+  @Column()
+  sex: boolean;
+
+  @Column()
+  minimum_age: number;
+
+  @Column()
+  maximum_age: number;
+
   @OneToMany(() => UserInClub, (userInClub) => userInClub.club, {
     cascade: true,
   })

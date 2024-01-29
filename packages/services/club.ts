@@ -1,4 +1,10 @@
-import { ClubConverter, ClubCreate, ClubDto, ClubUpdate } from "../models";
+import {
+  ClubCategory,
+  ClubConverter,
+  ClubCreate,
+  ClubDto,
+  ClubUpdate,
+} from "../models";
 import { UserInClub } from "../models/userInClub";
 import { TransactionManager } from "../modules";
 import { IClubRepository, IUserRepository } from "../repositories";
@@ -123,6 +129,9 @@ export class ClubService implements IClubService {
         userInClub.user = user;
         userInClub.club = club;
         club.users = [userInClub];
+        const clubCategory = new ClubCategory();
+        clubCategory.club = club;
+        club.categories = [clubCategory];
         return await this._clubRepository.create(club);
       });
     } catch (err) {
