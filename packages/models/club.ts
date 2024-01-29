@@ -1,4 +1,5 @@
 import { Column, Entity, OneToMany } from "typeorm";
+import { ClubCategory } from "./clubCategory";
 import { IdEntity } from "./common";
 import { Feed } from "./feed";
 import { UserInClub } from "./userInClub";
@@ -35,6 +36,11 @@ export class Club extends IdEntity implements ClubScheme {
 
   @OneToMany(() => Feed, (feed) => feed.club)
   public feeds: Feed[];
+
+  @OneToMany(() => ClubCategory, (clubCategory) => clubCategory.club, {
+    cascade: true,
+  })
+  public categories: ClubCategory[];
 }
 
 export class ClubConverter {

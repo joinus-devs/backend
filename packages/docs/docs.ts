@@ -25,18 +25,11 @@ const userBase = {
   email: { type: "string", example: "john@gmail.com" },
 };
 
-export const userDtoBaseDoc: any = {
-  ...cloneDeep(userBase),
-  social_id: { type: "string", example: "1234" },
-};
-
 const clubBase = {
   name: { type: "string", example: "name" },
   description: { type: "string", example: "description" },
   capacity: { type: "number", example: 1 },
 };
-
-export const clubDtoBaseDoc = cloneDeep(clubBase);
 
 export const userDoc = {
   ...cloneDeep(userBase),
@@ -44,19 +37,13 @@ export const userDoc = {
   social_id: { type: "string", example: "1234" },
 };
 
-export const userDtoDoc: any = {
-  ...cloneDeep(userDtoBaseDoc),
-  clubs: { type: "array", items: { properties: cloneDeep(clubDtoBaseDoc) } },
-};
+export const userDtoDoc = cloneDeep(userBase);
 
 export const userUpdateDoc = cloneDeep(userBase);
 
 export const clubDoc = cloneDeep(clubBase);
 
-export const clubDtoDoc: any = {
-  ...cloneDeep(clubDtoBaseDoc),
-  users: { type: "array", items: { properties: cloneDeep(userDtoBaseDoc) } },
-};
+export const clubDtoDoc: any = cloneDeep(clubBase);
 
 export const clubCreateDoc = cloneDeep(clubBase);
 
@@ -71,8 +58,8 @@ export const feedDoc = {
   ...cloneDeep(feedBase),
   user_id: { type: "number", example: 1 },
   club_id: { type: "number", example: 1 },
-  user: { properties: cloneDeep(userDtoBaseDoc) },
-  club: { properties: cloneDeep(clubDtoBaseDoc) },
+  user: { properties: cloneDeep(userDtoDoc) },
+  club: { properties: cloneDeep(clubDtoDoc) },
 };
 
 export const feedDtoDoc = cloneDeep(feedBase);

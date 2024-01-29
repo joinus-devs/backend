@@ -5,7 +5,6 @@ import { ErrorResponse, Nullable } from "../types";
 export interface IUserRepository {
   find(id: number): Promise<Nullable<User>>;
   findByEmail(email: string): Promise<Nullable<User>>;
-  findWithClubs(id: number): Promise<Nullable<User>>;
   findAll(): Promise<User[]>;
   findAllByClubId(clubId: number): Promise<User[]>;
   create(user: User): Promise<number>;
@@ -47,24 +46,12 @@ export class UserRepository implements IUserRepository {
     }
   };
 
-  findWithClubs = async (id: number) => {
-    try {
-      return await this._db.findOne({
-        where: { id },
-        relations: ["clubs"],
-      });
-    } catch (err) {
-      console.log(err);
-      throw err;
-    }
-  };
-
   findAllByClubId = async (clubId: number) => {
     try {
       return await this._db
         .createQueryBuilder("user")
         .leftJoinAndSelect("user.clubs", "club")
-        .where("club.id = :id", { id: clubId })
+        .where("club.id = :id", { id: clubId, deleted_at: undefined })
         .getMany();
     } catch (err) {
       console.log(err);

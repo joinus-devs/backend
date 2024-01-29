@@ -3,13 +3,13 @@ import { Club } from "./club";
 import { TimesEntity } from "./common";
 import { User } from "./user";
 
-export interface UserScheme extends TimesEntity {
+export interface UserInClubScheme extends TimesEntity {
   user_id: number;
   club_id: number;
 }
 
 @Entity("users_in_clubs")
-export class UserInClub extends TimesEntity implements UserScheme {
+export class UserInClub extends TimesEntity implements UserInClubScheme {
   @PrimaryColumn()
   user_id: number;
 

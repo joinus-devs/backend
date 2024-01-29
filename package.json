@@ -6,8 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node index.ts",
-    "migration": "typeorm-ts-node-esm migration:run -d ./packages/migrations/source.ts",
-    "revert": "typeorm-ts-node-esm migration:revert -d ./packages/migrations/source.ts"
+    "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
+    "migration": "yarn typeorm migration:run -d ./packages/migrations/source.ts",
+    "revert": "yarn typeorm migration:revert -d ./packages/migrations/source.ts"
   },
   "author": "Lee Minhoon",
   "license": "ISC",

@@ -4,7 +4,6 @@ import { ErrorResponse, Nullable } from "../types";
 
 export interface IUserService {
   find(id: number): Promise<UserDto>;
-  findWithClubs(id: number): Promise<UserDto>;
   findAll(): Promise<UserDto[]>;
   findAllByClubId(clubId: number): Promise<UserDto[]>;
   create(userCreate: UserCreate): Promise<number>;
@@ -42,19 +41,6 @@ export class UserService implements IUserService {
     }
 
     return UserConverter.toDto(user);
-  };
-
-  findWithClubs = async (id: number) => {
-    let user;
-    try {
-      user = await this._repository.findWithClubs(id);
-    } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
-    }
-    if (!user) {
-      throw new ErrorResponse(404, "User not found");
-    }
-    return UserConverter.toDtoWithClubs(user);
   };
 
   findAll = async () => {

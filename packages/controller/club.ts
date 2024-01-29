@@ -40,7 +40,7 @@ export class ClubController implements IClubController {
   ) => {
     try {
       const id = Number(req.params.id);
-      const club = await this._service.findWithUsers(id);
+      const club = await this._service.find(id);
       res
         .status(200)
         .json(new SuccessResponse(club, "Club retrieved successfully").toDTO());

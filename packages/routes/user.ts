@@ -11,6 +11,7 @@ const userRoutes = (controller: IUserController) => {
     .get(controller.find)
     .put(controller.update)
     .delete(controller.delete);
+  router.route("/:id/clubs").get(controller.findAllByClub);
 
   return router;
 };
@@ -42,6 +43,13 @@ swagger.add({
       summary: "Delete a user",
       tags: ["Users"],
       responses: { 200: { $ref: "#/components/responses/numberResponse" } },
+    },
+  },
+  "/users/{id}/clubs": {
+    get: {
+      summary: "Get all clubs of a user",
+      tags: ["Users"],
+      responses: { 200: { $ref: "#/components/responses/clubsResponse" } },
     },
   },
 });

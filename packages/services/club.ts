@@ -1,10 +1,4 @@
-import {
-  ClubConverter,
-  ClubCreate,
-  ClubDto,
-  ClubUpdate,
-  ClubWithUsersDto,
-} from "../models";
+import { ClubConverter, ClubCreate, ClubDto, ClubUpdate } from "../models";
 import { UserInClub } from "../models/userInClub";
 import { TransactionManager } from "../modules";
 import { IClubRepository, IUserRepository } from "../repositories";
@@ -12,8 +6,8 @@ import { ErrorResponse, Nullable } from "../types";
 
 export interface IClubService {
   find(id: number): Promise<Nullable<ClubDto>>;
-  findWithUsers(id: number): Promise<Nullable<ClubWithUsersDto>>;
   findAll(): Promise<ClubDto[]>;
+  findAllByUserId(userId: number): Promise<ClubDto[]>;
   join(userId: number, clubId: number): Promise<number>;
   create(userId: number, clubCreate: ClubCreate): Promise<number>;
   update(id: number, clubUpdate: ClubUpdate): Promise<number>;
@@ -68,22 +62,18 @@ export class ClubService implements IClubService {
     return ClubConverter.toDto(club);
   };
 
-  findWithUsers = async (id: number) => {
-    let club;
-    try {
-      club = await this._clubRepository.findWithUsers(id);
-    } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
-    }
-    if (!club) {
-      throw new ErrorResponse(404, "Club not found");
-    }
-    return ClubConverter.toDtoWithUsers(club);
-  };
-
   findAll = async () => {
     try {
       const clubs = await this._clubRepository.findAll();
+      return clubs.map((club) => ClubConverter.toDto(club));
+    } catch (err) {
+      throw new ErrorResponse(500, "Internal Server Error");
+    }
+  };
+
+  findAllByUserId = async (userId: number) => {
+    try {
+      const clubs = await this._clubRepository.findAllByUserId(userId);
       return clubs.map((club) => ClubConverter.toDto(club));
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
@@ -121,7 +111,7 @@ export class ClubService implements IClubService {
 
   create = async (userId: number, clubCreate: ClubCreate) => {
     // check if user exists
-    const user = await this._userRepository.findWithClubs(userId);
+    const user = await this._userRepository.find(userId);
     if (!user) {
       throw new ErrorResponse(404, "User not found");
     }

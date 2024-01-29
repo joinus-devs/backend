@@ -35,6 +35,9 @@ class CreateTables1705433210498 implements MigrationInterface {
         name varchar(255) not null,
         description varchar(255) not null,
         capacity int not null,
+        sex boolean,
+        minimum_age int not null,
+        maximum_age int not null,
         unique (name)
       );
     `);
@@ -47,6 +50,26 @@ class CreateTables1705433210498 implements MigrationInterface {
         primary key (user_id, club_id),
         foreign key (user_id) references users(id),
         foreign key (club_id) references clubs(id)
+      );
+    `);
+
+    await queryRunner.query(`
+      create table categories (
+        ${idQuery}
+        ${timesQuery}
+        name varchar(255) not null,
+        unique (name)
+      );
+    `);
+
+    await queryRunner.query(`
+      create table clubs_categories (
+        ${timesQuery}
+        club_id int not null,
+        category_id int not null,
+        primary key (club_id, category_id),
+        foreign key (club_id) references clubs(id),
+        foreign key (category_id) references categories(id)
       );
     `);
 
@@ -78,10 +101,12 @@ class CreateTables1705433210498 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`drop table comments;`);
-    await queryRunner.query(`drop table feed;`);
+    await queryRunner.query(`drop table feeds;`);
+    await queryRunner.query(`drop table clubs_categories;`);
+    await queryRunner.query(`drop table categories;`);
     await queryRunner.query(`drop table users_in_clubs;`);
-    await queryRunner.query(`drop table users;`);
     await queryRunner.query(`drop table clubs;`);
+    await queryRunner.query(`drop table users;`);
   }
 }
 
