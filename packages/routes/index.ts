@@ -2,6 +2,7 @@ import { Router } from "express";
 import { AppProvider } from "../modules";
 import authRoutes from "./auth";
 import clubRoutes from "./club";
+import commentRoutes from "./comment";
 import feedRoutes from "./feed";
 import userRoutes from "./user";
 
@@ -14,10 +15,15 @@ const initRoutes = (appManager: AppProvider) => {
     "/clubs",
     clubRoutes(
       appManager.appController.clubController,
+      appManager.appController.userController,
       appManager.appController.feedController
     )
   );
   router.use("/feeds", feedRoutes(appManager.appController.feedController));
+  router.use(
+    "/comments",
+    commentRoutes(appManager.appController.commentController)
+  );
 
   return router;
 };

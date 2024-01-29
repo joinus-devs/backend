@@ -7,6 +7,7 @@ export interface IUserRepository {
   findByEmail(email: string): Promise<Nullable<User>>;
   findWithClubs(id: number): Promise<Nullable<User>>;
   findAll(): Promise<User[]>;
+  findAllByClubId(clubId: number): Promise<User[]>;
   create(user: User): Promise<number>;
   update(user: User): Promise<number>;
   delete(id: number): Promise<number>;
@@ -52,6 +53,19 @@ export class UserRepository implements IUserRepository {
         where: { id },
         relations: ["clubs"],
       });
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  };
+
+  findAllByClubId = async (clubId: number) => {
+    try {
+      return await this._db
+        .createQueryBuilder("user")
+        .leftJoinAndSelect("user.clubs", "club")
+        .where("club.id = :id", { id: clubId })
+        .getMany();
     } catch (err) {
       console.log(err);
       throw err;

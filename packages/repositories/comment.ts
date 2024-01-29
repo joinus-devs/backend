@@ -1,28 +1,27 @@
 import { DataSource, QueryFailedError, Repository } from "typeorm";
-import { Club } from "../models";
+import { Comment } from "../models";
 import { ErrorResponse, Nullable } from "../types";
 
-export interface IClubRepository {
-  find(id: number): Promise<Nullable<Club>>;
-  findWithUsers(id: number): Promise<Nullable<Club>>;
-  findAll(): Promise<Club[]>;
-  createUser(clubId: number, userId: number): Promise<number>;
-  create(club: Club): Promise<number>;
-  update(club: Club): Promise<number>;
+export interface ICommentRepository {
+  find(id: number): Promise<Nullable<Comment>>;
+  findAll(): Promise<Comment[]>;
+  findAllByFeedId(clubId: number): Promise<Comment[]>;
+  create(comment: Comment): Promise<number>;
+  update(comment: Comment): Promise<number>;
   delete(id: number): Promise<number>;
 }
 
-export class ClubRepository implements IClubRepository {
-  private static _instance: Nullable<IClubRepository> = null;
-  private _db: Repository<Club>;
+export class CommentRepository implements ICommentRepository {
+  private static _instance: Nullable<ICommentRepository> = null;
+  private _db: Repository<Comment>;
 
   private constructor(datasource: DataSource) {
-    this._db = datasource.getRepository(Club);
+    this._db = datasource.getRepository(Comment);
   }
 
   static getInstance(datasource: DataSource) {
     if (!this._instance) {
-      this._instance = new ClubRepository(datasource);
+      this._instance = new CommentRepository(datasource);
     }
 
     return this._instance;
@@ -30,18 +29,9 @@ export class ClubRepository implements IClubRepository {
 
   find = async (id: number) => {
     try {
-      return await this._db.findOne({ where: { id } });
-    } catch (err) {
-      console.log(err);
-      throw err;
-    }
-  };
-
-  findWithUsers = async (id: number) => {
-    try {
       return await this._db.findOne({
         where: { id },
-        relations: ["users"],
+        relations: ["user"],
       });
     } catch (err) {
       console.log(err);
@@ -51,30 +41,31 @@ export class ClubRepository implements IClubRepository {
 
   findAll = async () => {
     try {
-      return await this._db.find({ where: { deleted_at: undefined } });
+      return await this._db.find({
+        where: { deleted_at: undefined },
+        relations: ["user"],
+      });
     } catch (err) {
       console.log(err);
       throw err;
     }
   };
 
-  createUser = async (clubId: number, userId: number) => {
+  findAllByFeedId = async (feedId: number) => {
     try {
-      await this._db
-        .createQueryBuilder()
-        .relation(Club, "users")
-        .of(clubId)
-        .add(userId);
-      return userId;
+      return await this._db.find({
+        where: { feed_id: feedId, deleted_at: undefined },
+        relations: ["user"],
+      });
     } catch (err) {
       console.log(err);
       throw err;
     }
   };
 
-  create = async (club: Club) => {
+  create = async (comment: Comment) => {
     try {
-      const result = await this._db.save(club);
+      const result = await this._db.save(comment);
       return result.id;
     } catch (err) {
       if (err instanceof QueryFailedError && err.driverError.errno === 1062) {
@@ -84,9 +75,9 @@ export class ClubRepository implements IClubRepository {
     }
   };
 
-  update = async (club: Club) => {
+  update = async (comment: Comment) => {
     try {
-      const result = await this._db.save(club);
+      const result = await this._db.save(comment);
       return result.id;
     } catch (err) {
       console.log(err);

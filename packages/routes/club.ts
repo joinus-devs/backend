@@ -1,9 +1,14 @@
 import { Router } from "express";
-import { IClubController, IFeedController } from "../controller";
+import {
+  IClubController,
+  IFeedController,
+  IUserController,
+} from "../controller";
 import Swagger from "../docs";
 
 const clubRoutes = (
   clubController: IClubController,
+  userController: IUserController,
   feedController: IFeedController
 ) => {
   const router = Router();
@@ -14,6 +19,10 @@ const clubRoutes = (
     .get(clubController.find)
     .put(clubController.update)
     .delete(clubController.delete);
+  router
+    .route("/:id/users")
+    .get(userController.findAllByClub)
+    .post(clubController.join);
   router
     .route("/:id/feeds")
     .get(feedController.findAllByClub)
@@ -26,6 +35,31 @@ export default clubRoutes;
 
 const swagger = Swagger.getInstance();
 swagger.add({
+  "/clubs/{id}/feeds": {
+    get: {
+      summary: "Get all feed of a club",
+      tags: ["Clubs"],
+      responses: { 200: { $ref: "#/components/responses/feedsResponse" } },
+    },
+    post: {
+      summary: "Create a feed",
+      tags: ["Clubs"],
+      parameters: [{ $ref: "#/components/parameters/feedCreate" }],
+      responses: { 200: { $ref: "#/components/responses/numberResponse" } },
+    },
+  },
+  "/clubs/{id}/users": {
+    get: {
+      summary: "Get all uesr of a club",
+      tags: ["Clubs"],
+      responses: { 200: { $ref: "#/components/responses/usersResponse" } },
+    },
+    post: {
+      summary: "Join a club",
+      tags: ["Clubs"],
+      responses: { 200: { $ref: "#/components/responses/numberResponse" } },
+    },
+  },
   "/clubs": {
     get: {
       summary: "Get all club",

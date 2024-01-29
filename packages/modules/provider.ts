@@ -3,17 +3,21 @@ import { TransactionManager } from ".";
 import {
   AuthController,
   ClubController,
+  CommentController,
   FeedController,
   IAuthController,
   IClubController,
+  ICommentController,
   IFeedController,
   IUserController,
   UserController,
 } from "../controller";
 import {
   ClubRepository,
+  CommentRepository,
   FeedRepository,
   IClubRepository,
+  ICommentRepository,
   IFeedRepository,
   IUserRepository,
   UserRepository,
@@ -21,9 +25,11 @@ import {
 import {
   AuthService,
   ClubService,
+  CommentService,
   FeedService,
   IAuthService,
   IClubService,
+  ICommentService,
   IFeedService,
   IUserService,
   UserService,
@@ -79,11 +85,13 @@ class AppRepository {
   private _userRepository: IUserRepository;
   private _clubRepository: IClubRepository;
   private _feedRepository: IFeedRepository;
+  private _commentRepository: ICommentRepository;
 
   constructor(datasource: DataSource) {
     this._userRepository = UserRepository.getInstance(datasource);
     this._clubRepository = ClubRepository.getInstance(datasource);
     this._feedRepository = FeedRepository.getInstance(datasource);
+    this._commentRepository = CommentRepository.getInstance(datasource);
   }
 
   get userRepository() {
@@ -97,6 +105,10 @@ class AppRepository {
   get feedRepository() {
     return this._feedRepository;
   }
+
+  get commentRepository() {
+    return this._commentRepository;
+  }
 }
 
 class AppService {
@@ -104,6 +116,7 @@ class AppService {
   private _userService: IUserService;
   private _clubService: IClubService;
   private _feedService: IFeedService;
+  private _commentService: ICommentService;
 
   constructor(
     appRepository: AppRepository,
@@ -122,6 +135,12 @@ class AppService {
       appRepository.userRepository,
       appRepository.clubRepository
     );
+    this._commentService = CommentService.getInstance(
+      transactionManager,
+      appRepository.commentRepository,
+      appRepository.feedRepository,
+      appRepository.userRepository
+    );
   }
 
   get authService() {
@@ -139,6 +158,10 @@ class AppService {
   get feedService() {
     return this._feedService;
   }
+
+  get commentService() {
+    return this._commentService;
+  }
 }
 
 class AppController {
@@ -146,6 +169,7 @@ class AppController {
   private _userController: IUserController;
   private _clubController: IClubController;
   private _feedController: IFeedController;
+  private _commentController: ICommentController;
 
   constructor(appService: AppService) {
     this._authController = AuthController.getInstance(
@@ -155,6 +179,9 @@ class AppController {
     this._userController = UserController.getInstance(appService.userService);
     this._clubController = ClubController.getInstance(appService.clubService);
     this._feedController = FeedController.getInstance(appService.feedService);
+    this._commentController = CommentController.getInstance(
+      appService.commentService
+    );
   }
 
   get authController() {
@@ -171,6 +198,10 @@ class AppController {
 
   get feedController() {
     return this._feedController;
+  }
+
+  get commentController() {
+    return this._commentController;
   }
 }
 

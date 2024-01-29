@@ -6,6 +6,7 @@ export interface IUserService {
   find(id: number): Promise<UserDto>;
   findWithClubs(id: number): Promise<UserDto>;
   findAll(): Promise<UserDto[]>;
+  findAllByClubId(clubId: number): Promise<UserDto[]>;
   create(userCreate: UserCreate): Promise<number>;
   update(id: number, userUpdate: UserUpdate): Promise<number>;
   delete(id: number): Promise<number>;
@@ -34,9 +35,12 @@ export class UserService implements IUserService {
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }
+
+    // check if user exists
     if (!user) {
       throw new ErrorResponse(404, "User not found");
     }
+
     return UserConverter.toDto(user);
   };
 
@@ -56,6 +60,15 @@ export class UserService implements IUserService {
   findAll = async () => {
     try {
       const users = await this._repository.findAll();
+      return users.map((user) => UserConverter.toDto(user));
+    } catch (err) {
+      throw new ErrorResponse(500, "Internal Server Error");
+    }
+  };
+
+  findAllByClubId = async (clubId: number) => {
+    try {
+      const users = await this._repository.findAllByClubId(clubId);
       return users.map((user) => UserConverter.toDto(user));
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");

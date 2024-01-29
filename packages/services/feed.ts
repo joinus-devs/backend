@@ -61,9 +61,12 @@ export class FeedService implements IFeedService {
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }
+
+    // check feed exists
     if (!feed) {
       throw new ErrorResponse(404, "Feed not found");
     }
+
     return FeedConverter.toDto(feed);
   };
 
@@ -86,16 +89,20 @@ export class FeedService implements IFeedService {
   };
 
   create = async (userId: number, clubId: number, feedCreate: FeedCreate) => {
+    // check user exists
+    const user = await this._userRepository.find(userId);
+    if (!user) {
+      throw new ErrorResponse(404, "User not found");
+    }
+
+    // check club exists
+    const club = await this._clubRepository.find(clubId);
+    if (!club) {
+      throw new ErrorResponse(404, "Club not found");
+    }
+
     try {
       return this._transactionManager.withTransaction(async () => {
-        const user = await this._userRepository.find(userId);
-        if (!user) {
-          throw new ErrorResponse(404, "User not found");
-        }
-        const club = await this._clubRepository.find(clubId);
-        if (!club) {
-          throw new ErrorResponse(404, "Club not found");
-        }
         const feed = FeedConverter.toEntityFromCreate(feedCreate);
         feed.user = user;
         feed.club = club;

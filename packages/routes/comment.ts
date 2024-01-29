@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { IFeedController } from "../controller";
+import { ICommentController } from "../controller";
 import Swagger from "../docs";
 
-const feedRoutes = (controller: IFeedController) => {
+const commentRoutes = (controller: ICommentController) => {
   const router = Router();
 
   router.route("/").get(controller.findAll);
@@ -15,10 +15,23 @@ const feedRoutes = (controller: IFeedController) => {
   return router;
 };
 
-export default feedRoutes;
+export default commentRoutes;
 
 const swagger = Swagger.getInstance();
 swagger.add({
+  "/clubs/{id}/feeds": {
+    get: {
+      summary: "Get all feed of a club",
+      tags: ["Feeds"],
+      responses: { 200: { $ref: "#/components/responses/feedsResponse" } },
+    },
+    post: {
+      summary: "Create a feed",
+      tags: ["Feeds"],
+      parameters: [{ $ref: "#/components/parameters/feedCreate" }],
+      responses: { 200: { $ref: "#/components/responses/numberResponse" } },
+    },
+  },
   "/feeds": {
     get: {
       summary: "Get all feed",

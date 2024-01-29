@@ -1,10 +1,16 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { IUserService } from "../services";
-import { ErrorResponse, Nullable, SuccessResponse } from "../types";
+import {
+  ErrorResponse,
+  IdQueryParams,
+  Nullable,
+  SuccessResponse,
+} from "../types";
 
 export interface IUserController {
   find: RequestHandler;
   findAll: RequestHandler;
+  findAllByClub: RequestHandler<IdQueryParams>;
   update: RequestHandler;
   delete: RequestHandler;
 }
@@ -45,6 +51,25 @@ export class UserController implements IUserController {
         .status(200)
         .json(
           new SuccessResponse(users, "Users retrieved successfully").toDTO()
+        );
+    } catch (err) {
+      if (!(err instanceof ErrorResponse)) return;
+      next(err);
+    }
+  };
+
+  findAllByClub = async (
+    req: Request<IdQueryParams>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const clubId = Number(req.params.id);
+      const feeds = await this._service.findAllByClubId(clubId);
+      res
+        .status(200)
+        .json(
+          new SuccessResponse(feeds, "Users retrieved successfully").toDTO()
         );
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;

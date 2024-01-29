@@ -33,14 +33,14 @@ export default authRoutes;
 
 const swagger = Swagger.getInstance();
 swagger.add({
-  "/me": {
+  "/auth/me": {
     get: {
       summary: "Get current user",
       tags: ["Auth"],
       responses: { 200: { $ref: "#/components/responses/userResponse" } },
     },
   },
-  "/signin": {
+  "/auth/signin": {
     post: {
       summary: "Sign in",
       tags: ["Auth"],
@@ -48,7 +48,7 @@ swagger.add({
       responses: { 200: { $ref: "#/components/responses/signinResponse" } },
     },
   },
-  "/signup": {
+  "/auth/signup": {
     post: {
       summary: "Sign up",
       tags: ["Auth"],
