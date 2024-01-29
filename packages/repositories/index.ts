@@ -1,3 +1,4 @@
+export * from "./category";
 export * from "./club";
 export * from "./comment";
 export * from "./feed";

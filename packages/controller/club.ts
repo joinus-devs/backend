@@ -11,6 +11,8 @@ import {
 export interface IClubController {
   find: RequestHandler<IdQueryParams>;
   findAll: RequestHandler<PageQueryParams>;
+  findAllByUser: RequestHandler<IdQueryParams>;
+  findAllByCategory: RequestHandler<IdQueryParams>;
   join: RequestHandler<IdQueryParams>;
   create: RequestHandler;
   update: RequestHandler;
@@ -57,6 +59,44 @@ export class ClubController implements IClubController {
   ) => {
     try {
       const clubs = await this._service.findAll();
+      res
+        .status(200)
+        .json(
+          new SuccessResponse(clubs, "Clubs retrieved successfully").toDTO()
+        );
+    } catch (err) {
+      if (!(err instanceof ErrorResponse)) return;
+      next(err);
+    }
+  };
+
+  findAllByUser = async (
+    req: Request<IdQueryParams>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const userId = Number(req.params.id);
+      const clubs = await this._service.findAllByUser(userId);
+      res
+        .status(200)
+        .json(
+          new SuccessResponse(clubs, "Clubs retrieved successfully").toDTO()
+        );
+    } catch (err) {
+      if (!(err instanceof ErrorResponse)) return;
+      next(err);
+    }
+  };
+
+  findAllByCategory = async (
+    req: Request<IdQueryParams>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const categoryId = Number(req.params.id);
+      const clubs = await this._service.findAllByCategory(categoryId);
       res
         .status(200)
         .json(

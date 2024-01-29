@@ -5,7 +5,8 @@ import { ErrorResponse, Nullable } from "../types";
 export interface IClubRepository {
   find(id: number): Promise<Nullable<Club>>;
   findAll(): Promise<Club[]>;
-  findAllByUserId(userId: number): Promise<Club[]>;
+  findAllByUser(userId: number): Promise<Club[]>;
+  findAllByCategory(categoryId: number): Promise<Club[]>;
   createUser(clubId: number, userId: number): Promise<number>;
   create(club: Club): Promise<number>;
   update(club: Club): Promise<number>;
@@ -46,12 +47,25 @@ export class ClubRepository implements IClubRepository {
     }
   };
 
-  findAllByUserId = async (userId: number) => {
+  findAllByUser = async (userId: number) => {
     try {
       return await this._db
         .createQueryBuilder("club")
         .leftJoinAndSelect("club.users", "user")
         .where("user.id = :id", { id: userId, deleted_at: undefined })
+        .getMany();
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  };
+
+  findAllByCategory = async (categoryId: number) => {
+    try {
+      return await this._db
+        .createQueryBuilder("club")
+        .leftJoinAndSelect("club.categories", "category")
+        .where("category.id = :id", { id: categoryId, deleted_at: undefined })
         .getMany();
     } catch (err) {
       console.log(err);

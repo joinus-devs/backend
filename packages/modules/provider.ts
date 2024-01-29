@@ -2,10 +2,12 @@ import { DataSource } from "typeorm";
 import { TransactionManager } from ".";
 import {
   AuthController,
+  CategoryController,
   ClubController,
   CommentController,
   FeedController,
   IAuthController,
+  ICategoryController,
   IClubController,
   ICommentController,
   IFeedController,
@@ -13,9 +15,11 @@ import {
   UserController,
 } from "../controller";
 import {
+  CategoryRepository,
   ClubRepository,
   CommentRepository,
   FeedRepository,
+  ICategoryRepository,
   IClubRepository,
   ICommentRepository,
   IFeedRepository,
@@ -24,10 +28,12 @@ import {
 } from "../repositories";
 import {
   AuthService,
+  CategoryService,
   ClubService,
   CommentService,
   FeedService,
   IAuthService,
+  ICategoryService,
   IClubService,
   ICommentService,
   IFeedService,
@@ -86,12 +92,14 @@ class AppRepository {
   private _clubRepository: IClubRepository;
   private _feedRepository: IFeedRepository;
   private _commentRepository: ICommentRepository;
+  private _categoryRepository: ICategoryRepository;
 
   constructor(datasource: DataSource) {
     this._userRepository = UserRepository.getInstance(datasource);
     this._clubRepository = ClubRepository.getInstance(datasource);
     this._feedRepository = FeedRepository.getInstance(datasource);
     this._commentRepository = CommentRepository.getInstance(datasource);
+    this._categoryRepository = CategoryRepository.getInstance(datasource);
   }
 
   get userRepository() {
@@ -109,6 +117,10 @@ class AppRepository {
   get commentRepository() {
     return this._commentRepository;
   }
+
+  get categoryRepository() {
+    return this._categoryRepository;
+  }
 }
 
 class AppService {
@@ -117,13 +129,20 @@ class AppService {
   private _clubService: IClubService;
   private _feedService: IFeedService;
   private _commentService: ICommentService;
+  private _categoryService: ICategoryService;
 
   constructor(
     appRepository: AppRepository,
     transactionManager: TransactionManager
   ) {
-    this._authService = AuthService.getInstance(appRepository.userRepository);
-    this._userService = UserService.getInstance(appRepository.userRepository);
+    this._authService = AuthService.getInstance(
+      transactionManager,
+      appRepository.userRepository
+    );
+    this._userService = UserService.getInstance(
+      transactionManager,
+      appRepository.userRepository
+    );
     this._clubService = ClubService.getInstance(
       transactionManager,
       appRepository.clubRepository,
@@ -140,6 +159,10 @@ class AppService {
       appRepository.commentRepository,
       appRepository.feedRepository,
       appRepository.userRepository
+    );
+    this._categoryService = CategoryService.getInstance(
+      transactionManager,
+      appRepository.categoryRepository
     );
   }
 
@@ -162,6 +185,10 @@ class AppService {
   get commentService() {
     return this._commentService;
   }
+
+  get categoryService() {
+    return this._categoryService;
+  }
 }
 
 class AppController {
@@ -170,6 +197,7 @@ class AppController {
   private _clubController: IClubController;
   private _feedController: IFeedController;
   private _commentController: ICommentController;
+  private _categoryController: ICategoryController;
 
   constructor(appService: AppService) {
     this._authController = AuthController.getInstance(
@@ -181,6 +209,9 @@ class AppController {
     this._feedController = FeedController.getInstance(appService.feedService);
     this._commentController = CommentController.getInstance(
       appService.commentService
+    );
+    this._categoryController = CategoryController.getInstance(
+      appService.categoryService
     );
   }
 
@@ -202,6 +233,10 @@ class AppController {
 
   get commentController() {
     return this._commentController;
+  }
+
+  get categoryController() {
+    return this._categoryController;
   }
 }
 

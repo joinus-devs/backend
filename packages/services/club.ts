@@ -13,7 +13,8 @@ import { ErrorResponse, Nullable } from "../types";
 export interface IClubService {
   find(id: number): Promise<Nullable<ClubDto>>;
   findAll(): Promise<ClubDto[]>;
-  findAllByUserId(userId: number): Promise<ClubDto[]>;
+  findAllByUser(userId: number): Promise<ClubDto[]>;
+  findAllByCategory(categoryId: number): Promise<ClubDto[]>;
   join(userId: number, clubId: number): Promise<number>;
   create(userId: number, clubCreate: ClubCreate): Promise<number>;
   update(id: number, clubUpdate: ClubUpdate): Promise<number>;
@@ -77,9 +78,18 @@ export class ClubService implements IClubService {
     }
   };
 
-  findAllByUserId = async (userId: number) => {
+  findAllByUser = async (userId: number) => {
     try {
-      const clubs = await this._clubRepository.findAllByUserId(userId);
+      const clubs = await this._clubRepository.findAllByUser(userId);
+      return clubs.map((club) => ClubConverter.toDto(club));
+    } catch (err) {
+      throw new ErrorResponse(500, "Internal Server Error");
+    }
+  };
+
+  findAllByCategory = async (categoryId: number) => {
+    try {
+      const clubs = await this._clubRepository.findAllByCategory(categoryId);
       return clubs.map((club) => ClubConverter.toDto(club));
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");

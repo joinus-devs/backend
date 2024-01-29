@@ -1,15 +1,10 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import {
-  IClubController,
-  IFeedController,
-  IUserController,
-} from "../controller";
+import { IClubController, IFeedController } from "../controller";
 import Swagger from "../docs";
 
 const clubRoutes = (
   clubController: IClubController,
-  userController: IUserController,
   feedController: IFeedController
 ) => {
   const router = Router();
@@ -33,7 +28,7 @@ const clubRoutes = (
     .delete(clubController.delete);
   router
     .route("/:id/users")
-    .get(userController.findAllByClub)
+    .get(clubController.findAllByUser)
     .post(clubController.join);
   router
     .route("/:id/feeds")

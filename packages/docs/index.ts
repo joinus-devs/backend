@@ -1,6 +1,12 @@
 import { cloneDeep } from "lodash";
 import swaggerJSDoc, { Parameter, Response, Schema } from "swagger-jsdoc";
 import { signinParmasDoc, signupParamsDoc, singinResponseDoc } from "./auth";
+import {
+  categoryCreateDoc,
+  categoryDoc,
+  categoryDtoDoc,
+  categoryUpdateDoc,
+} from "./category";
 import { clubCreateDoc, clubDoc, clubDtoDoc, clubUpdateDoc } from "./club";
 import { feedCreateDoc, feedDoc, feedDtoDoc, feedUpdateDoc } from "./feed";
 import { userDoc, userDtoDoc, userUpdateDoc } from "./user";
@@ -51,6 +57,7 @@ class Swagger {
           errorResponse: Swagger._errorResponse,
           user: Swagger.makeScheme(userDoc),
           club: Swagger.makeScheme(clubDoc),
+          category: Swagger.makeScheme(categoryDoc),
           feed: Swagger.makeScheme(feedDoc),
         },
         parameters: {
@@ -59,6 +66,8 @@ class Swagger {
           userUpdate: Swagger.makeBody(userUpdateDoc),
           clubCreate: Swagger.makeBody(clubCreateDoc),
           clubUpdate: Swagger.makeBody(clubUpdateDoc),
+          categoryCreate: Swagger.makeBody(categoryCreateDoc),
+          categoryUpdate: Swagger.makeBody(categoryUpdateDoc),
           feedCreate: Swagger.makeBody(feedCreateDoc),
           feedUpdate: Swagger.makeBody(feedUpdateDoc),
         },
@@ -75,6 +84,12 @@ class Swagger {
           ),
           clubsResponse: Swagger.makeSuccessResponse(
             Swagger.makeArrayScheme(clubDtoDoc)
+          ),
+          categoryResponse: Swagger.makeSuccessResponse(
+            Swagger.makeScheme(categoryDtoDoc)
+          ),
+          categoriesResponse: Swagger.makeSuccessResponse(
+            Swagger.makeArrayScheme(categoryDtoDoc)
           ),
           feedResponse: Swagger.makeSuccessResponse(
             Swagger.makeScheme(feedDtoDoc)

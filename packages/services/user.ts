@@ -1,4 +1,5 @@
 import { UserConverter, UserCreate, UserDto, UserUpdate } from "../models";
+import { TransactionManager } from "../modules";
 import { IUserRepository } from "../repositories";
 import { ErrorResponse, Nullable } from "../types";
 
@@ -14,14 +15,22 @@ export interface IUserService {
 export class UserService implements IUserService {
   private static _instance: Nullable<UserService> = null;
   private _repository: IUserRepository;
+  private _transactionManager: TransactionManager;
 
-  private constructor(repository: IUserRepository) {
+  private constructor(
+    transactionManager: TransactionManager,
+    repository: IUserRepository
+  ) {
     this._repository = repository;
+    this._transactionManager = transactionManager;
   }
 
-  static getInstance(repository: IUserRepository) {
+  static getInstance(
+    transactionManager: TransactionManager,
+    repository: IUserRepository
+  ) {
     if (!this._instance) {
-      this._instance = new UserService(repository);
+      this._instance = new UserService(transactionManager, repository);
     }
 
     return this._instance;

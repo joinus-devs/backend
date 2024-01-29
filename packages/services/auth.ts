@@ -1,4 +1,5 @@
 import { SigninParams, User } from "../models";
+import { TransactionManager } from "../modules";
 import { IUserRepository } from "../repositories";
 import { ErrorResponse, Nullable } from "../types";
 
@@ -9,15 +10,23 @@ export interface IAuthService {
 
 export class AuthService implements IAuthService {
   private static _instance: Nullable<AuthService> = null;
+  private _transactionManager: TransactionManager;
   private _repository: IUserRepository;
 
-  private constructor(repository: IUserRepository) {
+  private constructor(
+    transactionManager: TransactionManager,
+    repository: IUserRepository
+  ) {
     this._repository = repository;
+    this._transactionManager = transactionManager;
   }
 
-  static getInstance(repository: IUserRepository) {
+  static getInstance(
+    transactionManager: TransactionManager,
+    repository: IUserRepository
+  ) {
     if (!this._instance) {
-      this._instance = new AuthService(repository);
+      this._instance = new AuthService(transactionManager, repository);
     }
 
     return this._instance;
