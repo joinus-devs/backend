@@ -35,31 +35,6 @@ export default clubRoutes;
 
 const swagger = Swagger.getInstance();
 swagger.add({
-  "/clubs/{id}/feeds": {
-    get: {
-      summary: "Get all feed of a club",
-      tags: ["Clubs"],
-      responses: { 200: { $ref: "#/components/responses/feedsResponse" } },
-    },
-    post: {
-      summary: "Create a feed",
-      tags: ["Clubs"],
-      parameters: [{ $ref: "#/components/parameters/feedCreate" }],
-      responses: { 200: { $ref: "#/components/responses/numberResponse" } },
-    },
-  },
-  "/clubs/{id}/users": {
-    get: {
-      summary: "Get all uesr of a club",
-      tags: ["Clubs"],
-      responses: { 200: { $ref: "#/components/responses/usersResponse" } },
-    },
-    post: {
-      summary: "Join a club",
-      tags: ["Clubs"],
-      responses: { 200: { $ref: "#/components/responses/numberResponse" } },
-    },
-  },
   "/clubs": {
     get: {
       summary: "Get all club",
@@ -88,6 +63,31 @@ swagger.add({
     delete: {
       summary: "Delete a club",
       tags: ["Clubs"],
+      responses: { 200: { $ref: "#/components/responses/numberResponse" } },
+    },
+  },
+  "/clubs/{id}/users": {
+    get: {
+      summary: "Get all uesr of a club",
+      tags: ["Clubs"],
+      responses: { 200: { $ref: "#/components/responses/usersResponse" } },
+    },
+    post: {
+      summary: "Join a club",
+      tags: ["Clubs"],
+      responses: { 200: { $ref: "#/components/responses/numberResponse" } },
+    },
+  },
+  "/clubs/{id}/feeds": {
+    get: {
+      summary: "Get all feed of a club",
+      tags: ["Clubs"],
+      responses: { 200: { $ref: "#/components/responses/feedsResponse" } },
+    },
+    post: {
+      summary: "Create a feed",
+      tags: ["Clubs"],
+      parameters: [{ $ref: "#/components/parameters/feedCreate" }],
       responses: { 200: { $ref: "#/components/responses/numberResponse" } },
     },
   },

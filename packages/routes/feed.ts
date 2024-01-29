@@ -1,16 +1,23 @@
 import { Router } from "express";
-import { IFeedController } from "../controller";
+import { ICommentController, IFeedController } from "../controller";
 import Swagger from "../docs";
 
-const feedRoutes = (controller: IFeedController) => {
+const feedRoutes = (
+  feedController: IFeedController,
+  commentController: ICommentController
+) => {
   const router = Router();
 
-  router.route("/").get(controller.findAll);
+  router.route("/").get(feedController.findAll);
   router
     .route("/:id")
-    .get(controller.find)
-    .put(controller.update)
-    .delete(controller.delete);
+    .get(feedController.find)
+    .put(feedController.update)
+    .delete(feedController.delete);
+  router
+    .route("/:id/comments")
+    .get(commentController.findAllByFeed)
+    .post(commentController.create);
 
   return router;
 };
@@ -41,6 +48,19 @@ swagger.add({
     delete: {
       summary: "Delete a feed",
       tags: ["Feeds"],
+      responses: { 200: { $ref: "#/components/responses/numberResponse" } },
+    },
+  },
+  "/feeds/{id}/comments": {
+    get: {
+      summary: "Get all comments of a feed",
+      tags: ["Feeds"],
+      responses: { 200: { $ref: "#/components/responses/commentsResponse" } },
+    },
+    post: {
+      summary: "Create a comment",
+      tags: ["Feeds"],
+      parameters: [{ $ref: "#/components/parameters/commentCreate" }],
       responses: { 200: { $ref: "#/components/responses/numberResponse" } },
     },
   },

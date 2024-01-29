@@ -18,10 +18,10 @@ export interface ICommentService {
   findAllByFeed(feed: number): Promise<CommentDto[]>;
   create(
     userId: number,
-    clubId: number,
-    clubCreate: CommentCreate
+    feedId: number,
+    commentCreate: CommentCreate
   ): Promise<number>;
-  update(id: number, clubUpdate: CommentUpdate): Promise<number>;
+  update(id: number, commentUpdate: CommentUpdate): Promise<number>;
   delete(id: number): Promise<number>;
 }
 
@@ -110,7 +110,7 @@ export class CommentService implements ICommentService {
     // check feed exists
     const feed = await this._feedRepository.find(feedId);
     if (!feed) {
-      throw new ErrorResponse(404, "Club not found");
+      throw new ErrorResponse(404, "Feed not found");
     }
 
     try {

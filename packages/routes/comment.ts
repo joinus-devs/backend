@@ -19,19 +19,6 @@ export default commentRoutes;
 
 const swagger = Swagger.getInstance();
 swagger.add({
-  "/clubs/{id}/feeds": {
-    get: {
-      summary: "Get all feed of a club",
-      tags: ["Feeds"],
-      responses: { 200: { $ref: "#/components/responses/feedsResponse" } },
-    },
-    post: {
-      summary: "Create a feed",
-      tags: ["Feeds"],
-      parameters: [{ $ref: "#/components/parameters/feedCreate" }],
-      responses: { 200: { $ref: "#/components/responses/numberResponse" } },
-    },
-  },
   "/feeds": {
     get: {
       summary: "Get all feed",

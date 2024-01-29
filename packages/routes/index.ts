@@ -19,7 +19,13 @@ const initRoutes = (appManager: AppProvider) => {
       appManager.appController.feedController
     )
   );
-  router.use("/feeds", feedRoutes(appManager.appController.feedController));
+  router.use(
+    "/feeds",
+    feedRoutes(
+      appManager.appController.feedController,
+      appManager.appController.commentController
+    )
+  );
   router.use(
     "/comments",
     commentRoutes(appManager.appController.commentController)

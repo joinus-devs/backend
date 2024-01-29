@@ -92,11 +92,11 @@ export class CommentController implements ICommentController {
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userId = (req as any)?.decoded?.id;
-      const clubId = Number(req.params.id);
+      const feedId = Number(req.params.id);
       const commentCreate = req.body;
       const commentId = await this._service.create(
         userId,
-        clubId,
+        feedId,
         commentCreate
       );
       res
