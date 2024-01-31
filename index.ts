@@ -9,7 +9,7 @@ import { DataSource } from "./packages/migrations";
 import { AppProvider } from "./packages/modules";
 import initRoutes from "./packages/routes";
 
-let retries = 5;
+let retries = 10;
 
 const connectDB = async () => {
   try {
