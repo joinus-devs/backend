@@ -7,7 +7,7 @@ const clubBase = {
   sex: { type: "boolean", example: true },
   minimum_age: { type: "number", example: 1 },
   maximum_age: { type: "number", example: 1 },
-  categories: { type: "array", items: { type: "string", example: "sports" } },
+  categories: { type: "array", items: { type: "number", example: 1 } },
 };
 
 export const clubDoc = cloneDeep(clubBase);

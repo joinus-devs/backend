@@ -7,7 +7,11 @@ import {
 } from "../models";
 import { UserInClub } from "../models/userInClub";
 import { TransactionManager } from "../modules";
-import { IClubRepository, IUserRepository } from "../repositories";
+import {
+  ICategoryRepository,
+  IClubRepository,
+  IUserRepository,
+} from "../repositories";
 import { ErrorResponse, Nullable } from "../types";
 
 export interface IClubService {
@@ -26,27 +30,32 @@ export class ClubService implements IClubService {
   private _transactionManager: TransactionManager;
   private _clubRepository: IClubRepository;
   private _userRepository: IUserRepository;
+  private _categoryRepository: ICategoryRepository;
 
   private constructor(
     transactionManager: TransactionManager,
     clubRepository: IClubRepository,
-    userRepository: IUserRepository
+    userRepository: IUserRepository,
+    categoryRepository: ICategoryRepository
   ) {
     this._transactionManager = transactionManager;
     this._clubRepository = clubRepository;
     this._userRepository = userRepository;
+    this._categoryRepository = categoryRepository;
   }
 
   static getInstance(
     transactionManager: TransactionManager,
     clubRepository: IClubRepository,
-    userRepository: IUserRepository
+    userRepository: IUserRepository,
+    categoryRepository: ICategoryRepository
   ) {
     if (!this._instance) {
       this._instance = new ClubService(
         transactionManager,
         clubRepository,
-        userRepository
+        userRepository,
+        categoryRepository
       );
     }
 
@@ -132,6 +141,14 @@ export class ClubService implements IClubService {
       throw new ErrorResponse(404, "User not found");
     }
 
+    // check if category exists
+    const categories = await this._categoryRepository.find(
+      clubCreate.categories[0]
+    );
+    if (!categories) {
+      throw new ErrorResponse(404, "Category not found");
+    }
+
     try {
       return this._transactionManager.withTransaction(async () => {
         const club = ClubConverter.toEntityFromCreate(clubCreate);
@@ -141,6 +158,7 @@ export class ClubService implements IClubService {
         club.users = [userInClub];
         const clubCategory = new ClubCategory();
         clubCategory.club = club;
+        clubCategory.category = categories;
         club.categories = [clubCategory];
         return await this._clubRepository.create(club);
       });

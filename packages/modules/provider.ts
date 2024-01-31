@@ -146,7 +146,8 @@ class AppService {
     this._clubService = ClubService.getInstance(
       transactionManager,
       appRepository.clubRepository,
-      appRepository.userRepository
+      appRepository.userRepository,
+      appRepository.categoryRepository
     );
     this._feedService = FeedService.getInstance(
       transactionManager,

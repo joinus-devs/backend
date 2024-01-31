@@ -8,13 +8,18 @@ export interface ClubScheme extends IdEntity {
   name: string;
   description: string;
   capacity: number;
+  sex: boolean;
+  minimum_age: number;
+  maximum_age: number;
 }
 
 export type ClubDto = ClubScheme;
 
 export type ClubWithUsersDto = ClubDto & { users: UserInClub[] };
 
-export type ClubCreate = Omit<ClubScheme, keyof IdEntity>;
+export type ClubCreate = Omit<ClubScheme, keyof IdEntity> & {
+  categories: number[];
+};
 
 export type ClubUpdate = ClubCreate;
 

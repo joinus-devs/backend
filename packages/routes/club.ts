@@ -17,7 +17,7 @@ const clubRoutes = (
       body("description").isString(),
       body("capacity").isNumeric(),
       body("sex").isBoolean(),
-      body("mininum_age").isNumeric(),
+      body("minimum_age").isNumeric(),
       body("maximum_age").isNumeric(),
       clubController.create
     );
