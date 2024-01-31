@@ -36,12 +36,14 @@ export class AuthService implements IAuthService {
     let user;
     try {
       user = await this._repository.find(id);
-      if (!user) {
-        throw new ErrorResponse(404, "User not found");
-      }
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }
+
+    if (!user) {
+      throw new ErrorResponse(404, "User not found");
+    }
+
     return user;
   };
 
@@ -49,15 +51,17 @@ export class AuthService implements IAuthService {
     let user;
     try {
       user = await this._repository.findByEmail(params.email);
-      if (!user) {
-        throw new ErrorResponse(404, "User not found");
-      }
-      if (user.password !== params.password) {
-        throw new ErrorResponse(401, "Invalid password");
-      }
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }
+
+    if (!user) {
+      throw new ErrorResponse(404, "User not found");
+    }
+    if (user.password !== params.password) {
+      throw new ErrorResponse(401, "Invalid password");
+    }
+
     return user;
   };
 }

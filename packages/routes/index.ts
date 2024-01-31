@@ -31,7 +31,7 @@ const initRoutes = (appManager: AppProvider) => {
     commentRoutes(appManager.appController.commentController)
   );
   router.use(
-    "categories",
+    "/categories",
     categoryRoutes(
       appManager.appController.categoryController,
       appManager.appController.clubController

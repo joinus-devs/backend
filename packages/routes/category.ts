@@ -2,6 +2,7 @@ import { Router } from "express";
 import { IClubController } from "../controller";
 import { ICategoryController } from "../controller/category";
 import Swagger from "../docs";
+import { body } from "express-validator";
 
 const categoryRoutes = (
   categoryController: ICategoryController,
@@ -9,7 +10,10 @@ const categoryRoutes = (
 ) => {
   const router = Router();
 
-  router.route("/").get(categoryController.findAll);
+  router
+    .route("/")
+    .get(categoryController.findAll)
+    .post(body("name").isString(), categoryController.create);
   router
     .route("/:id")
     .get(categoryController.find)
