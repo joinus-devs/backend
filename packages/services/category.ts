@@ -53,7 +53,7 @@ export class CategoryService implements ICategoryService {
 
     // check if comment exists
     if (!category) {
-      throw new ErrorResponse(404, "Comment not found");
+      throw new ErrorResponse(404, "Category not found");
     }
 
     return CategoryConverter.toDto(category);

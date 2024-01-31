@@ -66,6 +66,7 @@ export class ClubService implements IClubService {
     try {
       club = await this._clubRepository.findOne({
         where: { id, deleted_at: undefined },
+        relations: ["categories", "categories.category"],
       });
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
@@ -81,7 +82,10 @@ export class ClubService implements IClubService {
 
   findAll = async () => {
     try {
-      const clubs = await this._clubRepository.find();
+      const clubs = await this._clubRepository.find({
+        where: { deleted_at: undefined },
+        relations: ["categories", "categories.category"],
+      });
       return clubs.map((club) => ClubConverter.toDto(club));
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
