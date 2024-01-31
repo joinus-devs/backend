@@ -31,7 +31,7 @@ const main = async () => {
   const app = express();
   const port = 8000;
 
-  connectDB();
+  await connectDB();
   const appManager = AppProvider.getInstance(DataSource);
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(bodyParser.json());
