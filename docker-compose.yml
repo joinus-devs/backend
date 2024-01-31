@@ -11,6 +11,11 @@ services:
       - MYSQL_ROOT_PASSWORD=root
     networks:
       - backend
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
 
   backend:
     build:
@@ -27,7 +32,8 @@ services:
     networks:
       - backend
     depends_on:
-      - joinus_db
+      joinus_db:
+        condition: service_healthy
 
 volumes:
   db-data:
