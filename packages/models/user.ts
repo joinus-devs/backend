@@ -45,7 +45,9 @@ export class User extends IdEntity implements UserScheme {
   })
   public clubs: UserInClub[];
 
-  @OneToMany(() => Feed, (feed) => feed.user)
+  @OneToMany(() => Feed, (feed) => feed.user, {
+    cascade: true,
+  })
   public feeds: Feed[];
 }
 

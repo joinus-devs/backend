@@ -43,7 +43,9 @@ export class Club extends IdEntity implements ClubScheme {
   })
   public users: UserInClub[];
 
-  @OneToMany(() => Feed, (feed) => feed.club)
+  @OneToMany(() => Feed, (feed) => feed.club, {
+    cascade: true,
+  })
   public feeds: Feed[];
 
   @OneToMany(() => ClubCategory, (clubCategory) => clubCategory.club, {
