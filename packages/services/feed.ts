@@ -1,7 +1,14 @@
-import { FeedConverter, FeedCreate, FeedDto, FeedUpdate } from "../models";
+import { Repository } from "typeorm";
+import {
+  Club,
+  Feed,
+  FeedConverter,
+  FeedCreate,
+  FeedDto,
+  FeedUpdate,
+  User,
+} from "../models";
 import { TransactionManager } from "../modules";
-import { IClubRepository, IUserRepository } from "../repositories";
-import { IFeedRepository } from "../repositories/feed";
 import { ErrorResponse, Nullable } from "../types";
 
 export interface IFeedService {
@@ -20,15 +27,15 @@ export interface IFeedService {
 export class FeedService implements IFeedService {
   private static _instance: Nullable<FeedService> = null;
   private _transactionManager: TransactionManager;
-  private _feedRepository: IFeedRepository;
-  private _userRepository: IUserRepository;
-  private _clubRepository: IClubRepository;
+  private _feedRepository: Repository<Feed>;
+  private _userRepository: Repository<User>;
+  private _clubRepository: Repository<Club>;
 
   private constructor(
     transactionManager: TransactionManager,
-    feedRepository: IFeedRepository,
-    userRepository: IUserRepository,
-    clubRepository: IClubRepository
+    feedRepository: Repository<Feed>,
+    userRepository: Repository<User>,
+    clubRepository: Repository<Club>
   ) {
     this._transactionManager = transactionManager;
     this._feedRepository = feedRepository;
@@ -38,9 +45,9 @@ export class FeedService implements IFeedService {
 
   static getInstance(
     transactionManager: TransactionManager,
-    feedRepository: IFeedRepository,
-    userRepository: IUserRepository,
-    clubRepository: IClubRepository
+    feedRepository: Repository<Feed>,
+    userRepository: Repository<User>,
+    clubRepository: Repository<Club>
   ) {
     if (!this._instance) {
       this._instance = new FeedService(
@@ -57,7 +64,9 @@ export class FeedService implements IFeedService {
   find = async (id: number) => {
     let feed;
     try {
-      feed = await this._feedRepository.find(id);
+      feed = await this._feedRepository.findOne({
+        where: { id: id, deleted_at: undefined },
+      });
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }
@@ -72,7 +81,7 @@ export class FeedService implements IFeedService {
 
   findAll = async () => {
     try {
-      const feeds = await this._feedRepository.findAll();
+      const feeds = await this._feedRepository.find();
       return feeds.map((feed) => FeedConverter.toDto(feed));
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
@@ -81,7 +90,10 @@ export class FeedService implements IFeedService {
 
   findAllByClub = async (clubId: number) => {
     try {
-      const feeds = await this._feedRepository.findAllByClubId(clubId);
+      const feeds = await this._feedRepository.find({
+        where: { club_id: clubId, deleted_at: undefined },
+        relations: ["user"],
+      });
       return feeds.map((feed) => FeedConverter.toDto(feed));
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
@@ -90,23 +102,28 @@ export class FeedService implements IFeedService {
 
   create = async (userId: number, clubId: number, feedCreate: FeedCreate) => {
     // check user exists
-    const user = await this._userRepository.find(userId);
+    const user = await this._userRepository.findOne({
+      where: { id: userId, deleted_at: undefined },
+    });
     if (!user) {
       throw new ErrorResponse(404, "User not found");
     }
 
     // check club exists
-    const club = await this._clubRepository.find(clubId);
+    const club = await this._clubRepository.findOne({
+      where: { id: clubId, deleted_at: undefined },
+    });
     if (!club) {
       throw new ErrorResponse(404, "Club not found");
     }
 
     try {
-      return this._transactionManager.withTransaction(async () => {
+      return this._transactionManager.withTransaction(async (manager) => {
         const feed = FeedConverter.toEntityFromCreate(feedCreate);
         feed.user = user;
         feed.club = club;
-        return await this._feedRepository.create(feed);
+        const result = await manager.getRepository(Feed).create(feed);
+        return result.id;
       });
     } catch (err) {
       if (err instanceof ErrorResponse) {
@@ -118,9 +135,12 @@ export class FeedService implements IFeedService {
 
   update = async (id: number, feedUpdate: FeedUpdate) => {
     try {
-      return await this._feedRepository.update(
-        FeedConverter.toEntityFromUpdate(id, feedUpdate)
-      );
+      return this._transactionManager.withTransaction(async (manager) => {
+        const result = await manager
+          .getRepository(Feed)
+          .save(FeedConverter.toEntityFromUpdate(id, feedUpdate));
+        return result.id;
+      });
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }
@@ -128,7 +148,8 @@ export class FeedService implements IFeedService {
 
   delete = async (id: number) => {
     try {
-      return await this._feedRepository.delete(id);
+      await this._feedRepository.update(id, { deleted_at: new Date() });
+      return id;
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }

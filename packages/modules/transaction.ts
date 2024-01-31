@@ -1,4 +1,4 @@
-import { DataSource } from "typeorm";
+import { DataSource, EntityManager } from "typeorm";
 
 class TransactionManager {
   private _datasource: DataSource;
@@ -7,12 +7,14 @@ class TransactionManager {
     this._datasource = datasource;
   }
 
-  withTransaction = async <T>(callback: () => Promise<T>) => {
+  withTransaction = async <T>(
+    callback: (manager: EntityManager) => Promise<T>
+  ) => {
     const queryRunner = this._datasource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const result = await callback();
+      const result = await callback(queryRunner.manager);
       await queryRunner.commitTransaction();
       return result;
     } catch (err) {

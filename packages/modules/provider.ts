@@ -14,15 +14,12 @@ import {
   IUserController,
   UserController,
 } from "../controller";
+import { Category, Club, Feed, User } from "../models";
 import {
   CategoryRepository,
-  ClubRepository,
   CommentRepository,
-  FeedRepository,
   ICategoryRepository,
-  IClubRepository,
   ICommentRepository,
-  IFeedRepository,
   IUserRepository,
   UserRepository,
 } from "../repositories";
@@ -75,7 +72,11 @@ class AppProvider {
   }
 
   private initService() {
-    return new AppService(this._appRepository, this._transactionManager);
+    return new AppService(
+      this._appRepository,
+      this._transactionManager,
+      this._datasource
+    );
   }
 
   private initController() {
@@ -89,29 +90,17 @@ class AppProvider {
 
 class AppRepository {
   private _userRepository: IUserRepository;
-  private _clubRepository: IClubRepository;
-  private _feedRepository: IFeedRepository;
   private _commentRepository: ICommentRepository;
   private _categoryRepository: ICategoryRepository;
 
   constructor(datasource: DataSource) {
     this._userRepository = UserRepository.getInstance(datasource);
-    this._clubRepository = ClubRepository.getInstance(datasource);
-    this._feedRepository = FeedRepository.getInstance(datasource);
     this._commentRepository = CommentRepository.getInstance(datasource);
     this._categoryRepository = CategoryRepository.getInstance(datasource);
   }
 
   get userRepository() {
     return this._userRepository;
-  }
-
-  get clubRepository() {
-    return this._clubRepository;
-  }
-
-  get feedRepository() {
-    return this._feedRepository;
   }
 
   get commentRepository() {
@@ -133,7 +122,8 @@ class AppService {
 
   constructor(
     appRepository: AppRepository,
-    transactionManager: TransactionManager
+    transactionManager: TransactionManager,
+    dataSource: DataSource
   ) {
     this._authService = AuthService.getInstance(
       transactionManager,
@@ -145,20 +135,20 @@ class AppService {
     );
     this._clubService = ClubService.getInstance(
       transactionManager,
-      appRepository.clubRepository,
-      appRepository.userRepository,
-      appRepository.categoryRepository
+      dataSource.getRepository(Club),
+      dataSource.getRepository(User),
+      dataSource.getRepository(Category)
     );
     this._feedService = FeedService.getInstance(
       transactionManager,
-      appRepository.feedRepository,
-      appRepository.userRepository,
-      appRepository.clubRepository
+      dataSource.getRepository(Feed),
+      dataSource.getRepository(User),
+      dataSource.getRepository(Club)
     );
     this._commentService = CommentService.getInstance(
       transactionManager,
       appRepository.commentRepository,
-      appRepository.feedRepository,
+      dataSource.getRepository(Feed),
       appRepository.userRepository
     );
     this._categoryService = CategoryService.getInstance(

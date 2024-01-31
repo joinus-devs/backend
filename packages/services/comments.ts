@@ -1,15 +1,13 @@
+import { Repository } from "typeorm";
 import {
   CommentConverter,
   CommentCreate,
   CommentDto,
   CommentUpdate,
+  Feed,
 } from "../models";
 import { TransactionManager } from "../modules";
-import {
-  ICommentRepository,
-  IFeedRepository,
-  IUserRepository,
-} from "../repositories";
+import { ICommentRepository, IUserRepository } from "../repositories";
 import { ErrorResponse, Nullable } from "../types";
 
 export interface ICommentService {
@@ -29,13 +27,13 @@ export class CommentService implements ICommentService {
   private static _instance: Nullable<CommentService> = null;
   private _transactionManager: TransactionManager;
   private _commentRepository: ICommentRepository;
-  private _feedRepository: IFeedRepository;
+  private _feedRepository: Repository<Feed>;
   private _userRepository: IUserRepository;
 
   private constructor(
     transactionManager: TransactionManager,
     commentRepository: ICommentRepository,
-    feedRepository: IFeedRepository,
+    feedRepository: Repository<Feed>,
     userRepository: IUserRepository
   ) {
     this._transactionManager = transactionManager;
@@ -47,7 +45,7 @@ export class CommentService implements ICommentService {
   static getInstance(
     transactionManager: TransactionManager,
     commentRepository: ICommentRepository,
-    feedRepository: IFeedRepository,
+    feedRepository: Repository<Feed>,
     userRepository: IUserRepository
   ) {
     if (!this._instance) {
@@ -108,7 +106,9 @@ export class CommentService implements ICommentService {
     }
 
     // check feed exists
-    const feed = await this._feedRepository.find(feedId);
+    const feed = await this._feedRepository.findOne({
+      where: { id: feedId, deleted_at: undefined },
+    });
     if (!feed) {
       throw new ErrorResponse(404, "Feed not found");
     }
