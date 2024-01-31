@@ -24,4 +24,5 @@ export default new DataSource({
   // logging: true,
   entities: [User, UserInClub, Club, Category, ClubCategory, Feed, Comment],
   migrations: [CreateTables1705433210498],
+  migrationsRun: true,
 });
