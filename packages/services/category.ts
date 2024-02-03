@@ -74,6 +74,13 @@ export class CategoryService implements ICategoryService {
   };
 
   create = async (categoryCreate: CategoryCreate) => {
+    const category = await this._categoryRepository.findOne({
+      where: { name: categoryCreate.name, deleted_at: undefined },
+    });
+    if (category) {
+      throw new ErrorResponse(404, "Category already exists");
+    }
+
     try {
       return this._transactionManager.withTransaction(async (manager) => {
         const category = CategoryConverter.toEntityFromCreate(categoryCreate);

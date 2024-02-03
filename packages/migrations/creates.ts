@@ -57,8 +57,7 @@ class CreateTables1705433210498 implements MigrationInterface {
       create table categories (
         ${idQuery}
         ${timesQuery}
-        name varchar(255) not null,
-        unique (name)
+        name varchar(255) not null
       );
     `);
 
