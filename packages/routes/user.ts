@@ -1,17 +1,21 @@
 import { Router } from "express";
 import { IUserController } from "../controller";
 import Swagger from "../docs";
+import { IClubController } from "./../controller/club";
 
-const userRoutes = (controller: IUserController) => {
+const userRoutes = (
+  userController: IUserController,
+  clubController: IClubController
+) => {
   const router = Router();
 
-  router.route("/").get(controller.findAll);
+  router.route("/").get(userController.findAll);
   router
     .route("/:id")
-    .get(controller.find)
-    .put(controller.update)
-    .delete(controller.delete);
-  router.route("/:id/clubs").get(controller.findAllByClub);
+    .get(userController.find)
+    .put(userController.update)
+    .delete(userController.delete);
+  router.route("/:id/clubs").get(clubController.findAllByUser);
 
   return router;
 };

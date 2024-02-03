@@ -11,11 +11,18 @@ const initRoutes = (appManager: AppProvider) => {
   const router = Router();
 
   router.use("/auth", authRoutes(appManager.appController.authController));
-  router.use("/users", userRoutes(appManager.appController.userController));
+  router.use(
+    "/users",
+    userRoutes(
+      appManager.appController.userController,
+      appManager.appController.clubController
+    )
+  );
   router.use(
     "/clubs",
     clubRoutes(
       appManager.appController.clubController,
+      appManager.appController.userController,
       appManager.appController.feedController
     )
   );

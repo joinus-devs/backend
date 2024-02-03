@@ -65,7 +65,7 @@ export class UserController implements IUserController {
   ) => {
     try {
       const clubId = Number(req.params.id);
-      const feeds = await this._service.findAllByClubId(clubId);
+      const feeds = await this._service.findAllByClub(clubId);
       res
         .status(200)
         .json(

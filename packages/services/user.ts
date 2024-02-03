@@ -12,7 +12,7 @@ import { ErrorResponse, Nullable } from "../types";
 export interface IUserService {
   find(id: number): Promise<UserDto>;
   findAll(): Promise<UserDto[]>;
-  findAllByClubId(clubId: number): Promise<UserDto[]>;
+  findAllByClub(clubId: number): Promise<UserDto[]>;
   create(userCreate: UserCreate): Promise<number>;
   update(id: number, userUpdate: UserUpdate): Promise<number>;
   delete(id: number): Promise<number>;
@@ -67,11 +67,12 @@ export class UserService implements IUserService {
     }
   };
 
-  findAllByClubId = async (clubId: number) => {
+  findAllByClub = async (clubId: number) => {
     try {
       const users = await this._repository
         .createQueryBuilder("user")
-        .leftJoinAndSelect("user.clubs", "club")
+        .leftJoinAndSelect("user.clubs", "userInClub")
+        .leftJoinAndSelect("userInClub.club", "club")
         .where("club.id = :id", { id: clubId, deleted_at: undefined })
         .getMany();
       return users.map((user) => UserConverter.toDto(user));
