@@ -45,7 +45,7 @@ export class ClubController implements IClubController {
       const club = await this._service.find(id);
       res
         .status(200)
-        .json(new SuccessResponse(club, "Club retrieved successfully").toDTO());
+        .json(new SuccessResponse(club, "해당 클럽을 불러왔습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -62,7 +62,7 @@ export class ClubController implements IClubController {
       res
         .status(200)
         .json(
-          new SuccessResponse(clubs, "Clubs retrieved successfully").toDTO()
+          new SuccessResponse(clubs, "모든 클럽들을 불러왔습니다.").toDTO()
         );
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
@@ -81,7 +81,10 @@ export class ClubController implements IClubController {
       res
         .status(200)
         .json(
-          new SuccessResponse(clubs, "Clubs retrieved successfully").toDTO()
+          new SuccessResponse(
+            clubs,
+            "해당 유저의 클럽들을 불러왔습니다."
+          ).toDTO()
         );
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
@@ -100,7 +103,10 @@ export class ClubController implements IClubController {
       res
         .status(200)
         .json(
-          new SuccessResponse(clubs, "Clubs retrieved successfully").toDTO()
+          new SuccessResponse(
+            clubs,
+            "해당 카테고리의 클럽들을 불러왔습니다."
+          ).toDTO()
         );
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
@@ -119,7 +125,9 @@ export class ClubController implements IClubController {
       await this._service.join(userId, clubId);
       res
         .status(200)
-        .json(new SuccessResponse(clubId, "Club joined successfully").toDTO());
+        .json(
+          new SuccessResponse(clubId, "유저가 클럽에 가입되었습니다.").toDTO()
+        );
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -133,7 +141,7 @@ export class ClubController implements IClubController {
       const clubId = await this._service.create(userId, clubCreate);
       res
         .status(201)
-        .json(new SuccessResponse(clubId, "Club created successfully").toDTO());
+        .json(new SuccessResponse(clubId, "클럽이 생성되었습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -147,7 +155,7 @@ export class ClubController implements IClubController {
       const clubId = await this._service.update(id, clubUpdate);
       res
         .status(200)
-        .json(new SuccessResponse(clubId, "Club updated successfully").toDTO());
+        .json(new SuccessResponse(clubId, "클럽이 수정되었습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -160,9 +168,7 @@ export class ClubController implements IClubController {
       const deletedId = await this._service.delete(id);
       res
         .status(200)
-        .json(
-          new SuccessResponse(deletedId, "Club deleted successfully").toDTO()
-        );
+        .json(new SuccessResponse(deletedId, "클럽이 삭제되었습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);

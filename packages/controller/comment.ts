@@ -43,9 +43,7 @@ export class CommentController implements ICommentController {
       const feed = await this._service.find(id);
       res
         .status(200)
-        .json(
-          new SuccessResponse(feed, "Comment retrieved successfully").toDTO()
-        );
+        .json(new SuccessResponse(feed, "해당 댓글을 불러왔습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -61,9 +59,7 @@ export class CommentController implements ICommentController {
       const feeds = await this._service.findAll();
       res
         .status(200)
-        .json(
-          new SuccessResponse(feeds, "Comments retrieved successfully").toDTO()
-        );
+        .json(new SuccessResponse(feeds, "모든 댓글을 불러왔습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -81,7 +77,10 @@ export class CommentController implements ICommentController {
       res
         .status(200)
         .json(
-          new SuccessResponse(feeds, "Comments retrieved successfully").toDTO()
+          new SuccessResponse(
+            feeds,
+            "해당 피드의 모든 댓글을 불러왔습니다."
+          ).toDTO()
         );
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
@@ -101,9 +100,7 @@ export class CommentController implements ICommentController {
       );
       res
         .status(201)
-        .json(
-          new SuccessResponse(commentId, "Comment created successfully").toDTO()
-        );
+        .json(new SuccessResponse(commentId, "댓글이 등록되었습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -117,9 +114,7 @@ export class CommentController implements ICommentController {
       const commentId = await this._service.update(id, commentUpdate);
       res
         .status(200)
-        .json(
-          new SuccessResponse(commentId, "Comment updated successfully").toDTO()
-        );
+        .json(new SuccessResponse(commentId, "댓글이 수정되었습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -132,9 +127,7 @@ export class CommentController implements ICommentController {
       const deletedId = await this._service.delete(id);
       res
         .status(200)
-        .json(
-          new SuccessResponse(deletedId, "Comment deleted successfully").toDTO()
-        );
+        .json(new SuccessResponse(deletedId, "댓글이 삭제되었습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);

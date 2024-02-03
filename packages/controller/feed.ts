@@ -43,7 +43,7 @@ export class FeedController implements IFeedController {
       const feed = await this._service.find(id);
       res
         .status(200)
-        .json(new SuccessResponse(feed, "Club retrieved successfully").toDTO());
+        .json(new SuccessResponse(feed, "해당 피드를 불러왔습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -59,9 +59,7 @@ export class FeedController implements IFeedController {
       const feeds = await this._service.findAll();
       res
         .status(200)
-        .json(
-          new SuccessResponse(feeds, "Feeds retrieved successfully").toDTO()
-        );
+        .json(new SuccessResponse(feeds, "모든 피드를 불러왔습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -79,7 +77,10 @@ export class FeedController implements IFeedController {
       res
         .status(200)
         .json(
-          new SuccessResponse(feeds, "Feeds retrieved successfully").toDTO()
+          new SuccessResponse(
+            feeds,
+            "해당 클럽의 모든 피드를 불러왔습니다."
+          ).toDTO()
         );
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
@@ -95,7 +96,7 @@ export class FeedController implements IFeedController {
       const feedId = await this._service.create(userId, clubId, feedCreate);
       res
         .status(201)
-        .json(new SuccessResponse(feedId, "Feed created successfully").toDTO());
+        .json(new SuccessResponse(feedId, "피드가 생성되었습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -109,7 +110,7 @@ export class FeedController implements IFeedController {
       const feedId = await this._service.update(id, feedUpdate);
       res
         .status(200)
-        .json(new SuccessResponse(feedId, "Feed updated successfully").toDTO());
+        .json(new SuccessResponse(feedId, "피드가 수정되었습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -122,9 +123,7 @@ export class FeedController implements IFeedController {
       const deletedId = await this._service.delete(id);
       res
         .status(200)
-        .json(
-          new SuccessResponse(deletedId, "Feed deleted successfully").toDTO()
-        );
+        .json(new SuccessResponse(deletedId, "피드가 삭제되었습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);

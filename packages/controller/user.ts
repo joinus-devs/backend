@@ -37,7 +37,7 @@ export class UserController implements IUserController {
       const user = await this._service.find(id);
       res
         .status(200)
-        .json(new SuccessResponse(user, "User retrieved successfully").toDTO());
+        .json(new SuccessResponse(user, "유저를 불러왔습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -49,9 +49,7 @@ export class UserController implements IUserController {
       const users = await this._service.findAll();
       res
         .status(200)
-        .json(
-          new SuccessResponse(users, "Users retrieved successfully").toDTO()
-        );
+        .json(new SuccessResponse(users, "모든 유저를 불러왔습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -69,7 +67,10 @@ export class UserController implements IUserController {
       res
         .status(200)
         .json(
-          new SuccessResponse(feeds, "Users retrieved successfully").toDTO()
+          new SuccessResponse(
+            feeds,
+            "해당 클럽의 유저들을 불러왔습니다."
+          ).toDTO()
         );
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
@@ -84,7 +85,9 @@ export class UserController implements IUserController {
       const userId = await this._service.update(id, userUpdate);
       res
         .status(200)
-        .json(new SuccessResponse(userId, "User updated successfully").toDTO());
+        .json(
+          new SuccessResponse(userId, "유저 정보가 수정되었습니다.").toDTO()
+        );
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -97,9 +100,7 @@ export class UserController implements IUserController {
       const deletedId = await this._service.delete(id);
       res
         .status(200)
-        .json(
-          new SuccessResponse(deletedId, "User deleted successfully").toDTO()
-        );
+        .json(new SuccessResponse(deletedId, "유저가 삭제되었습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);

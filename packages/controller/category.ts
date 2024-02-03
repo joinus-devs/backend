@@ -43,7 +43,7 @@ export class CategoryController implements ICategoryController {
       res
         .status(200)
         .json(
-          new SuccessResponse(feed, "Comment retrieved successfully").toDTO()
+          new SuccessResponse(feed, "해당 카테고리를 불러왔습니다.").toDTO()
         );
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
@@ -61,7 +61,7 @@ export class CategoryController implements ICategoryController {
       res
         .status(200)
         .json(
-          new SuccessResponse(feeds, "Comments retrieved successfully").toDTO()
+          new SuccessResponse(feeds, "모든 카테고리를 불러왔습니다.").toDTO()
         );
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
@@ -76,10 +76,7 @@ export class CategoryController implements ICategoryController {
       res
         .status(201)
         .json(
-          new SuccessResponse(
-            categoryId,
-            "Category created successfully"
-          ).toDTO()
+          new SuccessResponse(categoryId, "카테고리가 생성되었습니다.").toDTO()
         );
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
@@ -95,10 +92,7 @@ export class CategoryController implements ICategoryController {
       res
         .status(200)
         .json(
-          new SuccessResponse(
-            categoryId,
-            "Category updated successfully"
-          ).toDTO()
+          new SuccessResponse(categoryId, "카테고리가 수정되었습니다.").toDTO()
         );
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
@@ -113,10 +107,7 @@ export class CategoryController implements ICategoryController {
       res
         .status(200)
         .json(
-          new SuccessResponse(
-            deletedId,
-            "Category deleted successfully"
-          ).toDTO()
+          new SuccessResponse(deletedId, "카테고리가 삭제되었습니다.").toDTO()
         );
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;

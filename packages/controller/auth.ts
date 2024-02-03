@@ -32,7 +32,9 @@ export class AuthController implements IAuthController {
   me = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = await this._authService.me((req as any)?.decoded?.id);
-      res.status(200).json(new SuccessResponse(user, "Success").toDTO());
+      res
+        .status(200)
+        .json(new SuccessResponse(user, "내 정보를 불러왔습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -57,7 +59,7 @@ export class AuthController implements IAuthController {
       }
       res
         .status(201)
-        .json(new SuccessResponse({ token }, "Signin successfully").toDTO());
+        .json(new SuccessResponse({ token }, "로그인에 성공했습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -74,7 +76,7 @@ export class AuthController implements IAuthController {
       const userId = await this._userService.create(userCreate);
       res
         .status(201)
-        .json(new SuccessResponse(userId, "User created successfully").toDTO());
+        .json(new SuccessResponse(userId, "회원가입에 성공했습니다.").toDTO());
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
