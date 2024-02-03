@@ -72,12 +72,12 @@ export class UserService implements IUserService {
     try {
       const users = await this._repository
         .createQueryBuilder("user")
-        .leftJoinAndSelect("user.clubs", "userInClub")
-        .leftJoinAndSelect("userInClub.club", "club")
-        .where("club.id = :id", { id: clubId, deleted_at: undefined })
+        .leftJoin("user.clubs", "club")
+        .where("club.club_id = :clubId", { clubId })
         .getMany();
       return users.map((user) => UserConverter.toDto(user));
     } catch (err) {
+      console.log(err);
       throw Errors.InternalServerError;
     }
   };
