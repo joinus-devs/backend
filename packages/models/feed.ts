@@ -14,7 +14,10 @@ export type FeedDto = FeedScheme & {
   user: UserDto;
 };
 
-export type FeedCreate = Omit<FeedScheme, keyof IdEntity>;
+export type FeedCreate = Omit<
+  FeedScheme,
+  keyof IdEntity | "user_id" | "club_id"
+>;
 
 export type FeedUpdate = FeedCreate;
 

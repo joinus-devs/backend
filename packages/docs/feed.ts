@@ -3,17 +3,21 @@ import { FeedCreate, FeedDto, FeedScheme, FeedUpdate } from "../models";
 import { CoreSchema } from "./common";
 import { userDtoDoc } from "./user";
 
-const feedBase: CoreSchema<FeedDto> = {
-  user_id: { type: "number", example: 1 },
-  club_id: { type: "number", example: 1 },
+const feedBase: CoreSchema<Omit<FeedScheme, "user_id" | "club_id">> = {
   title: { type: "string", example: "title" },
   content: { type: "string", example: "content" },
-  user: { properties: userDtoDoc },
 };
 
-export const feedDoc: CoreSchema<FeedScheme> = cloneDeep(feedBase);
+export const feedDoc: CoreSchema<FeedScheme> = {
+  ...cloneDeep(feedBase),
+  user_id: { type: "number", example: 1 },
+  club_id: { type: "number", example: 1 },
+};
 
-export const feedDtoDoc: CoreSchema<FeedDto> = cloneDeep(feedBase);
+export const feedDtoDoc: CoreSchema<FeedDto> = {
+  ...cloneDeep(feedDoc),
+  user: { properties: userDtoDoc },
+};
 
 export const feedCreateDoc: CoreSchema<FeedCreate> = cloneDeep(feedBase);
 
