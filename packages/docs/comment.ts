@@ -9,7 +9,6 @@ import { CoreSchema, makeScheme } from "./common";
 import { userDtoDoc } from "./user";
 
 const commentBase: CoreSchema<Omit<CommentScheme, "user_id" | "feed_id">> = {
-  title: { type: "string", example: "title" },
   content: { type: "string", example: "content" },
 };
 

@@ -1,4 +1,5 @@
 import { Column, Entity, OneToMany } from "typeorm";
+import { Comment } from "./comment";
 import { IdEntity } from "./common";
 import { Feed } from "./feed";
 import { UserInClub } from "./userInClub";
@@ -49,6 +50,11 @@ export class User extends IdEntity implements UserScheme {
     cascade: true,
   })
   public feeds: Feed[];
+
+  @OneToMany(() => Comment, (comment) => comment.user, {
+    cascade: true,
+  })
+  public comments: Comment[];
 }
 
 export class UserConverter {

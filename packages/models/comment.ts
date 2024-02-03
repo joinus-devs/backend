@@ -1,5 +1,4 @@
 import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
-import { Club } from "./club";
 import { IdEntity } from "./common";
 import { Feed } from "./feed";
 import { User, UserDto } from "./user";
@@ -7,7 +6,6 @@ import { User, UserDto } from "./user";
 export interface CommentScheme extends IdEntity {
   user_id: number;
   feed_id: number;
-  title: string;
   content: string;
 }
 
@@ -31,18 +29,15 @@ export class Comment extends IdEntity implements CommentScheme {
   feed_id: number;
 
   @Column()
-  title: string;
-
-  @Column()
   content: string;
 
-  @ManyToOne(() => Club, (club) => club.feeds, {
+  @ManyToOne(() => User, (user) => user.comments, {
     cascade: false,
   })
   @JoinColumn({ name: "user_id" })
   user: User;
 
-  @ManyToOne(() => User, (user) => user.feeds, {
+  @ManyToOne(() => Feed, (feed) => feed.comments, {
     cascade: false,
   })
   @JoinColumn({ name: "feed_id" })
