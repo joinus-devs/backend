@@ -5,7 +5,7 @@ import {
   CommentScheme,
   CommentUpdate,
 } from "../models";
-import { CoreSchema } from "./common";
+import { CoreSchema, makeScheme } from "./common";
 import { userDtoDoc } from "./user";
 
 const commentBase: CoreSchema<Omit<CommentScheme, "user_id" | "feed_id">> = {
@@ -21,7 +21,7 @@ export const commentDoc: CoreSchema<CommentScheme> = {
 
 export const commentDtoDoc: CoreSchema<CommentDto> = {
   ...cloneDeep(commentDoc),
-  user: { properties: userDtoDoc },
+  user: { properties: makeScheme(userDtoDoc) },
 };
 
 export const commentCreateDoc: CoreSchema<CommentCreate> =
