@@ -1,5 +1,6 @@
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { Club } from "./club";
+import { Comment, CommentDto } from "./comment";
 import { IdEntity } from "./common";
 import { User, UserDto } from "./user";
 
@@ -12,6 +13,7 @@ export interface FeedScheme extends IdEntity {
 
 export type FeedDto = FeedScheme & {
   user: UserDto;
+  comments: CommentDto[];
 };
 
 export type FeedCreate = Omit<
@@ -46,6 +48,11 @@ export class Feed extends IdEntity implements FeedScheme {
   })
   @JoinColumn({ name: "club_id" })
   club: Club;
+
+  @OneToMany(() => Comment, (comment) => comment.feed, {
+    cascade: true,
+  })
+  comments: Comment[];
 }
 
 export class FeedConverter {

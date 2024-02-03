@@ -1,6 +1,7 @@
 import { cloneDeep } from "lodash";
 import { FeedCreate, FeedDto, FeedScheme, FeedUpdate } from "../models";
-import { CoreSchema, scheme } from "./common";
+import { commentDtoDoc } from "./comment";
+import { CoreSchema, makeArray, makeScheme } from "./common";
 import { userDtoDoc } from "./user";
 
 const feedBase: CoreSchema<Omit<FeedScheme, "user_id" | "club_id">> = {
@@ -16,7 +17,8 @@ export const feedDoc: CoreSchema<FeedScheme> = {
 
 export const feedDtoDoc: CoreSchema<FeedDto> = {
   ...cloneDeep(feedDoc),
-  user: { properties: { ...scheme.properties, ...userDtoDoc } },
+  user: makeScheme(userDtoDoc),
+  comments: makeArray(commentDtoDoc),
 };
 
 export const feedCreateDoc: CoreSchema<FeedCreate> = cloneDeep(feedBase);
