@@ -67,6 +67,7 @@ export class FeedService implements IFeedService {
     try {
       feed = await this._feedRepository.findOne({
         where: { id: id, deleted_at: undefined },
+        relations: ["user"],
       });
     } catch (err) {
       throw Errors.InternalServerError;
@@ -82,7 +83,10 @@ export class FeedService implements IFeedService {
 
   findAll = async () => {
     try {
-      const feeds = await this._feedRepository.find();
+      const feeds = await this._feedRepository.find({
+        where: { deleted_at: undefined },
+        relations: ["user"],
+      });
       return feeds.map((feed) => FeedConverter.toDto(feed));
     } catch (err) {
       throw Errors.InternalServerError;
@@ -123,7 +127,7 @@ export class FeedService implements IFeedService {
         const feed = FeedConverter.toEntityFromCreate(feedCreate);
         feed.user = user;
         feed.club = club;
-        const result = await manager.getRepository(Feed).create(feed);
+        const result = await manager.getRepository(Feed).save(feed);
         return result.id;
       });
     } catch (err) {

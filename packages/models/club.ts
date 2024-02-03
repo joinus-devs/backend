@@ -13,7 +13,9 @@ export interface ClubScheme extends IdEntity {
   maximum_age: number;
 }
 
-export type ClubDto = ClubScheme;
+export type ClubDto = ClubScheme & {
+  categories: number[];
+};
 
 export type ClubWithUsersDto = ClubDto & { users: UserInClub[] };
 
@@ -61,12 +63,18 @@ export class Club extends IdEntity implements ClubScheme {
 
 export class ClubConverter {
   public static toDto = (club: Club): ClubDto => {
-    const dto = { ...club };
+    const dto = {
+      ...club,
+      categories: club.categories.map((c) => c.category_id),
+    };
     return dto;
   };
 
   public static toDtoWithUsers = (club: Club): ClubWithUsersDto => {
-    const dto = { ...club };
+    const dto = {
+      ...club,
+      categories: club.categories.map((c) => c.category_id),
+    };
     return dto;
   };
 

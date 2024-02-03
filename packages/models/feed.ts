@@ -1,16 +1,17 @@
 import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
-import { Club, ClubDto } from "./club";
+import { Club } from "./club";
 import { IdEntity } from "./common";
 import { User, UserDto } from "./user";
 
 export interface FeedScheme extends IdEntity {
   user_id: number;
   club_id: number;
+  title: string;
+  content: string;
 }
 
 export type FeedDto = FeedScheme & {
   user: UserDto;
-  club: ClubDto;
 };
 
 export type FeedCreate = Omit<FeedScheme, keyof IdEntity>;

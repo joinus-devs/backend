@@ -1,22 +1,20 @@
 import { cloneDeep } from "lodash";
-import { clubDtoDoc } from "./club";
+import { FeedCreate, FeedDto, FeedScheme, FeedUpdate } from "../models";
+import { CoreSchema } from "./common";
 import { userDtoDoc } from "./user";
 
-const feedBase = {
-  title: { type: "string", example: "title" },
-  content: { type: "string", example: "content" },
-};
-
-export const feedDoc = {
-  ...cloneDeep(feedBase),
+const feedBase: CoreSchema<FeedDto> = {
   user_id: { type: "number", example: 1 },
   club_id: { type: "number", example: 1 },
-  user: { properties: cloneDeep(userDtoDoc) },
-  club: { properties: cloneDeep(clubDtoDoc) },
+  title: { type: "string", example: "title" },
+  content: { type: "string", example: "content" },
+  user: userDtoDoc,
 };
 
-export const feedDtoDoc = cloneDeep(feedBase);
+export const feedDoc: CoreSchema<FeedScheme> = cloneDeep(feedBase);
 
-export const feedCreateDoc = cloneDeep(feedBase);
+export const feedDtoDoc: CoreSchema<FeedDto> = cloneDeep(feedBase);
 
-export const feedUpdateDoc = cloneDeep(feedBase);
+export const feedCreateDoc: CoreSchema<FeedCreate> = cloneDeep(feedBase);
+
+export const feedUpdateDoc: CoreSchema<FeedUpdate> = cloneDeep(feedBase);

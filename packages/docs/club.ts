@@ -1,6 +1,8 @@
 import { cloneDeep } from "lodash";
+import { ClubCreate, ClubDto, ClubScheme, ClubUpdate } from "../models";
+import { CoreSchema } from "./common";
 
-const clubBase = {
+const clubBase: CoreSchema<ClubDto> = {
   name: { type: "string", example: "name" },
   description: { type: "string", example: "description" },
   capacity: { type: "number", example: 1 },
@@ -10,10 +12,10 @@ const clubBase = {
   categories: { type: "array", items: { type: "number", example: 1 } },
 };
 
-export const clubDoc = cloneDeep(clubBase);
+export const clubDoc: CoreSchema<ClubScheme> = cloneDeep(clubBase);
 
-export const clubDtoDoc: any = cloneDeep(clubBase);
+export const clubDtoDoc: CoreSchema<ClubDto> = cloneDeep(clubBase);
 
-export const clubCreateDoc = cloneDeep(clubBase);
+export const clubCreateDoc: CoreSchema<ClubCreate> = cloneDeep(clubBase);
 
-export const clubUpdateDoc = cloneDeep(clubBase);
+export const clubUpdateDoc: CoreSchema<ClubUpdate> = cloneDeep(clubBase);
