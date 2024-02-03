@@ -8,7 +8,7 @@ const feedBase: CoreSchema<FeedDto> = {
   club_id: { type: "number", example: 1 },
   title: { type: "string", example: "title" },
   content: { type: "string", example: "content" },
-  user: userDtoDoc,
+  user: { properties: userDtoDoc },
 };
 
 export const feedDoc: CoreSchema<FeedScheme> = cloneDeep(feedBase);
