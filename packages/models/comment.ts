@@ -15,7 +15,10 @@ export type CommentDto = CommentScheme & {
   user: UserDto;
 };
 
-export type CommentCreate = Omit<CommentScheme, keyof IdEntity>;
+export type CommentCreate = Omit<
+  CommentScheme,
+  keyof IdEntity | "user_id" | "feed_id"
+>;
 
 export type CommentUpdate = CommentCreate;
 

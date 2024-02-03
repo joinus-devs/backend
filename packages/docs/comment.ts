@@ -8,17 +8,19 @@ import {
 import { CoreSchema } from "./common";
 import { userDtoDoc } from "./user";
 
-const commentBase: CoreSchema<CommentScheme> = {
-  user_id: { type: "number", example: 1 },
-  feed_id: { type: "number", example: 1 },
+const commentBase: CoreSchema<Omit<CommentScheme, "user_id" | "feed_id">> = {
   title: { type: "string", example: "title" },
   content: { type: "string", example: "content" },
 };
 
-export const commentDoc: CoreSchema<CommentScheme> = cloneDeep(commentBase);
+export const commentDoc: CoreSchema<CommentScheme> = {
+  ...cloneDeep(commentBase),
+  user_id: { type: "number", example: 1 },
+  feed_id: { type: "number", example: 1 },
+};
 
 export const commentDtoDoc: CoreSchema<CommentDto> = {
-  ...cloneDeep(commentBase),
+  ...cloneDeep(commentDoc),
   user: { properties: userDtoDoc },
 };
 
