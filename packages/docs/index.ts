@@ -8,6 +8,7 @@ import {
   categoryUpdateDoc,
 } from "./category";
 import { clubCreateDoc, clubDoc, clubDtoDoc, clubUpdateDoc } from "./club";
+import { commentCreateDoc, commentUpdateDoc } from "./comment";
 import { feedCreateDoc, feedDoc, feedDtoDoc, feedUpdateDoc } from "./feed";
 import { userDoc, userDtoDoc, userUpdateDoc } from "./user";
 
@@ -70,6 +71,8 @@ class Swagger {
           categoryUpdate: Swagger.makeBody(categoryUpdateDoc),
           feedCreate: Swagger.makeBody(feedCreateDoc),
           feedUpdate: Swagger.makeBody(feedUpdateDoc),
+          commentCreate: Swagger.makeBody(commentCreateDoc),
+          commentUpdate: Swagger.makeBody(commentUpdateDoc),
         },
         responses: {
           signinResponse: Swagger.makeSuccessResponse(singinResponseDoc),

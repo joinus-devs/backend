@@ -1,17 +1,18 @@
 import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 import { Club } from "./club";
 import { IdEntity } from "./common";
-import { Feed, FeedDto } from "./feed";
+import { Feed } from "./feed";
 import { User, UserDto } from "./user";
 
 export interface CommentScheme extends IdEntity {
   user_id: number;
   feed_id: number;
+  title: string;
+  content: string;
 }
 
 export type CommentDto = CommentScheme & {
   user: UserDto;
-  feed: FeedDto;
 };
 
 export type CommentCreate = Omit<CommentScheme, keyof IdEntity>;
@@ -48,8 +49,7 @@ export class Comment extends IdEntity implements CommentScheme {
 export class CommentConverter {
   public static toDto = (comment: Comment): CommentDto => {
     const { password, ...user } = comment.user;
-    const { ...feed } = comment.feed;
-    return { ...comment, user, feed };
+    return { ...comment, user };
   };
 
   public static toEntityFromCreate = (dto: CommentCreate): Comment => {
