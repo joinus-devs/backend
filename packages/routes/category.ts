@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { IClubController } from "../controller";
 import { ICategoryController } from "../controller/category";
-import Swagger from "../docs";
+import Docs from "../docs";
 import { body } from "express-validator";
 
 const categoryRoutes = (
@@ -26,7 +26,7 @@ const categoryRoutes = (
 
 export default categoryRoutes;
 
-const swagger = Swagger.getInstance();
+const swagger = Docs.getInstance();
 swagger.add({
   "/categories": {
     get: {

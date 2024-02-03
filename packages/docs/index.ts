@@ -8,13 +8,13 @@ import {
   categoryUpdateDoc,
 } from "./category";
 import { clubCreateDoc, clubDoc, clubDtoDoc, clubUpdateDoc } from "./club";
-import { commentCreateDoc, commentUpdateDoc } from "./comment";
+import { commentCreateDoc, commentDtoDoc, commentUpdateDoc } from "./comment";
 import { feedCreateDoc, feedDoc, feedDtoDoc, feedUpdateDoc } from "./feed";
 import { userDoc, userDtoDoc, userUpdateDoc } from "./user";
 
-class Swagger {
-  private static _instance: Swagger;
-  private _swagger: swaggerJSDoc.OAS3Definition;
+class Docs {
+  private static _instance: Docs;
+  private _swaggerDocs: swaggerJSDoc.OAS3Definition;
   private static _scheme: Schema = {
     description: "common scheme",
     properties: {
@@ -42,7 +42,7 @@ class Swagger {
   };
 
   private constructor() {
-    this._swagger = {
+    this._swaggerDocs = {
       openapi: "3.0.0",
       info: {
         title: "Joinus API",
@@ -53,54 +53,40 @@ class Swagger {
       basePath: "/",
       components: {
         schemas: {
-          scheme: Swagger._scheme,
-          successResponse: Swagger._successResponse,
-          errorResponse: Swagger._errorResponse,
-          user: Swagger.makeScheme(userDoc),
-          club: Swagger.makeScheme(clubDoc),
-          category: Swagger.makeScheme(categoryDoc),
-          feed: Swagger.makeScheme(feedDoc),
+          scheme: Docs._scheme,
+          successResponse: Docs._successResponse,
+          errorResponse: Docs._errorResponse,
+          user: Docs.makeScheme(userDoc),
+          club: Docs.makeScheme(clubDoc),
+          category: Docs.makeScheme(categoryDoc),
+          feed: Docs.makeScheme(feedDoc),
         },
         parameters: {
-          signinParams: Swagger.makeBody(signinParmasDoc),
-          signupParams: Swagger.makeBody(signupParamsDoc),
-          userUpdate: Swagger.makeBody(userUpdateDoc),
-          clubCreate: Swagger.makeBody(clubCreateDoc),
-          clubUpdate: Swagger.makeBody(clubUpdateDoc),
-          categoryCreate: Swagger.makeBody(categoryCreateDoc),
-          categoryUpdate: Swagger.makeBody(categoryUpdateDoc),
-          feedCreate: Swagger.makeBody(feedCreateDoc),
-          feedUpdate: Swagger.makeBody(feedUpdateDoc),
-          commentCreate: Swagger.makeBody(commentCreateDoc),
-          commentUpdate: Swagger.makeBody(commentUpdateDoc),
+          signinParams: Docs.makeBody(signinParmasDoc),
+          signupParams: Docs.makeBody(signupParamsDoc),
+          userUpdate: Docs.makeBody(userUpdateDoc),
+          clubCreate: Docs.makeBody(clubCreateDoc),
+          clubUpdate: Docs.makeBody(clubUpdateDoc),
+          categoryCreate: Docs.makeBody(categoryCreateDoc),
+          categoryUpdate: Docs.makeBody(categoryUpdateDoc),
+          feedCreate: Docs.makeBody(feedCreateDoc),
+          feedUpdate: Docs.makeBody(feedUpdateDoc),
+          commentCreate: Docs.makeBody(commentCreateDoc),
+          commentUpdate: Docs.makeBody(commentUpdateDoc),
         },
         responses: {
-          signinResponse: Swagger.makeSuccessResponse(singinResponseDoc),
-          userResponse: Swagger.makeSuccessResponse(
-            Swagger.makeScheme(userDtoDoc)
-          ),
-          usersResponse: Swagger.makeSuccessResponse(
-            Swagger.makeArrayScheme(userDtoDoc)
-          ),
-          clubResponse: Swagger.makeSuccessResponse(
-            Swagger.makeScheme(clubDtoDoc)
-          ),
-          clubsResponse: Swagger.makeSuccessResponse(
-            Swagger.makeArrayScheme(clubDtoDoc)
-          ),
-          categoryResponse: Swagger.makeSuccessResponse(
-            Swagger.makeScheme(categoryDtoDoc)
-          ),
-          categoriesResponse: Swagger.makeSuccessResponse(
-            Swagger.makeArrayScheme(categoryDtoDoc)
-          ),
-          feedResponse: Swagger.makeSuccessResponse(
-            Swagger.makeScheme(feedDtoDoc)
-          ),
-          feedsResponse: Swagger.makeSuccessResponse(
-            Swagger.makeArrayScheme(feedDtoDoc)
-          ),
-          numberResponse: Swagger.makeSuccessResponse({
+          signinResponse: Docs.makeSuccess(singinResponseDoc),
+          userResponse: Docs.makeSuccess(Docs.makeScheme(userDtoDoc)),
+          usersResponse: Docs.makeSuccess(Docs.makeArray(userDtoDoc)),
+          clubResponse: Docs.makeSuccess(Docs.makeScheme(clubDtoDoc)),
+          clubsResponse: Docs.makeSuccess(Docs.makeArray(clubDtoDoc)),
+          categoryResponse: Docs.makeSuccess(Docs.makeScheme(categoryDtoDoc)),
+          categoriesResponse: Docs.makeSuccess(Docs.makeArray(categoryDtoDoc)),
+          feedResponse: Docs.makeSuccess(Docs.makeScheme(feedDtoDoc)),
+          feedsResponse: Docs.makeSuccess(Docs.makeArray(feedDtoDoc)),
+          commentResponse: Docs.makeSuccess(Docs.makeScheme(commentDtoDoc)),
+          commentsResponse: Docs.makeSuccess(Docs.makeArray(commentDtoDoc)),
+          numberResponse: Docs.makeSuccess({
             type: "number",
             example: 1,
           }),
@@ -113,7 +99,7 @@ class Swagger {
 
   static getInstance() {
     if (!this._instance) {
-      this._instance = new Swagger();
+      this._instance = new Docs();
     }
 
     return this._instance;
@@ -121,13 +107,13 @@ class Swagger {
 
   static makeScheme = (data: object): Schema => ({
     type: "object",
-    properties: { ...Swagger._scheme.properties, ...cloneDeep(data) },
+    properties: { ...Docs._scheme.properties, ...cloneDeep(data) },
   });
 
-  static makeArrayScheme = (data: object): Schema => ({
+  static makeArray = (data: object): Schema => ({
     type: "array",
     items: {
-      properties: { ...Swagger._scheme.properties, ...cloneDeep(data) },
+      properties: { ...Docs._scheme.properties, ...cloneDeep(data) },
     },
   });
 
@@ -141,16 +127,16 @@ class Swagger {
     },
   });
 
-  static makeSuccessResponse = (schema: Schema): Response => {
-    const newData = cloneDeep(Swagger._successResponse);
+  static makeSuccess = (schema: Schema): Response => {
+    const newData = cloneDeep(Docs._successResponse);
     newData.properties.data = cloneDeep(schema);
-    return Swagger.makeResponse(newData, "success");
+    return Docs.makeResponse(newData, "success");
   };
 
-  static makeErrorResponse = (schema: Schema): Response => {
-    const newData = cloneDeep(Swagger._errorResponse);
+  static makeError = (schema: Schema): Response => {
+    const newData = cloneDeep(Docs._errorResponse);
     newData.properties.data = cloneDeep(schema);
-    return Swagger.makeResponse(newData, "error");
+    return Docs.makeResponse(newData, "error");
   };
 
   static makeResponse = (schema: Schema, description?: string): Response => ({
@@ -159,12 +145,12 @@ class Swagger {
   });
 
   public add = (docs: swaggerJSDoc.Paths) => {
-    this._swagger.paths = { ...this._swagger.paths, ...docs };
+    this._swaggerDocs.paths = { ...this._swaggerDocs.paths, ...docs };
   };
 
   public get = () => {
-    return this._swagger;
+    return this._swaggerDocs;
   };
 }
 
-export default Swagger;
+export default Docs;

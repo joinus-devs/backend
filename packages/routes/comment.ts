@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { ICommentController } from "../controller";
-import Swagger from "../docs";
+import Docs from "../docs";
 
 const commentRoutes = (controller: ICommentController) => {
   const router = Router();
@@ -17,7 +17,7 @@ const commentRoutes = (controller: ICommentController) => {
 
 export default commentRoutes;
 
-const swagger = Swagger.getInstance();
+const swagger = Docs.getInstance();
 swagger.add({
   "/feeds": {
     get: {

@@ -3,7 +3,7 @@ import cors from "cors";
 import express from "express";
 import "reflect-metadata";
 import swaggerUi from "swagger-ui-express";
-import Swagger from "./packages/docs";
+import Docs from "./packages/docs";
 import { authenticator, errorHandler, logger } from "./packages/middleware";
 import { DataSource } from "./packages/migrations";
 import { AppProvider } from "./packages/modules";
@@ -40,11 +40,7 @@ const main = async () => {
   app.use(authenticator);
   app.use(initRoutes(appManager));
   app.use(errorHandler);
-  app.use(
-    "/docs",
-    swaggerUi.serve,
-    swaggerUi.setup(Swagger.getInstance().get())
-  );
+  app.use("/docs", swaggerUi.serve, swaggerUi.setup(Docs.getInstance().get()));
 
   app.listen(port, function () {
     console.log(`Server is listening on port ${port}`);

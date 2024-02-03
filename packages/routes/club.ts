@@ -5,7 +5,7 @@ import {
   IFeedController,
   IUserController,
 } from "../controller";
-import Swagger from "../docs";
+import Docs from "../docs";
 
 const clubRoutes = (
   clubController: IClubController,
@@ -45,7 +45,7 @@ const clubRoutes = (
 
 export default clubRoutes;
 
-const swagger = Swagger.getInstance();
+const swagger = Docs.getInstance();
 swagger.add({
   "/clubs": {
     get: {

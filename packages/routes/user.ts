@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { IUserController } from "../controller";
-import Swagger from "../docs";
+import Docs from "../docs";
 import { IClubController } from "./../controller/club";
 
 const userRoutes = (
@@ -22,7 +22,7 @@ const userRoutes = (
 
 export default userRoutes;
 
-const swagger = Swagger.getInstance();
+const swagger = Docs.getInstance();
 swagger.add({
   "/users": {
     get: {

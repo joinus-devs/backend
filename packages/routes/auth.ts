@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { body } from "express-validator";
 import { IAuthController } from "../controller";
-import Swagger from "../docs";
+import Docs from "../docs";
 
 const authRoutes = (controller: IAuthController) => {
   const router = Router();
@@ -31,7 +31,7 @@ const authRoutes = (controller: IAuthController) => {
 
 export default authRoutes;
 
-const swagger = Swagger.getInstance();
+const swagger = Docs.getInstance();
 swagger.add({
   "/auth/me": {
     get: {
