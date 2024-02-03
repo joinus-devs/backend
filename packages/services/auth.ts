@@ -1,7 +1,8 @@
 import { Repository } from "typeorm";
+import Errors from "../constants/errors";
 import { SigninParams, User } from "../models";
 import { TransactionManager } from "../modules";
-import { ErrorResponse, Nullable } from "../types";
+import { Nullable } from "../types";
 
 export interface IAuthService {
   me: (id: number) => Promise<User>;
@@ -37,11 +38,11 @@ export class AuthService implements IAuthService {
     try {
       user = await this._repository.findOne({ where: { id } });
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
 
     if (!user) {
-      throw new ErrorResponse(404, "User not found");
+      throw Errors.UserNotFound;
     }
 
     return user;
@@ -52,14 +53,14 @@ export class AuthService implements IAuthService {
     try {
       user = await this._repository.findOne({ where: { email: params.email } });
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
 
     if (!user) {
-      throw new ErrorResponse(404, "User not found");
+      throw Errors.UserNotFound;
     }
     if (user.password !== params.password) {
-      throw new ErrorResponse(401, "Invalid password");
+      throw Errors.PasswordNotMatch;
     }
 
     return user;

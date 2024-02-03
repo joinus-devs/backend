@@ -1,4 +1,5 @@
 import { Repository } from "typeorm";
+import Errors from "../constants/errors";
 import {
   User,
   UserConverter,
@@ -47,12 +48,12 @@ export class UserService implements IUserService {
     try {
       user = await this._repository.findOne({ where: { id } });
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
 
-    // check if user exists
+    // 유저가 없을 경우
     if (!user) {
-      throw new ErrorResponse(404, "User not found");
+      throw Errors.UserNotFound;
     }
 
     return UserConverter.toDto(user);
@@ -63,7 +64,7 @@ export class UserService implements IUserService {
       const users = await this._repository.find();
       return users.map((user) => UserConverter.toDto(user));
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
@@ -77,7 +78,7 @@ export class UserService implements IUserService {
         .getMany();
       return users.map((user) => UserConverter.toDto(user));
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
@@ -91,7 +92,7 @@ export class UserService implements IUserService {
       if (err instanceof ErrorResponse) {
         throw err;
       }
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
@@ -102,7 +103,7 @@ export class UserService implements IUserService {
       );
       return result.id;
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
@@ -111,7 +112,7 @@ export class UserService implements IUserService {
       await this._repository.update(id, { deleted_at: new Date() });
       return id;
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 }

@@ -1,4 +1,5 @@
 import { Repository } from "typeorm";
+import Errors from "../constants/errors";
 import {
   Category,
   CategoryConverter,
@@ -7,7 +8,7 @@ import {
   CategoryUpdate,
 } from "../models";
 import { TransactionManager } from "../modules";
-import { ErrorResponse, Nullable } from "../types";
+import { Nullable } from "../types";
 
 export interface ICategoryService {
   find(id: number): Promise<Nullable<CategoryDto>>;
@@ -51,12 +52,12 @@ export class CategoryService implements ICategoryService {
         where: { id, deleted_at: undefined },
       });
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
 
-    // check if comment exists
+    // 카테고리가 없을 경우
     if (!category) {
-      throw new ErrorResponse(404, "Category not found");
+      throw Errors.CategoryNotFound;
     }
 
     return CategoryConverter.toDto(category);
@@ -69,7 +70,7 @@ export class CategoryService implements ICategoryService {
       });
       return categories.map((category) => CategoryConverter.toDto(category));
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
@@ -78,7 +79,7 @@ export class CategoryService implements ICategoryService {
       where: { name: categoryCreate.name, deleted_at: undefined },
     });
     if (category) {
-      throw new ErrorResponse(404, "Category already exists");
+      throw Errors.CategoryNameAlreadyExists;
     }
 
     try {
@@ -88,10 +89,7 @@ export class CategoryService implements ICategoryService {
         return result.id;
       });
     } catch (err) {
-      if (err instanceof ErrorResponse) {
-        throw err;
-      }
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
@@ -102,7 +100,7 @@ export class CategoryService implements ICategoryService {
       );
       return result.id;
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
@@ -111,7 +109,7 @@ export class CategoryService implements ICategoryService {
       await this._categoryRepository.delete(id);
       return id;
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 }

@@ -1,4 +1,5 @@
 import { QueryFailedError, Repository } from "typeorm";
+import Errors from "../constants/errors";
 import {
   Category,
   Club,
@@ -69,12 +70,12 @@ export class ClubService implements IClubService {
         relations: ["categories", "categories.category"],
       });
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
 
-    // check if club exists
+    // 클럽이 없을 경우
     if (!club) {
-      throw new ErrorResponse(404, "Club not found");
+      throw Errors.ClubNotFound;
     }
 
     return ClubConverter.toDto(club);
@@ -88,7 +89,7 @@ export class ClubService implements IClubService {
       });
       return clubs.map((club) => ClubConverter.toDto(club));
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
@@ -101,7 +102,7 @@ export class ClubService implements IClubService {
         .getMany();
       return clubs.map((club) => ClubConverter.toDto(club));
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
@@ -114,21 +115,25 @@ export class ClubService implements IClubService {
         .getMany();
       return clubs.map((club) => ClubConverter.toDto(club));
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
   join = async (userId: number, clubId: number) => {
-    // check if user exists
-    const user = await this._userRepository.findOne({ where: { id: userId } });
+    // 유저가 존재하는지 확인
+    const user = await this._userRepository.findOne({
+      where: { id: userId, deleted_at: undefined },
+    });
     if (!user) {
-      throw new ErrorResponse(404, "User not found");
+      throw Errors.UserNotFound;
     }
 
-    // check if club exists
-    const club = await this._clubRepository.findOne({ where: { id: clubId } });
+    // 클럽이 존재하는지 확인
+    const club = await this._clubRepository.findOne({
+      where: { id: clubId, deleted_at: undefined },
+    });
     if (!club) {
-      throw new ErrorResponse(404, "Club not found");
+      throw Errors.ClubNotFound;
     }
 
     try {
@@ -149,23 +154,23 @@ export class ClubService implements IClubService {
       if (err instanceof ErrorResponse) {
         throw err;
       }
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
   create = async (userId: number, clubCreate: ClubCreate) => {
-    // check if user exists
+    // 유저가 존재하는지 확인
     const user = await this._userRepository.findOne({ where: { id: userId } });
     if (!user) {
-      throw new ErrorResponse(404, "User not found");
+      throw Errors.UserNotFound;
     }
 
-    // check if category exists
+    // 카테고리가 존재하는지 확인
     const category = await this._categoryRepository.findOne({
       where: { id: clubCreate.categories[0] },
     });
     if (!category) {
-      throw new ErrorResponse(404, "Category not found");
+      throw Errors.CategoryNotFound;
     }
 
     try {
@@ -187,13 +192,13 @@ export class ClubService implements IClubService {
             err instanceof QueryFailedError &&
             err.driverError.errno === 1062
           ) {
-            throw new ErrorResponse(409, "Unique constraint error");
+            throw Errors.ClubNameAlreadyExists;
           }
           throw err;
         }
       });
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
@@ -206,7 +211,7 @@ export class ClubService implements IClubService {
         return result.id;
       });
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
@@ -215,7 +220,7 @@ export class ClubService implements IClubService {
       await this._clubRepository.update(id, { deleted_at: new Date() });
       return id;
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 }

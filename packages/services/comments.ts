@@ -1,4 +1,5 @@
 import { Repository } from "typeorm";
+import Errors from "../constants/errors";
 import {
   Comment,
   CommentConverter,
@@ -9,7 +10,7 @@ import {
   User,
 } from "../models";
 import { TransactionManager } from "../modules";
-import { ErrorResponse, Nullable } from "../types";
+import { Nullable } from "../types";
 
 export interface ICommentService {
   find(id: number): Promise<Nullable<CommentDto>>;
@@ -62,22 +63,22 @@ export class CommentService implements ICommentService {
   }
 
   find = async (id: number) => {
-    let feed;
+    let comment;
     try {
-      feed = await this._commentRepository.findOne({
+      comment = await this._commentRepository.findOne({
         where: { id },
         relations: ["user"],
       });
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
 
-    // check if comment exists
-    if (!feed) {
-      throw new ErrorResponse(404, "Comment not found");
+    // 댓글이 없을 경우
+    if (!comment) {
+      throw Errors.CommentNotFound;
     }
 
-    return CommentConverter.toDto(feed);
+    return CommentConverter.toDto(comment);
   };
 
   findAll = async () => {
@@ -88,7 +89,7 @@ export class CommentService implements ICommentService {
       });
       return comments.map((comment) => CommentConverter.toDto(comment));
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
@@ -100,7 +101,7 @@ export class CommentService implements ICommentService {
       });
       return comments.map((comment) => CommentConverter.toDto(comment));
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
@@ -109,18 +110,20 @@ export class CommentService implements ICommentService {
     feedId: number,
     commentCreate: CommentCreate
   ) => {
-    // check user exists
-    const user = await this._userRepository.findOne({ where: { id: userId } });
+    // 유저가 존재하는지 확인
+    const user = await this._userRepository.findOne({
+      where: { id: userId, deleted_at: undefined },
+    });
     if (!user) {
-      throw new ErrorResponse(404, "User not found");
+      throw Errors.UserNotFound;
     }
 
-    // check feed exists
+    // 피드가 존재하는지 확인
     const feed = await this._feedRepository.findOne({
       where: { id: feedId, deleted_at: undefined },
     });
     if (!feed) {
-      throw new ErrorResponse(404, "Feed not found");
+      throw Errors.FeedNotFound;
     }
 
     try {
@@ -132,10 +135,7 @@ export class CommentService implements ICommentService {
         return result.id;
       });
     } catch (err) {
-      if (err instanceof ErrorResponse) {
-        throw err;
-      }
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
@@ -146,7 +146,7 @@ export class CommentService implements ICommentService {
       );
       return result.id;
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
@@ -157,7 +157,7 @@ export class CommentService implements ICommentService {
       });
       return id;
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 }

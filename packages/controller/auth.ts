@@ -1,5 +1,6 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import jwt from "jsonwebtoken";
+import Errors from "../constants/errors";
 import { SigninParams, UserCreate } from "../models";
 import { IAuthService, IUserService } from "../services";
 import { ErrorResponse, Nullable, SuccessResponse } from "../types";
@@ -52,7 +53,7 @@ export class AuthController implements IAuthController {
           expiresIn: "1h",
         });
       } catch (err) {
-        throw new ErrorResponse(500, "Internal Server Error");
+        throw Errors.InternalServerError;
       }
       res
         .status(201)

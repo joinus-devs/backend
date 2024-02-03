@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
-import { ErrorResponse, MiddelWare } from "../types";
+import Errors from "../constants/errors";
+import { MiddelWare } from "../types";
 
 const whiteList = ["/auth/signin", "/auth/signup"];
 
@@ -13,12 +14,12 @@ const authenticator: MiddelWare = (req, res, next) => {
     return next();
   } catch (err) {
     if (err instanceof jwt.JsonWebTokenError) {
-      next(new ErrorResponse(401, "Invalid Token"));
+      next(Errors.InvalidToken);
     }
     if (err instanceof jwt.TokenExpiredError) {
-      next(new ErrorResponse(419, "Token Expired"));
+      next(Errors.TokenExpired);
     }
-    next(new ErrorResponse(500, "Internal Server Error"));
+    next(Errors.InternalServerError);
   }
 };
 

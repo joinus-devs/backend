@@ -1,4 +1,5 @@
 import { Repository } from "typeorm";
+import Errors from "../constants/errors";
 import {
   Club,
   Feed,
@@ -68,12 +69,12 @@ export class FeedService implements IFeedService {
         where: { id: id, deleted_at: undefined },
       });
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
 
-    // check feed exists
+    // 피드가 없을 경우
     if (!feed) {
-      throw new ErrorResponse(404, "Feed not found");
+      throw Errors.FeedNotFound;
     }
 
     return FeedConverter.toDto(feed);
@@ -84,7 +85,7 @@ export class FeedService implements IFeedService {
       const feeds = await this._feedRepository.find();
       return feeds.map((feed) => FeedConverter.toDto(feed));
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
@@ -96,25 +97,25 @@ export class FeedService implements IFeedService {
       });
       return feeds.map((feed) => FeedConverter.toDto(feed));
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
   create = async (userId: number, clubId: number, feedCreate: FeedCreate) => {
-    // check user exists
+    // 유저가 존재하는지 확인
     const user = await this._userRepository.findOne({
       where: { id: userId, deleted_at: undefined },
     });
     if (!user) {
-      throw new ErrorResponse(404, "User not found");
+      throw Errors.UserNotFound;
     }
 
-    // check club exists
+    // 클럽이 존재하는지 확인
     const club = await this._clubRepository.findOne({
       where: { id: clubId, deleted_at: undefined },
     });
     if (!club) {
-      throw new ErrorResponse(404, "Club not found");
+      throw Errors.ClubNotFound;
     }
 
     try {
@@ -129,7 +130,7 @@ export class FeedService implements IFeedService {
       if (err instanceof ErrorResponse) {
         throw err;
       }
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
@@ -142,7 +143,7 @@ export class FeedService implements IFeedService {
         return result.id;
       });
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 
@@ -151,7 +152,7 @@ export class FeedService implements IFeedService {
       await this._feedRepository.update(id, { deleted_at: new Date() });
       return id;
     } catch (err) {
-      throw new ErrorResponse(500, "Internal Server Error");
+      throw Errors.InternalServerError;
     }
   };
 }
