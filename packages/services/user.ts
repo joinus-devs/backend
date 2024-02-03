@@ -1,6 +1,12 @@
-import { UserConverter, UserCreate, UserDto, UserUpdate } from "../models";
+import { Repository } from "typeorm";
+import {
+  User,
+  UserConverter,
+  UserCreate,
+  UserDto,
+  UserUpdate,
+} from "../models";
 import { TransactionManager } from "../modules";
-import { IUserRepository } from "../repositories";
 import { ErrorResponse, Nullable } from "../types";
 
 export interface IUserService {
@@ -14,12 +20,12 @@ export interface IUserService {
 
 export class UserService implements IUserService {
   private static _instance: Nullable<UserService> = null;
-  private _repository: IUserRepository;
+  private _repository: Repository<User>;
   private _transactionManager: TransactionManager;
 
   private constructor(
     transactionManager: TransactionManager,
-    repository: IUserRepository
+    repository: Repository<User>
   ) {
     this._repository = repository;
     this._transactionManager = transactionManager;
@@ -27,7 +33,7 @@ export class UserService implements IUserService {
 
   static getInstance(
     transactionManager: TransactionManager,
-    repository: IUserRepository
+    repository: Repository<User>
   ) {
     if (!this._instance) {
       this._instance = new UserService(transactionManager, repository);
@@ -39,7 +45,7 @@ export class UserService implements IUserService {
   find = async (id: number) => {
     let user;
     try {
-      user = await this._repository.find(id);
+      user = await this._repository.findOne({ where: { id } });
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }
@@ -54,7 +60,7 @@ export class UserService implements IUserService {
 
   findAll = async () => {
     try {
-      const users = await this._repository.findAll();
+      const users = await this._repository.find();
       return users.map((user) => UserConverter.toDto(user));
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
@@ -63,7 +69,11 @@ export class UserService implements IUserService {
 
   findAllByClubId = async (clubId: number) => {
     try {
-      const users = await this._repository.findAllByClubId(clubId);
+      const users = await this._repository
+        .createQueryBuilder("user")
+        .leftJoinAndSelect("user.clubs", "club")
+        .where("club.id = :id", { id: clubId, deleted_at: undefined })
+        .getMany();
       return users.map((user) => UserConverter.toDto(user));
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
@@ -72,9 +82,10 @@ export class UserService implements IUserService {
 
   create = async (userCreate: UserCreate) => {
     try {
-      return await this._repository.create(
+      const result = await this._repository.save(
         UserConverter.toEntityFromCreate(userCreate)
       );
+      return result.id;
     } catch (err) {
       if (err instanceof ErrorResponse) {
         throw err;
@@ -85,9 +96,10 @@ export class UserService implements IUserService {
 
   update = async (id: number, userUpdate: UserUpdate) => {
     try {
-      return await this._repository.update(
+      const result = await this._repository.save(
         UserConverter.toEntityFromUpdate(id, userUpdate)
       );
+      return result.id;
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }
@@ -95,7 +107,8 @@ export class UserService implements IUserService {
 
   delete = async (id: number) => {
     try {
-      return await this._repository.delete(id);
+      await this._repository.update(id, { deleted_at: new Date() });
+      return id;
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }

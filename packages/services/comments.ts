@@ -1,13 +1,14 @@
 import { Repository } from "typeorm";
 import {
+  Comment,
   CommentConverter,
   CommentCreate,
   CommentDto,
   CommentUpdate,
   Feed,
+  User,
 } from "../models";
 import { TransactionManager } from "../modules";
-import { ICommentRepository, IUserRepository } from "../repositories";
 import { ErrorResponse, Nullable } from "../types";
 
 export interface ICommentService {
@@ -26,15 +27,15 @@ export interface ICommentService {
 export class CommentService implements ICommentService {
   private static _instance: Nullable<CommentService> = null;
   private _transactionManager: TransactionManager;
-  private _commentRepository: ICommentRepository;
+  private _commentRepository: Repository<Comment>;
   private _feedRepository: Repository<Feed>;
-  private _userRepository: IUserRepository;
+  private _userRepository: Repository<User>;
 
   private constructor(
     transactionManager: TransactionManager,
-    commentRepository: ICommentRepository,
+    commentRepository: Repository<Comment>,
     feedRepository: Repository<Feed>,
-    userRepository: IUserRepository
+    userRepository: Repository<User>
   ) {
     this._transactionManager = transactionManager;
     this._commentRepository = commentRepository;
@@ -44,9 +45,9 @@ export class CommentService implements ICommentService {
 
   static getInstance(
     transactionManager: TransactionManager,
-    commentRepository: ICommentRepository,
+    commentRepository: Repository<Comment>,
     feedRepository: Repository<Feed>,
-    userRepository: IUserRepository
+    userRepository: Repository<User>
   ) {
     if (!this._instance) {
       this._instance = new CommentService(
@@ -63,7 +64,10 @@ export class CommentService implements ICommentService {
   find = async (id: number) => {
     let feed;
     try {
-      feed = await this._commentRepository.find(id);
+      feed = await this._commentRepository.findOne({
+        where: { id },
+        relations: ["user"],
+      });
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }
@@ -78,7 +82,10 @@ export class CommentService implements ICommentService {
 
   findAll = async () => {
     try {
-      const comments = await this._commentRepository.findAll();
+      const comments = await this._commentRepository.find({
+        where: { deleted_at: undefined },
+        relations: ["user"],
+      });
       return comments.map((comment) => CommentConverter.toDto(comment));
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
@@ -87,7 +94,10 @@ export class CommentService implements ICommentService {
 
   findAllByFeed = async (feedId: number) => {
     try {
-      const comments = await this._commentRepository.findAllByFeedId(feedId);
+      const comments = await this._commentRepository.find({
+        where: { feed_id: feedId, deleted_at: undefined },
+        relations: ["user"],
+      });
       return comments.map((comment) => CommentConverter.toDto(comment));
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
@@ -100,7 +110,7 @@ export class CommentService implements ICommentService {
     commentCreate: CommentCreate
   ) => {
     // check user exists
-    const user = await this._userRepository.find(userId);
+    const user = await this._userRepository.findOne({ where: { id: userId } });
     if (!user) {
       throw new ErrorResponse(404, "User not found");
     }
@@ -114,11 +124,12 @@ export class CommentService implements ICommentService {
     }
 
     try {
-      return this._transactionManager.withTransaction(async () => {
+      return this._transactionManager.withTransaction(async (manager) => {
         const comment = CommentConverter.toEntityFromCreate(commentCreate);
         comment.user = user;
         comment.feed = feed;
-        return await this._commentRepository.create(comment);
+        const result = await manager.getRepository(Comment).save(comment);
+        return result.id;
       });
     } catch (err) {
       if (err instanceof ErrorResponse) {
@@ -130,9 +141,10 @@ export class CommentService implements ICommentService {
 
   update = async (id: number, commentUpdate: CommentUpdate) => {
     try {
-      return await this._commentRepository.update(
+      const result = await this._commentRepository.save(
         CommentConverter.toEntityFromUpdate(id, commentUpdate)
       );
+      return result.id;
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }
@@ -140,7 +152,10 @@ export class CommentService implements ICommentService {
 
   delete = async (id: number) => {
     try {
-      return await this._commentRepository.delete(id);
+      await this._commentRepository.update(id, {
+        deleted_at: new Date(),
+      });
+      return id;
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }

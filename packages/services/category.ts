@@ -1,11 +1,12 @@
+import { Repository } from "typeorm";
 import {
+  Category,
   CategoryConverter,
   CategoryCreate,
   CategoryDto,
   CategoryUpdate,
 } from "../models";
 import { TransactionManager } from "../modules";
-import { ICategoryRepository } from "../repositories";
 import { ErrorResponse, Nullable } from "../types";
 
 export interface ICategoryService {
@@ -19,11 +20,11 @@ export interface ICategoryService {
 export class CategoryService implements ICategoryService {
   private static _instance: Nullable<CategoryService> = null;
   private _transactionManager: TransactionManager;
-  private _categoryRepository: ICategoryRepository;
+  private _categoryRepository: Repository<Category>;
 
   private constructor(
     transactionManager: TransactionManager,
-    categoryRepository: ICategoryRepository
+    categoryRepository: Repository<Category>
   ) {
     this._transactionManager = transactionManager;
     this._categoryRepository = categoryRepository;
@@ -31,7 +32,7 @@ export class CategoryService implements ICategoryService {
 
   static getInstance(
     transactionManager: TransactionManager,
-    categoryRepository: ICategoryRepository
+    categoryRepository: Repository<Category>
   ) {
     if (!this._instance) {
       this._instance = new CategoryService(
@@ -46,7 +47,9 @@ export class CategoryService implements ICategoryService {
   find = async (id: number) => {
     let category;
     try {
-      category = await this._categoryRepository.find(id);
+      category = await this._categoryRepository.findOne({
+        where: { id, deleted_at: undefined },
+      });
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }
@@ -61,7 +64,9 @@ export class CategoryService implements ICategoryService {
 
   findAll = async () => {
     try {
-      const categories = await this._categoryRepository.findAll();
+      const categories = await this._categoryRepository.find({
+        where: { deleted_at: undefined },
+      });
       return categories.map((category) => CategoryConverter.toDto(category));
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
@@ -70,9 +75,10 @@ export class CategoryService implements ICategoryService {
 
   create = async (categoryCreate: CategoryCreate) => {
     try {
-      return this._transactionManager.withTransaction(async () => {
+      return this._transactionManager.withTransaction(async (manager) => {
         const category = CategoryConverter.toEntityFromCreate(categoryCreate);
-        return await this._categoryRepository.create(category);
+        const result = await manager.getRepository(Category).save(category);
+        return result.id;
       });
     } catch (err) {
       if (err instanceof ErrorResponse) {
@@ -84,9 +90,10 @@ export class CategoryService implements ICategoryService {
 
   update = async (id: number, categoryUpdate: CategoryUpdate) => {
     try {
-      return await this._categoryRepository.update(
+      const result = await this._categoryRepository.save(
         CategoryConverter.toEntityFromUpdate(id, categoryUpdate)
       );
+      return result.id;
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }
@@ -94,7 +101,8 @@ export class CategoryService implements ICategoryService {
 
   delete = async (id: number) => {
     try {
-      return await this._categoryRepository.delete(id);
+      await this._categoryRepository.delete(id);
+      return id;
     } catch (err) {
       throw new ErrorResponse(500, "Internal Server Error");
     }

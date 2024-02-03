@@ -14,15 +14,7 @@ import {
   IUserController,
   UserController,
 } from "../controller";
-import { Category, Club, Feed, User } from "../models";
-import {
-  CategoryRepository,
-  CommentRepository,
-  ICategoryRepository,
-  ICommentRepository,
-  IUserRepository,
-  UserRepository,
-} from "../repositories";
+import { Category, Club, Comment, Feed, User } from "../models";
 import {
   AuthService,
   CategoryService,
@@ -43,14 +35,12 @@ class AppProvider {
   private static _instance: Nullable<AppProvider> = null;
   private _datasource: DataSource;
   private _transactionManager: TransactionManager;
-  private _appRepository: AppRepository;
   private _appService: AppService;
   private _appController: AppController;
 
   private constructor(datasource: DataSource) {
     this._datasource = datasource;
     this._transactionManager = this.initTransactionManager();
-    this._appRepository = this.initRepository();
     this._appService = this.initService();
     this._appController = this.initController();
   }
@@ -67,16 +57,8 @@ class AppProvider {
     return new TransactionManager(this._datasource);
   }
 
-  private initRepository() {
-    return new AppRepository(this._datasource);
-  }
-
   private initService() {
-    return new AppService(
-      this._appRepository,
-      this._transactionManager,
-      this._datasource
-    );
+    return new AppService(this._transactionManager, this._datasource);
   }
 
   private initController() {
@@ -88,30 +70,6 @@ class AppProvider {
   }
 }
 
-class AppRepository {
-  private _userRepository: IUserRepository;
-  private _commentRepository: ICommentRepository;
-  private _categoryRepository: ICategoryRepository;
-
-  constructor(datasource: DataSource) {
-    this._userRepository = UserRepository.getInstance(datasource);
-    this._commentRepository = CommentRepository.getInstance(datasource);
-    this._categoryRepository = CategoryRepository.getInstance(datasource);
-  }
-
-  get userRepository() {
-    return this._userRepository;
-  }
-
-  get commentRepository() {
-    return this._commentRepository;
-  }
-
-  get categoryRepository() {
-    return this._categoryRepository;
-  }
-}
-
 class AppService {
   private _authService: IAuthService;
   private _userService: IUserService;
@@ -120,18 +78,14 @@ class AppService {
   private _commentService: ICommentService;
   private _categoryService: ICategoryService;
 
-  constructor(
-    appRepository: AppRepository,
-    transactionManager: TransactionManager,
-    dataSource: DataSource
-  ) {
+  constructor(transactionManager: TransactionManager, dataSource: DataSource) {
     this._authService = AuthService.getInstance(
       transactionManager,
-      appRepository.userRepository
+      dataSource.getRepository(User)
     );
     this._userService = UserService.getInstance(
       transactionManager,
-      appRepository.userRepository
+      dataSource.getRepository(User)
     );
     this._clubService = ClubService.getInstance(
       transactionManager,
@@ -147,13 +101,13 @@ class AppService {
     );
     this._commentService = CommentService.getInstance(
       transactionManager,
-      appRepository.commentRepository,
+      dataSource.getRepository(Comment),
       dataSource.getRepository(Feed),
-      appRepository.userRepository
+      dataSource.getRepository(User)
     );
     this._categoryService = CategoryService.getInstance(
       transactionManager,
-      appRepository.categoryRepository
+      dataSource.getRepository(Category)
     );
   }
 
