@@ -1,5 +1,5 @@
 import { cloneDeep } from "lodash";
-import { UserDto, UserScheme, UserUpdate } from "../models";
+import { UserDto, UserInClubDto, UserScheme, UserUpdate } from "../models";
 import { CoreSchema } from "./common";
 
 const userBase: CoreSchema<UserDto> = {
@@ -16,5 +16,11 @@ export const userDoc: CoreSchema<UserScheme> = {
 };
 
 export const userDtoDoc: CoreSchema<UserDto> = cloneDeep(userBase);
+
+export const userInClubDtoDoc: CoreSchema<UserInClubDto> = {
+  ...cloneDeep(userBase),
+  role: { type: "string", example: "admin" },
+  exp: { type: "number", example: 1000 },
+};
 
 export const userUpdateDoc: CoreSchema<UserUpdate> = cloneDeep(userDoc);

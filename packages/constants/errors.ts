@@ -4,6 +4,8 @@ const Errors = {
   BadRequest: new Err(400, 40000, "잘못된 요청입니다."),
   PasswordNotMatch: new Err(401, 40100, "비밀번호가 일치하지 않습니다."),
   InvalidToken: new Err(401, 40101, "유효하지 않은 토큰입니다."),
+  NotAdmin: new Err(403, 40300, "클럽 어드민이 아닙니다."),
+  NotStaff: new Err(403, 40301, "클럽 관리자가 아닙니다."),
   TokenExpired: new Err(419, 41900, "토큰이 만료되었습니다."),
   UserNotFound: new Err(404, 40400, "유저를 찾을 수 없습니다."),
   ClubNotFound: new Err(404, 40401, "그룹을 찾을 수 없습니다."),

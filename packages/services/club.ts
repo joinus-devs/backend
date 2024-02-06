@@ -8,9 +8,10 @@ import {
   ClubCreate,
   ClubDto,
   ClubUpdate,
+  Role,
   User,
+  UserInClub,
 } from "../models";
-import { UserInClub } from "../models/userInClub";
 import { TransactionManager } from "../modules";
 import { ErrorResponse, Nullable } from "../types";
 
@@ -20,6 +21,12 @@ export interface IClubService {
   findAllByUser(userId: number): Promise<ClubDto[]>;
   findAllByCategory(categoryId: number): Promise<ClubDto[]>;
   join(userId: number, clubId: number): Promise<number>;
+  setRole(
+    requesterId: number,
+    clubId: number,
+    userId: number,
+    role: Role
+  ): Promise<number>;
   create(userId: number, clubCreate: ClubCreate): Promise<number>;
   update(id: number, clubUpdate: ClubUpdate): Promise<number>;
   delete(id: number): Promise<number>;
@@ -141,19 +148,84 @@ export class ClubService implements IClubService {
         const userInClub = new UserInClub();
         userInClub.user = user;
         userInClub.club = club;
-        club.users = [userInClub];
-        await manager
-          .getRepository(Club)
-          .createQueryBuilder()
-          .relation(Club, "users")
-          .of(clubId)
-          .add(userId);
+        await manager.getRepository(UserInClub).save(userInClub);
         return userId;
       });
     } catch (err) {
       if (err instanceof ErrorResponse) {
         throw err;
       }
+      throw Errors.InternalServerError;
+    }
+  };
+
+  setRole = async (
+    requesterId: number,
+    clubId: number,
+    userId: number,
+    role: Role
+  ) => {
+    if (requesterId === userId) {
+      throw Errors.BadRequest;
+    }
+
+    if (role === Role.Admin) {
+      throw Errors.BadRequest;
+    }
+
+    const requester = await this._userRepository
+      .createQueryBuilder("user")
+      .leftJoin("user.clubs", "club")
+      .addSelect("club.role", "user_role")
+      .where("user.id = :id", { id: requesterId })
+      .andWhere("club.club_id = :clubId", { clubId })
+      .andWhere("club.role = :role", { role: Role.Admin })
+      .getOne();
+
+    // 요청자가 존재하는지 확인
+    if (!requester) {
+      throw Errors.UserNotFound;
+    }
+
+    // 요청자의 권한 확인
+    if (requester.role !== Role.Admin && role === Role.Staff) {
+      throw Errors.NotAdmin;
+    }
+
+    // 요청자의 권한 확인
+    if (requester.role !== Role.Admin && requester.role !== Role.Staff) {
+      throw Errors.NotStaff;
+    }
+
+    // 유저가 존재하는지 확인
+    const user = await this._userRepository.findOne({
+      where: { id: userId, deleted_at: undefined },
+    });
+    if (!user) {
+      throw Errors.UserNotFound;
+    }
+
+    // 클럽이 존재하는지 확인
+    const club = await this._clubRepository.findOne({
+      where: { id: clubId, deleted_at: undefined },
+    });
+    if (!club) {
+      throw Errors.ClubNotFound;
+    }
+
+    try {
+      return this._transactionManager.withTransaction(async (manager) => {
+        await manager
+          .getRepository(UserInClub)
+          .createQueryBuilder()
+          .update()
+          .set({ role })
+          .where("user_id = :userId", { userId })
+          .andWhere("club_id = :clubId", { clubId })
+          .execute();
+        return userId;
+      });
+    } catch (err) {
       throw Errors.InternalServerError;
     }
   };
@@ -179,6 +251,7 @@ export class ClubService implements IClubService {
         const userInClub = new UserInClub();
         userInClub.user = user;
         userInClub.club = club;
+        userInClub.role = Role.Admin;
         club.users = [userInClub];
         const clubCategory = new ClubCategory();
         clubCategory.club = club;

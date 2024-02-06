@@ -84,7 +84,7 @@ export class FeedService implements IFeedService {
   findAll = async () => {
     try {
       const feeds = await this._feedRepository.find({
-        where: { deleted_at: undefined },
+        where: { is_private: false, deleted_at: undefined },
         relations: ["user"],
       });
       return feeds.map((feed) => FeedConverter.toDto(feed));

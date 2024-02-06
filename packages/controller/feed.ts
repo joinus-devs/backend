@@ -2,16 +2,16 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 import { IFeedService } from "../services";
 import {
   ErrorResponse,
-  IdQueryParams,
+  IdPathParams,
   Nullable,
   PageQueryParams,
   SuccessResponse,
 } from "../types";
 
 export interface IFeedController {
-  find: RequestHandler<IdQueryParams>;
+  find: RequestHandler<IdPathParams>;
   findAll: RequestHandler<PageQueryParams>;
-  findAllByClub: RequestHandler<IdQueryParams>;
+  findAllByClub: RequestHandler<IdPathParams>;
   create: RequestHandler;
   update: RequestHandler;
   delete: RequestHandler;
@@ -34,7 +34,7 @@ export class FeedController implements IFeedController {
   }
 
   find = async (
-    req: Request<IdQueryParams>,
+    req: Request<IdPathParams>,
     res: Response,
     next: NextFunction
   ) => {
@@ -67,7 +67,7 @@ export class FeedController implements IFeedController {
   };
 
   findAllByClub = async (
-    req: Request<IdQueryParams>,
+    req: Request<IdPathParams>,
     res: Response,
     next: NextFunction
   ) => {

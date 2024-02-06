@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { body } from "express-validator";
 import { ICommentController, IFeedController } from "../controller";
 import Docs from "../docs";
 
@@ -17,7 +18,12 @@ const feedRoutes = (
   router
     .route("/:id/comments")
     .get(commentController.findAllByFeed)
-    .post(commentController.create);
+    .post(
+      body("title").isString(),
+      body("content").isString(),
+      body("is_private").isBoolean(),
+      commentController.create
+    );
 
   return router;
 };

@@ -47,6 +47,8 @@ class CreateTables1705433210498 implements MigrationInterface {
         ${timesQuery}
         user_id int not null,
         club_id int not null,
+        role enum('admin', 'staff', 'member', 'pending', 'banned') not null,
+        exp int not null,
         primary key (user_id, club_id),
         foreign key (user_id) references users(id),
         foreign key (club_id) references clubs(id)
@@ -80,6 +82,7 @@ class CreateTables1705433210498 implements MigrationInterface {
         club_id int not null,
         title varchar(255) not null,
         content text not null,
+        is_private boolean not null,
         foreign key (user_id) references users(id),
         foreign key (club_id) references clubs(id)
       )

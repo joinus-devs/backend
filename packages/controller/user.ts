@@ -1,16 +1,21 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
+import { Role } from "../models";
 import { IUserService } from "../services";
 import {
   ErrorResponse,
-  IdQueryParams,
+  IdPathParams,
   Nullable,
   SuccessResponse,
 } from "../types";
 
+export interface RoleQueryParams {
+  roles?: Role[];
+}
+
 export interface IUserController {
   find: RequestHandler;
   findAll: RequestHandler;
-  findAllByClub: RequestHandler<IdQueryParams>;
+  findAllByClub: RequestHandler<IdPathParams, void, void, RoleQueryParams>;
   update: RequestHandler;
   delete: RequestHandler;
 }
@@ -57,18 +62,20 @@ export class UserController implements IUserController {
   };
 
   findAllByClub = async (
-    req: Request<IdQueryParams>,
+    req: Request<IdPathParams, void, void, RoleQueryParams>,
     res: Response,
     next: NextFunction
   ) => {
     try {
       const clubId = Number(req.params.id);
-      const feeds = await this._service.findAllByClub(clubId);
+      let roles = req.query.roles;
+      roles = roles ? (Array.isArray(roles) ? roles : [roles]) : undefined;
+      const users = await this._service.findAllByClub(clubId, roles);
       res
         .status(200)
         .json(
           new SuccessResponse(
-            feeds,
+            users,
             "해당 클럽의 유저들을 불러왔습니다."
           ).toDTO()
         );

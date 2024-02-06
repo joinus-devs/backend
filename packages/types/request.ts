@@ -1,4 +1,4 @@
-export interface IdQueryParams {
+export interface IdPathParams {
   id: number;
 }
 

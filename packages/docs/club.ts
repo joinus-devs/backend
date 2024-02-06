@@ -1,5 +1,7 @@
 import { cloneDeep } from "lodash";
-import { ClubCreate, ClubDto, ClubScheme, ClubUpdate } from "../models";
+import { Parameter } from "swagger-jsdoc";
+import { UserSetRole } from "../controller";
+import { ClubCreate, ClubDto, ClubScheme, ClubUpdate, Role } from "../models";
 import { CoreSchema } from "./common";
 
 const clubBase: CoreSchema<ClubDto> = {
@@ -19,3 +21,20 @@ export const clubDtoDoc: CoreSchema<ClubDto> = cloneDeep(clubBase);
 export const clubCreateDoc: CoreSchema<ClubCreate> = cloneDeep(clubBase);
 
 export const clubUpdateDoc: CoreSchema<ClubUpdate> = cloneDeep(clubBase);
+
+export const userSetRoleDoc: CoreSchema<UserSetRole> = {
+  role: { type: "string", example: "member" },
+};
+
+export const roleQueryParamsDoc: Parameter = {
+  in: "query",
+  name: "roles",
+  required: false,
+  schema: {
+    type: "array",
+    items: {
+      type: "string",
+      enum: Object.values(Role),
+    },
+  },
+};

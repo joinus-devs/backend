@@ -1,6 +1,7 @@
 import { Repository } from "typeorm";
 import Errors from "../constants/errors";
 import {
+  Role,
   User,
   UserConverter,
   UserCreate,
@@ -13,7 +14,7 @@ import { ErrorResponse, Nullable } from "../types";
 export interface IUserService {
   find(id: number): Promise<UserDto>;
   findAll(): Promise<UserDto[]>;
-  findAllByClub(clubId: number): Promise<UserDto[]>;
+  findAllByClub(clubId: number, roles?: Role | Role[]): Promise<UserDto[]>;
   create(userCreate: UserCreate): Promise<number>;
   update(id: number, userUpdate: UserUpdate): Promise<number>;
   delete(id: number): Promise<number>;
@@ -68,14 +69,18 @@ export class UserService implements IUserService {
     }
   };
 
-  findAllByClub = async (clubId: number) => {
+  findAllByClub = async (clubId: number, roles?: Role[]) => {
     try {
       const users = await this._repository
         .createQueryBuilder("user")
-        .leftJoin("user.clubs", "club")
+        .leftJoin("user.clubs", "club", "club.deleted_at IS NULL")
+        .addSelect("club.role", "user_role")
+        .addSelect("club.exp", "user_exp")
         .where("club.club_id = :clubId", { clubId })
+        .andWhere("user.deleted_at IS NULL")
+        .andWhere(roles ? "club.role IN (:...roles)" : "1=1", { roles })
         .getMany();
-      return users.map((user) => UserConverter.toDto(user));
+      return users.map((user) => UserConverter.toInClubDto(user));
     } catch (err) {
       console.log(err);
       throw Errors.InternalServerError;

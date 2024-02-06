@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { Club } from "./club";
 import { TimesEntity } from "./common";
 import { User } from "./user";
@@ -8,6 +8,14 @@ export interface UserInClubScheme extends TimesEntity {
   club_id: number;
 }
 
+export enum Role {
+  Admin = "admin",
+  Staff = "staff",
+  Member = "member",
+  Pending = "pending",
+  Banned = "banned",
+}
+
 @Entity("users_in_clubs")
 export class UserInClub extends TimesEntity implements UserInClubScheme {
   @PrimaryColumn()
@@ -15,6 +23,12 @@ export class UserInClub extends TimesEntity implements UserInClubScheme {
 
   @PrimaryColumn()
   club_id: number;
+
+  @Column()
+  role: Role = Role.Pending;
+
+  @Column()
+  exp: number = 0;
 
   @ManyToOne(() => User, (user) => user.clubs, {
     cascade: false,

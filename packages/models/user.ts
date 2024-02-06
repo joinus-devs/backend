@@ -2,7 +2,7 @@ import { Column, Entity, OneToMany } from "typeorm";
 import { Comment } from "./comment";
 import { IdEntity } from "./common";
 import { Feed } from "./feed";
-import { UserInClub } from "./userInClub";
+import { Role, UserInClub } from "./userInClub";
 
 export interface UserScheme extends IdEntity {
   password: string;
@@ -14,6 +14,11 @@ export interface UserScheme extends IdEntity {
 }
 
 export type UserDto = Omit<UserScheme, "password">;
+
+export type UserInClubDto = UserDto & {
+  role: Role;
+  exp: number;
+};
 
 export type UserWithClubsDto = UserDto & { clubs: UserInClub[] };
 
@@ -55,12 +60,29 @@ export class User extends IdEntity implements UserScheme {
     cascade: true,
   })
   public comments: Comment[];
+
+  @Column({
+    enum: Role,
+    select: false,
+    insert: false,
+    readonly: true,
+    nullable: true,
+  })
+  public role: Role;
+
+  @Column({ select: false, insert: false, readonly: true, nullable: true })
+  public exp: number;
 }
 
 export class UserConverter {
   public static toDto = (user: User): UserDto => {
     const { password, ...dto } = user;
     return dto;
+  };
+
+  public static toInClubDto = (user: User): UserInClubDto => {
+    const { password, clubs, ...dto } = user;
+    return { ...dto };
   };
 
   public static toDtoWithClubs = (user: User): UserWithClubsDto => {

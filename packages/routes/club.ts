@@ -6,6 +6,7 @@ import {
   IUserController,
 } from "../controller";
 import Docs from "../docs";
+import { Role } from "../models";
 
 const clubRoutes = (
   clubController: IClubController,
@@ -35,6 +36,9 @@ const clubRoutes = (
     .route("/:id/users")
     .get(userController.findAllByClub)
     .post(clubController.join);
+  router
+    .route("/:id/users/:userId")
+    .put(body("role").isIn(Object.values(Role)), clubController.setRole);
   router
     .route("/:id/feeds")
     .get(feedController.findAllByClub)
@@ -82,11 +86,20 @@ swagger.add({
     get: {
       summary: "Get all user of a club",
       tags: ["Clubs"],
-      responses: { 200: { $ref: "#/components/responses/usersResponse" } },
+      parameters: [{ $ref: "#/components/parameters/roleQueryParams" }],
+      responses: { 200: { $ref: "#/components/responses/userInClubResponse" } },
     },
     post: {
       summary: "Join a club",
       tags: ["Clubs"],
+      responses: { 200: { $ref: "#/components/responses/numberResponse" } },
+    },
+  },
+  "/clubs/{id}/users/{userId}": {
+    put: {
+      summary: "Set role of a user in a club",
+      tags: ["Clubs"],
+      parameters: [{ $ref: "#/components/parameters/userSetRole" }],
       responses: { 200: { $ref: "#/components/responses/numberResponse" } },
     },
   },

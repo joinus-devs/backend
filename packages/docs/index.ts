@@ -6,7 +6,14 @@ import {
   categoryDtoDoc,
   categoryUpdateDoc,
 } from "./category";
-import { clubCreateDoc, clubDoc, clubDtoDoc, clubUpdateDoc } from "./club";
+import {
+  clubCreateDoc,
+  clubDoc,
+  clubDtoDoc,
+  clubUpdateDoc,
+  roleQueryParamsDoc,
+  userSetRoleDoc,
+} from "./club";
 import { commentCreateDoc, commentDtoDoc, commentUpdateDoc } from "./comment";
 import {
   errorResponse,
@@ -18,7 +25,7 @@ import {
   successResponse,
 } from "./common";
 import { feedCreateDoc, feedDoc, feedDtoDoc, feedUpdateDoc } from "./feed";
-import { userDoc, userDtoDoc, userUpdateDoc } from "./user";
+import { userDoc, userDtoDoc, userInClubDtoDoc, userUpdateDoc } from "./user";
 
 class Docs {
   private static _instance: Docs;
@@ -50,6 +57,8 @@ class Docs {
           userUpdate: makeBody(userUpdateDoc),
           clubCreate: makeBody(clubCreateDoc),
           clubUpdate: makeBody(clubUpdateDoc),
+          userSetRole: makeBody(userSetRoleDoc),
+          roleQueryParams: roleQueryParamsDoc,
           categoryCreate: makeBody(categoryCreateDoc),
           categoryUpdate: makeBody(categoryUpdateDoc),
           feedCreate: makeBody(feedCreateDoc),
@@ -60,6 +69,7 @@ class Docs {
         responses: {
           signinResponse: makeSuccess(singinResponseDoc),
           userResponse: makeSuccess(makeScheme(userDtoDoc)),
+          userInClubResponse: makeSuccess(makeScheme(userInClubDtoDoc)),
           usersResponse: makeSuccess(makeArray(userDtoDoc)),
           clubResponse: makeSuccess(makeScheme(clubDtoDoc)),
           clubsResponse: makeSuccess(makeArray(clubDtoDoc)),

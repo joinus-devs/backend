@@ -2,14 +2,14 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 import { ICategoryService } from "../services";
 import {
   ErrorResponse,
-  IdQueryParams,
+  IdPathParams,
   Nullable,
   PageQueryParams,
   SuccessResponse,
 } from "../types";
 
 export interface ICategoryController {
-  find: RequestHandler<IdQueryParams>;
+  find: RequestHandler<IdPathParams>;
   findAll: RequestHandler<PageQueryParams>;
   create: RequestHandler;
   update: RequestHandler;
@@ -33,7 +33,7 @@ export class CategoryController implements ICategoryController {
   }
 
   find = async (
-    req: Request<IdQueryParams>,
+    req: Request<IdPathParams>,
     res: Response,
     next: NextFunction
   ) => {

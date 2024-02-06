@@ -37,6 +37,9 @@ export class Feed extends IdEntity implements FeedScheme {
   @Column()
   content: string;
 
+  @Column()
+  is_private: boolean;
+
   @ManyToOne(() => User, (user) => user.feeds, {
     cascade: false,
   })

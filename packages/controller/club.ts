@@ -1,22 +1,28 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
+import { ClubCreate, ClubUpdate, Role } from "../models";
 import { IClubService } from "../services";
 import {
   ErrorResponse,
-  IdQueryParams,
+  IdPathParams,
   Nullable,
   PageQueryParams,
   SuccessResponse,
 } from "../types";
 
+export interface UserSetRole {
+  role: Role;
+}
+
 export interface IClubController {
-  find: RequestHandler<IdQueryParams>;
+  find: RequestHandler<IdPathParams>;
   findAll: RequestHandler<PageQueryParams>;
-  findAllByUser: RequestHandler<IdQueryParams>;
-  findAllByCategory: RequestHandler<IdQueryParams>;
-  join: RequestHandler<IdQueryParams>;
-  create: RequestHandler;
-  update: RequestHandler;
-  delete: RequestHandler;
+  findAllByUser: RequestHandler<IdPathParams>;
+  findAllByCategory: RequestHandler<IdPathParams>;
+  join: RequestHandler<IdPathParams>;
+  setRole: RequestHandler<IdPathParams & { userId: number }, UserSetRole>;
+  create: RequestHandler<unknown, ClubCreate>;
+  update: RequestHandler<IdPathParams, ClubUpdate>;
+  delete: RequestHandler<IdPathParams, void>;
 }
 
 export class ClubController implements IClubController {
@@ -36,7 +42,7 @@ export class ClubController implements IClubController {
   }
 
   find = async (
-    req: Request<IdQueryParams>,
+    req: Request<IdPathParams>,
     res: Response,
     next: NextFunction
   ) => {
@@ -71,7 +77,7 @@ export class ClubController implements IClubController {
   };
 
   findAllByUser = async (
-    req: Request<IdQueryParams>,
+    req: Request<IdPathParams>,
     res: Response,
     next: NextFunction
   ) => {
@@ -93,7 +99,7 @@ export class ClubController implements IClubController {
   };
 
   findAllByCategory = async (
-    req: Request<IdQueryParams>,
+    req: Request<IdPathParams>,
     res: Response,
     next: NextFunction
   ) => {
@@ -115,7 +121,7 @@ export class ClubController implements IClubController {
   };
 
   join = async (
-    req: Request<IdQueryParams>,
+    req: Request<IdPathParams>,
     res: Response,
     next: NextFunction
   ) => {
@@ -134,7 +140,33 @@ export class ClubController implements IClubController {
     }
   };
 
-  create = async (req: Request, res: Response, next: NextFunction) => {
+  setRole = async (
+    req: Request<IdPathParams & { userId: number }, UserSetRole>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const requesterId = (req as any)?.decoded?.id;
+      const clubId = Number(req.params.id);
+      const userId = Number(req.params.userId);
+      const role = req.body.role;
+      await this._service.setRole(requesterId, clubId, userId, role);
+      res
+        .status(200)
+        .json(
+          new SuccessResponse(userId, "유저의 역할이 변경되었습니다.").toDTO()
+        );
+    } catch (err) {
+      if (!(err instanceof ErrorResponse)) return;
+      next(err);
+    }
+  };
+
+  create = async (
+    req: Request<unknown, ClubCreate>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const userId = (req as any)?.decoded?.id;
       const clubCreate = req.body;
@@ -148,7 +180,11 @@ export class ClubController implements IClubController {
     }
   };
 
-  update = async (req: Request, res: Response, next: NextFunction) => {
+  update = async (
+    req: Request<IdPathParams, ClubUpdate>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const id = Number(req.params.id);
       const clubUpdate = req.body;
@@ -162,7 +198,11 @@ export class ClubController implements IClubController {
     }
   };
 
-  delete = async (req: Request, res: Response, next: NextFunction) => {
+  delete = async (
+    req: Request<IdPathParams, void>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const id = Number(req.params.id);
       const deletedId = await this._service.delete(id);

@@ -2,16 +2,16 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 import { ICommentService } from "../services";
 import {
   ErrorResponse,
-  IdQueryParams,
+  IdPathParams,
   Nullable,
   PageQueryParams,
   SuccessResponse,
 } from "../types";
 
 export interface ICommentController {
-  find: RequestHandler<IdQueryParams>;
+  find: RequestHandler<IdPathParams>;
   findAll: RequestHandler<PageQueryParams>;
-  findAllByFeed: RequestHandler<IdQueryParams>;
+  findAllByFeed: RequestHandler<IdPathParams>;
   create: RequestHandler;
   update: RequestHandler;
   delete: RequestHandler;
@@ -34,7 +34,7 @@ export class CommentController implements ICommentController {
   }
 
   find = async (
-    req: Request<IdQueryParams>,
+    req: Request<IdPathParams>,
     res: Response,
     next: NextFunction
   ) => {
@@ -67,7 +67,7 @@ export class CommentController implements ICommentController {
   };
 
   findAllByFeed = async (
-    req: Request<IdQueryParams>,
+    req: Request<IdPathParams>,
     res: Response,
     next: NextFunction
   ) => {
