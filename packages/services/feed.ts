@@ -97,7 +97,7 @@ export class FeedService implements IFeedService {
         .andWhere("feed.deleted_at IS NULL")
         .andWhere(cursor ? "feed.id < :cursor" : "1=1", { cursor })
         .groupBy("feed.id")
-        .orderBy("feed.created_at", "DESC")
+        .orderBy("feed.id", "DESC")
         .take(limit + 1)
         .getMany();
       const next = feeds.length > limit ? feeds[feeds.length - 2].id : null;
@@ -121,7 +121,7 @@ export class FeedService implements IFeedService {
         .andWhere("feed.deleted_at IS NULL")
         .andWhere(cursor ? "feed.id < :cursor" : "1=1", { cursor })
         .groupBy("feed.id")
-        .orderBy("feed.created_at", "DESC")
+        .orderBy("feed.id", "DESC")
         .take(limit + 1)
         .getMany();
       const next = feeds.length > limit ? feeds[feeds.length - 2].id : null;

@@ -5,7 +5,6 @@ import {
   ErrorResponse,
   IdPathParams,
   Nullable,
-  PageQueryParams,
   SuccessResponse,
 } from "../types";
 

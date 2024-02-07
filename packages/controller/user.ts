@@ -2,6 +2,7 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 import { Role } from "../models";
 import { IUserService } from "../services";
 import {
+  CursorQueryParams,
   ErrorResponse,
   IdPathParams,
   Nullable,
@@ -14,7 +15,7 @@ export interface RoleQueryParams {
 
 export interface IUserController {
   find: RequestHandler;
-  findAll: RequestHandler;
+  findAll: RequestHandler<unknown, void, void, CursorQueryParams>;
   findAllByClub: RequestHandler<IdPathParams, void, void, RoleQueryParams>;
   update: RequestHandler;
   delete: RequestHandler;
@@ -49,9 +50,16 @@ export class UserController implements IUserController {
     }
   };
 
-  findAll = async (req: Request, res: Response, next: NextFunction) => {
+  findAll = async (
+    req: Request<unknown, void, void, CursorQueryParams>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
-      const users = await this._service.findAll();
+      const users = await this._service.findAll(
+        req.query.cursor ? Number(req.query.cursor) : undefined,
+        req.query.limit ? Number(req.query.limit) : undefined
+      );
       res
         .status(200)
         .json(new SuccessResponse(users, "모든 유저를 불러왔습니다.").toDTO());

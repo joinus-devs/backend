@@ -9,11 +9,11 @@ import {
   UserUpdate,
 } from "../models";
 import { TransactionManager } from "../modules";
-import { ErrorResponse, Nullable } from "../types";
+import { CursorDto, ErrorResponse, Nullable } from "../types";
 
 export interface IUserService {
   find(id: number): Promise<UserDto>;
-  findAll(): Promise<UserDto[]>;
+  findAll(cursor?: number, limit?: number): Promise<CursorDto<UserDto[]>>;
   findAllByClub(clubId: number, roles?: Role | Role[]): Promise<UserDto[]>;
   create(userCreate: UserCreate): Promise<number>;
   update(id: number, userUpdate: UserUpdate): Promise<number>;
@@ -60,10 +60,20 @@ export class UserService implements IUserService {
     return UserConverter.toDto(user);
   };
 
-  findAll = async () => {
+  findAll = async (cursor?: number, limit = 10) => {
     try {
-      const users = await this._repository.find();
-      return users.map((user) => UserConverter.toDto(user));
+      const users = await this._repository
+        .createQueryBuilder("user")
+        .where("user.deleted_at IS NULL")
+        .andWhere(cursor ? "user.id < :cursor" : "1=1", { cursor })
+        .orderBy("user.id", "DESC")
+        .take(limit + 1)
+        .getMany();
+      const next = users.length > limit ? users[users.length - 2].id : null;
+      return {
+        data: users.slice(0, limit).map((user) => UserConverter.toDto(user)),
+        next,
+      };
     } catch (err) {
       throw Errors.InternalServerError;
     }

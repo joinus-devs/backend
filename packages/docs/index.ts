@@ -77,7 +77,7 @@ class Docs {
           signinResponse: makeSuccess(singinResponseDoc),
           userResponse: makeSuccess(makeScheme(userDtoDoc)),
           userInClubResponse: makeSuccess(makeScheme(userInClubDtoDoc)),
-          usersResponse: makeSuccess(makeArray(userDtoDoc)),
+          usersResponse: makeSuccess(makeCursor(userDtoDoc)),
           clubResponse: makeSuccess(makeScheme(clubDtoDoc)),
           clubsResponse: makeSuccess(makeArray(clubDtoDoc)),
           categoryResponse: makeSuccess(makeScheme(categoryDtoDoc)),
