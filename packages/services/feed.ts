@@ -10,12 +10,16 @@ import {
   User,
 } from "../models";
 import { TransactionManager } from "../modules";
-import { ErrorResponse, Nullable } from "../types";
+import { CursorDto, ErrorResponse, Nullable } from "../types";
 
 export interface IFeedService {
   find(id: number): Promise<Nullable<FeedDto>>;
-  findAll(): Promise<FeedDto[]>;
-  findAllByClub(clubId: number): Promise<FeedDto[]>;
+  findAll(cursor?: number, limit?: number): Promise<FeedDto[]>;
+  findAllByClub(
+    clubId: number,
+    cursor?: number,
+    limit?: number
+  ): Promise<CursorDto<FeedDto[]>>;
   create(
     userId: number,
     clubId: number,
@@ -81,7 +85,7 @@ export class FeedService implements IFeedService {
     return FeedConverter.toDto(feed);
   };
 
-  findAll = async () => {
+  findAll = async (cursor = 1, limit = 10) => {
     try {
       const feeds = await this._feedRepository
         .createQueryBuilder("feed")
@@ -91,7 +95,10 @@ export class FeedService implements IFeedService {
         .addSelect("COUNT(comment.id)", "feed_comment_count")
         .where("feed.is_private = false")
         .andWhere("feed.deleted_at IS NULL")
+        .andWhere("feed.id <= :cursor", { cursor })
         .groupBy("feed.id")
+        .orderBy("feed.created_at", "DESC")
+        .take(limit)
         .getMany();
       return feeds.map((feed) => FeedConverter.toWithClubDto(feed));
     } catch (err) {
@@ -99,7 +106,7 @@ export class FeedService implements IFeedService {
     }
   };
 
-  findAllByClub = async (clubId: number) => {
+  findAllByClub = async (clubId: number, cursor?: number, limit = 10) => {
     try {
       const feeds = await this._feedRepository
         .createQueryBuilder("feed")
@@ -108,9 +115,16 @@ export class FeedService implements IFeedService {
         .addSelect("COUNT(comment.id)", "feed_comment_count")
         .where("feed.club_id = :clubId", { clubId })
         .andWhere("feed.deleted_at IS NULL")
+        .andWhere(cursor ? "feed.id < :cursor" : "1=1", { cursor })
         .groupBy("feed.id")
+        .orderBy("feed.created_at", "DESC")
+        .take(limit + 1)
         .getMany();
-      return feeds.map((feed: any) => FeedConverter.toDto(feed));
+      const next = feeds.length > limit ? feeds[feeds.length - 2].id : null;
+      return {
+        data: feeds.slice(0, limit).map((feed) => FeedConverter.toDto(feed)),
+        next,
+      };
     } catch (err) {
       throw Errors.InternalServerError;
     }
@@ -135,7 +149,7 @@ export class FeedService implements IFeedService {
 
     try {
       return this._transactionManager.withTransaction(async (manager) => {
-        const feed = FeedConverter.toEntityFromCreate(feedCreate);
+        const feed = FeedConverter.fromCreate(feedCreate);
         feed.user = user;
         feed.club = club;
         const result = await manager.getRepository(Feed).save(feed);
@@ -154,7 +168,7 @@ export class FeedService implements IFeedService {
       return this._transactionManager.withTransaction(async (manager) => {
         const result = await manager
           .getRepository(Feed)
-          .save(FeedConverter.toEntityFromUpdate(id, feedUpdate));
+          .save(FeedConverter.fromUpdate(id, feedUpdate));
         return result.id;
       });
     } catch (err) {

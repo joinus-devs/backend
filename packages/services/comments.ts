@@ -128,7 +128,7 @@ export class CommentService implements ICommentService {
 
     try {
       return this._transactionManager.withTransaction(async (manager) => {
-        const comment = CommentConverter.toEntityFromCreate(commentCreate);
+        const comment = CommentConverter.fromCreate(commentCreate);
         comment.user = user;
         comment.feed = feed;
         const result = await manager.getRepository(Comment).save(comment);
@@ -142,7 +142,7 @@ export class CommentService implements ICommentService {
   update = async (id: number, commentUpdate: CommentUpdate) => {
     try {
       const result = await this._commentRepository.save(
-        CommentConverter.toEntityFromUpdate(id, commentUpdate)
+        CommentConverter.fromUpdate(id, commentUpdate)
       );
       return result.id;
     } catch (err) {

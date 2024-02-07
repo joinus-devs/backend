@@ -90,12 +90,12 @@ export class UserConverter {
     return dto;
   };
 
-  public static toEntityFromCreate = (dto: UserCreate): User => {
+  public static fromCreate = (dto: UserCreate): User => {
     const user = new User();
     return Object.assign(user, dto);
   };
 
-  public static toEntityFromUpdate = (id: number, dto: UserUpdate): User => {
+  public static fromUpdate = (id: number, dto: UserUpdate): User => {
     const user = new User();
     return Object.assign(user, { id, ...dto });
   };

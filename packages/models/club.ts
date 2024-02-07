@@ -78,12 +78,12 @@ export class ClubConverter {
     return dto;
   };
 
-  public static toEntityFromCreate = (dto: ClubCreate): Club => {
+  public static fromCreate = (dto: ClubCreate): Club => {
     const club = new Club();
     return Object.assign(club, dto);
   };
 
-  public static toEntityFromUpdate = (id: number, dto: ClubUpdate): Club => {
+  public static fromUpdate = (id: number, dto: ClubUpdate): Club => {
     const club = new Club();
     return Object.assign(club, { id, ...dto });
   };

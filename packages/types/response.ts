@@ -50,3 +50,8 @@ export class ErrorResponse extends Error {
     };
   }
 }
+
+export interface CursorDto<T, S = number> {
+  next: Nullable<S>;
+  data: T;
+}

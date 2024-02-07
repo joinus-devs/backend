@@ -1,6 +1,7 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { IFeedService } from "../services";
 import {
+  CursorQueryParams,
   ErrorResponse,
   IdPathParams,
   Nullable,
@@ -10,8 +11,8 @@ import {
 
 export interface IFeedController {
   find: RequestHandler<IdPathParams>;
-  findAll: RequestHandler<PageQueryParams>;
-  findAllByClub: RequestHandler<IdPathParams>;
+  findAll: RequestHandler<unknown, void, void, CursorQueryParams>;
+  findAllByClub: RequestHandler<IdPathParams, void, void, CursorQueryParams>;
   create: RequestHandler;
   update: RequestHandler;
   delete: RequestHandler;
@@ -51,12 +52,15 @@ export class FeedController implements IFeedController {
   };
 
   findAll = async (
-    req: Request<PageQueryParams>,
+    req: Request<unknown, void, void, CursorQueryParams>,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      const feeds = await this._service.findAll();
+      const feeds = await this._service.findAll(
+        req.query.cursor,
+        req.query.limit
+      );
       res
         .status(200)
         .json(new SuccessResponse(feeds, "모든 피드를 불러왔습니다.").toDTO());
@@ -67,13 +71,17 @@ export class FeedController implements IFeedController {
   };
 
   findAllByClub = async (
-    req: Request<IdPathParams>,
+    req: Request<IdPathParams, void, void, CursorQueryParams>,
     res: Response,
     next: NextFunction
   ) => {
     try {
       const clubId = Number(req.params.id);
-      const feeds = await this._service.findAllByClub(clubId);
+      const feeds = await this._service.findAllByClub(
+        clubId,
+        req.query.cursor ? Number(req.query.cursor) : undefined,
+        req.query.limit ? Number(req.query.limit) : undefined
+      );
       res
         .status(200)
         .json(

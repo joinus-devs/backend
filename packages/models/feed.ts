@@ -76,12 +76,12 @@ export class FeedConverter {
     return { ...feed };
   };
 
-  public static toEntityFromCreate = (dto: FeedCreate): Feed => {
+  public static fromCreate = (dto: FeedCreate): Feed => {
     const user = new Feed();
     return Object.assign(user, dto);
   };
 
-  public static toEntityFromUpdate = (id: number, dto: FeedUpdate): Feed => {
+  public static fromUpdate = (id: number, dto: FeedUpdate): Feed => {
     const user = new Feed();
     return Object.assign(user, { id, ...dto });
   };

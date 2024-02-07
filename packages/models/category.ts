@@ -29,15 +29,12 @@ export class CategoryConverter {
     return dto;
   };
 
-  public static toEntityFromCreate = (dto: CategoryCreate): Category => {
+  public static fromCreate = (dto: CategoryCreate): Category => {
     const category = new Category();
     return Object.assign(category, dto);
   };
 
-  public static toEntityFromUpdate = (
-    id: number,
-    dto: CategoryUpdate
-  ): Category => {
+  public static fromUpdate = (id: number, dto: CategoryUpdate): Category => {
     const category = new Category();
     return Object.assign(category, { id, ...dto });
   };

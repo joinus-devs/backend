@@ -84,7 +84,7 @@ export class CategoryService implements ICategoryService {
 
     try {
       return this._transactionManager.withTransaction(async (manager) => {
-        const category = CategoryConverter.toEntityFromCreate(categoryCreate);
+        const category = CategoryConverter.fromCreate(categoryCreate);
         const result = await manager.getRepository(Category).save(category);
         return result.id;
       });
@@ -96,7 +96,7 @@ export class CategoryService implements ICategoryService {
   update = async (id: number, categoryUpdate: CategoryUpdate) => {
     try {
       const result = await this._categoryRepository.save(
-        CategoryConverter.toEntityFromUpdate(id, categoryUpdate)
+        CategoryConverter.fromUpdate(id, categoryUpdate)
       );
       return result.id;
     } catch (err) {

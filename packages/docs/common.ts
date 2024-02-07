@@ -58,6 +58,14 @@ export const makeBody = (schema: Schema, description?: string): Parameter => ({
   },
 });
 
+export const makeCursorDto = (data: object) => ({
+  type: "object",
+  properties: {
+    next: { type: "number", example: 1 },
+    data: makeArray(data),
+  },
+});
+
 export const makeResponse = (
   schema: Schema,
   description?: string

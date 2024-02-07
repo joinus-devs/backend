@@ -50,15 +50,12 @@ export class CommentConverter {
     return { ...comment, user };
   };
 
-  public static toEntityFromCreate = (dto: CommentCreate): Comment => {
+  public static fromCreate = (dto: CommentCreate): Comment => {
     const user = new Comment();
     return Object.assign(user, dto);
   };
 
-  public static toEntityFromUpdate = (
-    id: number,
-    dto: CommentUpdate
-  ): Comment => {
+  public static fromUpdate = (id: number, dto: CommentUpdate): Comment => {
     const user = new Comment();
     return Object.assign(user, { id, ...dto });
   };

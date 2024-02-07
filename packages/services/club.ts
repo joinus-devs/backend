@@ -247,7 +247,7 @@ export class ClubService implements IClubService {
 
     try {
       return this._transactionManager.withTransaction(async (manager) => {
-        const club = ClubConverter.toEntityFromCreate(clubCreate);
+        const club = ClubConverter.fromCreate(clubCreate);
         const userInClub = new UserInClub();
         userInClub.user = user;
         userInClub.club = club;
@@ -280,7 +280,7 @@ export class ClubService implements IClubService {
       return this._transactionManager.withTransaction(async (manager) => {
         const result = await manager
           .getRepository(Club)
-          .save(ClubConverter.toEntityFromUpdate(id, clubUpdate));
+          .save(ClubConverter.fromUpdate(id, clubUpdate));
         return result.id;
       });
     } catch (err) {

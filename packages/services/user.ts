@@ -90,7 +90,7 @@ export class UserService implements IUserService {
   create = async (userCreate: UserCreate) => {
     try {
       const result = await this._repository.save(
-        UserConverter.toEntityFromCreate(userCreate)
+        UserConverter.fromCreate(userCreate)
       );
       return result.id;
     } catch (err) {
@@ -104,7 +104,7 @@ export class UserService implements IUserService {
   update = async (id: number, userUpdate: UserUpdate) => {
     try {
       const result = await this._repository.save(
-        UserConverter.toEntityFromUpdate(id, userUpdate)
+        UserConverter.fromUpdate(id, userUpdate)
       );
       return result.id;
     } catch (err) {
