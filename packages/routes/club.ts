@@ -7,6 +7,7 @@ import {
 } from "../controller";
 import Docs from "../docs";
 import { Role } from "../models";
+import { validator } from "../middleware";
 
 const clubRoutes = (
   clubController: IClubController,
@@ -25,6 +26,7 @@ const clubRoutes = (
       body("sex").isBoolean(),
       body("minimum_age").isNumeric(),
       body("maximum_age").isNumeric(),
+      validator,
       clubController.create
     );
   router
@@ -38,11 +40,21 @@ const clubRoutes = (
     .post(clubController.join);
   router
     .route("/:id/users/:userId")
-    .put(body("role").isIn(Object.values(Role)), clubController.setRole);
+    .put(
+      body("role").isIn(Object.values(Role)),
+      validator,
+      clubController.setRole
+    );
   router
     .route("/:id/feeds")
     .get(feedController.findAllByClub)
-    .post(feedController.create);
+    .post(
+      body("title").isString(),
+      body("content").isString(),
+      body("is_private").isBoolean(),
+      validator,
+      feedController.create
+    );
 
   return router;
 };

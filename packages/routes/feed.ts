@@ -2,6 +2,7 @@ import { Router } from "express";
 import { body } from "express-validator";
 import { ICommentController, IFeedController } from "../controller";
 import Docs from "../docs";
+import { validator } from "../middleware";
 
 const feedRoutes = (
   feedController: IFeedController,
@@ -18,12 +19,7 @@ const feedRoutes = (
   router
     .route("/:id/comments")
     .get(commentController.findAllByFeed)
-    .post(
-      body("title").isString(),
-      body("content").isString(),
-      body("is_private").isBoolean(),
-      commentController.create
-    );
+    .post(body("content").isString(), validator, commentController.create);
 
   return router;
 };

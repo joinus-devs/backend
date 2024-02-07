@@ -7,6 +7,7 @@ import { userDtoDoc } from "./user";
 const feedBase: CoreSchema<Omit<FeedScheme, "user_id" | "club_id">> = {
   title: { type: "string", example: "title" },
   content: { type: "string", example: "content" },
+  is_private: { type: "boolean", example: true },
 };
 
 export const feedDoc: CoreSchema<FeedScheme> = {

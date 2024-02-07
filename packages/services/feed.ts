@@ -83,10 +83,15 @@ export class FeedService implements IFeedService {
 
   findAll = async () => {
     try {
-      const feeds = await this._feedRepository.find({
-        where: { is_private: false, deleted_at: undefined },
-        relations: ["user"],
-      });
+      const feeds = await this._feedRepository
+        .createQueryBuilder("feed")
+        .leftJoinAndSelect("feed.user", "user")
+        .leftJoin("feed.comments", "comment")
+        .addSelect("COUNT(comment.id)", "feed_comment_count")
+        .where("feed.is_private = false")
+        .andWhere("feed.deleted_at IS NULL")
+        .groupBy("feed.id")
+        .getMany();
       return feeds.map((feed) => FeedConverter.toDto(feed));
     } catch (err) {
       throw Errors.InternalServerError;
@@ -95,11 +100,18 @@ export class FeedService implements IFeedService {
 
   findAllByClub = async (clubId: number) => {
     try {
-      const feeds = await this._feedRepository.find({
-        where: { club_id: clubId, deleted_at: undefined },
-        relations: ["user", "comments"],
-      });
-      return feeds.map((feed: any) => FeedConverter.toDto(feed));
+      const feeds = await this._feedRepository
+        .createQueryBuilder("feed")
+        .leftJoinAndSelect("feed.user", "user")
+        .leftJoin("feed.comments", "comment")
+        .addSelect("COUNT(comment.id)", "feed_comment_count")
+        .where("feed.club_id = :clubId", { clubId })
+        .andWhere("feed.deleted_at IS NULL")
+        .groupBy("feed.id")
+        .getMany();
+      return feeds.map((feed: any) =>
+        FeedConverter.toWithCommentCountDto(feed)
+      );
     } catch (err) {
       throw Errors.InternalServerError;
     }

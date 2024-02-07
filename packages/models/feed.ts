@@ -9,11 +9,16 @@ export interface FeedScheme extends IdEntity {
   club_id: number;
   title: string;
   content: string;
+  is_private: boolean;
 }
 
 export type FeedDto = FeedScheme & {
   user: UserDto;
   comments: CommentDto[];
+};
+
+export type FeedWithCommentCountDto = FeedDto & {
+  comment_count: number;
 };
 
 export type FeedCreate = Omit<
@@ -56,10 +61,20 @@ export class Feed extends IdEntity implements FeedScheme {
     cascade: true,
   })
   comments: Comment[];
+
+  @Column({ select: false, insert: false, readonly: true, nullable: true })
+  public comment_count: number;
 }
 
 export class FeedConverter {
   public static toDto = (feed: Feed): FeedDto => {
+    const { password, ...user } = feed.user;
+    return { ...feed, user };
+  };
+
+  public static toWithCommentCountDto = (
+    feed: Feed
+  ): FeedWithCommentCountDto => {
     const { password, ...user } = feed.user;
     return { ...feed, user };
   };

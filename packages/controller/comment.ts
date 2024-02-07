@@ -1,4 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
+import { CommentCreate } from "../models";
 import { ICommentService } from "../services";
 import {
   ErrorResponse,
@@ -12,7 +13,7 @@ export interface ICommentController {
   find: RequestHandler<IdPathParams>;
   findAll: RequestHandler<PageQueryParams>;
   findAllByFeed: RequestHandler<IdPathParams>;
-  create: RequestHandler;
+  create: RequestHandler<IdPathParams, CommentCreate>;
   update: RequestHandler;
   delete: RequestHandler;
 }
@@ -88,7 +89,11 @@ export class CommentController implements ICommentController {
     }
   };
 
-  create = async (req: Request, res: Response, next: NextFunction) => {
+  create = async (
+    req: Request<IdPathParams, CommentCreate>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const userId = (req as any)?.decoded?.id;
       const feedId = Number(req.params.id);
