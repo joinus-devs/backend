@@ -119,6 +119,10 @@ swagger.add({
     get: {
       summary: "Get all feed of a club",
       tags: ["Clubs"],
+      parameters: [
+        { $ref: "#/components/parameters/cursorParam" },
+        { $ref: "#/components/parameters/limitParam" },
+      ],
       responses: { 200: { $ref: "#/components/responses/feedsResponse" } },
     },
     post: {

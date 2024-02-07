@@ -16,7 +16,9 @@ import {
 } from "./club";
 import { commentCreateDoc, commentDtoDoc, commentUpdateDoc } from "./comment";
 import {
+  cursorParamDoc,
   errorResponse,
+  limnitParamDoc,
   makeArray,
   makeBody,
   makeCursor,
@@ -59,13 +61,15 @@ class Docs {
           feed: makeScheme(feedDoc),
         },
         parameters: {
+          cursorParam: { ...cursorParamDoc },
+          limitParam: { ...limnitParamDoc },
           signinParams: makeBody(signinParmasDoc),
           signupParams: makeBody(signupParamsDoc),
           userUpdate: makeBody(userUpdateDoc),
           clubCreate: makeBody(clubCreateDoc),
           clubUpdate: makeBody(clubUpdateDoc),
           userSetRole: makeBody(userSetRoleDoc),
-          roleQueryParams: roleQueryParamsDoc,
+          roleQueryParams: { ...roleQueryParamsDoc },
           categoryCreate: makeBody(categoryCreateDoc),
           categoryUpdate: makeBody(categoryUpdateDoc),
           feedCreate: makeBody(feedCreateDoc),

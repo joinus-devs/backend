@@ -32,6 +32,10 @@ swagger.add({
     get: {
       summary: "Get all feed",
       tags: ["Feeds"],
+      parameters: [
+        { $ref: "#/components/parameters/cursorParam" },
+        { $ref: "#/components/parameters/limitParam" },
+      ],
       responses: {
         200: { $ref: "#/components/responses/feedsWithClubResponse" },
       },

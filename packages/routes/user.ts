@@ -28,6 +28,10 @@ swagger.add({
     get: {
       summary: "Get all users",
       tags: ["Users"],
+      parameters: [
+        { $ref: "#/components/parameters/cursorParam" },
+        { $ref: "#/components/parameters/limitParam" },
+      ],
       responses: { 200: { $ref: "#/components/responses/usersResponse" } },
     },
   },

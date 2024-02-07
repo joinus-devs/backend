@@ -36,6 +36,24 @@ export const errorResponse: Schema = {
   },
 };
 
+export const cursorParamDoc: Parameter = {
+  in: "query",
+  name: "cursor",
+  required: false,
+  schema: {
+    type: "number",
+  },
+};
+
+export const limnitParamDoc: Parameter = {
+  in: "query",
+  name: "limit",
+  required: false,
+  schema: {
+    type: "number",
+  },
+};
+
 export const makeScheme = (data: object): Schema => ({
   type: "object",
   properties: { ...scheme.properties, ...cloneDeep(data) },
