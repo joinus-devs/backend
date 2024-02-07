@@ -8,6 +8,6 @@ export interface PageQueryParams {
 }
 
 export interface CursorQueryParams {
-  cursor: number;
-  limit: number;
+  cursor?: number;
+  limit?: number;
 }

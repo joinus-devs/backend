@@ -48,6 +48,14 @@ export const makeArray = (data: object): Schema => ({
   },
 });
 
+export const makeCursor = (data: object) => ({
+  type: "object",
+  properties: {
+    next: { type: "number", example: 1 },
+    data: makeArray(data),
+  },
+});
+
 export const makeBody = (schema: Schema, description?: string): Parameter => ({
   in: "body",
   name: "body",
@@ -55,14 +63,6 @@ export const makeBody = (schema: Schema, description?: string): Parameter => ({
   required: true,
   schema: {
     properties: schema,
-  },
-});
-
-export const makeCursorDto = (data: object) => ({
-  type: "object",
-  properties: {
-    next: { type: "number", example: 1 },
-    data: makeArray(data),
   },
 });
 

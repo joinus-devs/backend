@@ -14,7 +14,7 @@ import { CursorDto, ErrorResponse, Nullable } from "../types";
 
 export interface IFeedService {
   find(id: number): Promise<Nullable<FeedDto>>;
-  findAll(cursor?: number, limit?: number): Promise<FeedDto[]>;
+  findAll(cursor?: number, limit?: number): Promise<CursorDto<FeedDto[]>>;
   findAllByClub(
     clubId: number,
     cursor?: number,
@@ -85,7 +85,7 @@ export class FeedService implements IFeedService {
     return FeedConverter.toDto(feed);
   };
 
-  findAll = async (cursor = 1, limit = 10) => {
+  findAll = async (cursor?: number, limit = 10) => {
     try {
       const feeds = await this._feedRepository
         .createQueryBuilder("feed")
@@ -95,12 +95,16 @@ export class FeedService implements IFeedService {
         .addSelect("COUNT(comment.id)", "feed_comment_count")
         .where("feed.is_private = false")
         .andWhere("feed.deleted_at IS NULL")
-        .andWhere("feed.id <= :cursor", { cursor })
+        .andWhere(cursor ? "feed.id < :cursor" : "1=1", { cursor })
         .groupBy("feed.id")
         .orderBy("feed.created_at", "DESC")
-        .take(limit)
+        .take(limit + 1)
         .getMany();
-      return feeds.map((feed) => FeedConverter.toWithClubDto(feed));
+      const next = feeds.length > limit ? feeds[feeds.length - 2].id : null;
+      return {
+        data: feeds.slice(0, limit).map((feed) => FeedConverter.toDto(feed)),
+        next,
+      };
     } catch (err) {
       throw Errors.InternalServerError;
     }
