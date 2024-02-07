@@ -32,7 +32,9 @@ swagger.add({
     get: {
       summary: "Get all feed",
       tags: ["Feeds"],
-      responses: { 200: { $ref: "#/components/responses/feedsResponse" } },
+      responses: {
+        200: { $ref: "#/components/responses/feedsWithClubResponse" },
+      },
     },
   },
   "/feeds/{id}": {

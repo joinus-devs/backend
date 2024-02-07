@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { Club } from "./club";
-import { Comment, CommentDto } from "./comment";
+import { Comment } from "./comment";
 import { IdEntity } from "./common";
 import { User, UserDto } from "./user";
 
@@ -10,15 +10,15 @@ export interface FeedScheme extends IdEntity {
   title: string;
   content: string;
   is_private: boolean;
+  comment_count: number;
 }
 
 export type FeedDto = FeedScheme & {
   user: UserDto;
-  comments: CommentDto[];
 };
 
-export type FeedWithCommentCountDto = FeedDto & {
-  comment_count: number;
+export type FeedWithClubDto = FeedDto & {
+  club: Club;
 };
 
 export type FeedCreate = Omit<
@@ -72,11 +72,8 @@ export class FeedConverter {
     return { ...feed, user };
   };
 
-  public static toWithCommentCountDto = (
-    feed: Feed
-  ): FeedWithCommentCountDto => {
-    const { password, ...user } = feed.user;
-    return { ...feed, user };
+  public static toWithClubDto = (feed: Feed): FeedWithClubDto => {
+    return { ...feed };
   };
 
   public static toEntityFromCreate = (dto: FeedCreate): Feed => {

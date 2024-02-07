@@ -24,7 +24,13 @@ import {
   scheme,
   successResponse,
 } from "./common";
-import { feedCreateDoc, feedDoc, feedDtoDoc, feedUpdateDoc } from "./feed";
+import {
+  feedCreateDoc,
+  feedDoc,
+  feedDtoDoc,
+  feedUpdateDoc,
+  feedWithClubDtoDoc,
+} from "./feed";
 import { userDoc, userDtoDoc, userInClubDtoDoc, userUpdateDoc } from "./user";
 
 class Docs {
@@ -77,6 +83,7 @@ class Docs {
           categoriesResponse: makeSuccess(makeArray(categoryDtoDoc)),
           feedResponse: makeSuccess(makeScheme(feedDtoDoc)),
           feedsResponse: makeSuccess(makeArray(feedDtoDoc)),
+          feedsWithClubResponse: makeSuccess(makeArray(feedWithClubDtoDoc)),
           commentResponse: makeSuccess(makeScheme(commentDtoDoc)),
           commentsResponse: makeSuccess(makeArray(commentDtoDoc)),
           numberResponse: makeSuccess({

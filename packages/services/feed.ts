@@ -86,13 +86,14 @@ export class FeedService implements IFeedService {
       const feeds = await this._feedRepository
         .createQueryBuilder("feed")
         .leftJoinAndSelect("feed.user", "user")
+        .leftJoinAndSelect("feed.club", "club")
         .leftJoin("feed.comments", "comment")
         .addSelect("COUNT(comment.id)", "feed_comment_count")
         .where("feed.is_private = false")
         .andWhere("feed.deleted_at IS NULL")
         .groupBy("feed.id")
         .getMany();
-      return feeds.map((feed) => FeedConverter.toDto(feed));
+      return feeds.map((feed) => FeedConverter.toWithClubDto(feed));
     } catch (err) {
       throw Errors.InternalServerError;
     }
@@ -109,9 +110,7 @@ export class FeedService implements IFeedService {
         .andWhere("feed.deleted_at IS NULL")
         .groupBy("feed.id")
         .getMany();
-      return feeds.map((feed: any) =>
-        FeedConverter.toWithCommentCountDto(feed)
-      );
+      return feeds.map((feed: any) => FeedConverter.toDto(feed));
     } catch (err) {
       throw Errors.InternalServerError;
     }
