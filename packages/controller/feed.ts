@@ -5,6 +5,7 @@ import {
   ErrorResponse,
   IdPathParams,
   Nullable,
+  QueryParser,
   SuccessResponse,
 } from "../types";
 
@@ -57,8 +58,7 @@ export class FeedController implements IFeedController {
   ) => {
     try {
       const feeds = await this._service.findAll(
-        req.query.cursor ? Number(req.query.cursor) : undefined,
-        req.query.limit ? Number(req.query.limit) : undefined
+        ...QueryParser.getCursorQuery(req)
       );
       res
         .status(200)
@@ -78,8 +78,7 @@ export class FeedController implements IFeedController {
       const clubId = Number(req.params.id);
       const feeds = await this._service.findAllByClub(
         clubId,
-        req.query.cursor ? Number(req.query.cursor) : undefined,
-        req.query.limit ? Number(req.query.limit) : undefined
+        ...QueryParser.getCursorQuery(req)
       );
       res
         .status(200)

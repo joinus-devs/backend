@@ -7,6 +7,7 @@ import {
   IdPathParams,
   Nullable,
   PageQueryParams,
+  QueryParser,
   SuccessResponse,
 } from "../types";
 
@@ -86,8 +87,7 @@ export class ClubController implements IClubController {
       const userId = Number(req.params.id);
       const clubs = await this._service.findAllByUser(
         userId,
-        req.query.cursor ? Number(req.query.cursor) : undefined,
-        req.query.limit ? Number(req.query.limit) : undefined
+        ...QueryParser.getCursorQuery(req)
       );
       res
         .status(200)

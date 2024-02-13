@@ -6,6 +6,7 @@ import {
   ErrorResponse,
   IdPathParams,
   Nullable,
+  QueryParser,
   SuccessResponse,
 } from "../types";
 
@@ -62,8 +63,7 @@ export class UserController implements IUserController {
   ) => {
     try {
       const users = await this._service.findAll(
-        req.query.cursor ? Number(req.query.cursor) : undefined,
-        req.query.limit ? Number(req.query.limit) : undefined
+        ...QueryParser.getCursorQuery(req)
       );
       res
         .status(200)
@@ -86,8 +86,7 @@ export class UserController implements IUserController {
       const users = await this._service.findAllByClub(
         clubId,
         roles,
-        req.query.cursor ? Number(req.query.cursor) : undefined,
-        req.query.limit ? Number(req.query.limit) : undefined
+        ...QueryParser.getCursorQuery(req)
       );
       res
         .status(200)
