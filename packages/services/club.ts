@@ -18,7 +18,7 @@ import { CursorDto, ErrorResponse, Nullable } from "../types";
 
 export interface IClubService {
   find(id: number): Promise<Nullable<ClubDto>>;
-  findAll(): Promise<ClubDto[]>;
+  findAll(cursor?: number, limit?: number): Promise<CursorDto<ClubDto[]>>;
   findAllByUser(
     userId: number,
     cursor?: number,
@@ -97,13 +97,21 @@ export class ClubService implements IClubService {
     return ClubConverter.toDto(club);
   };
 
-  findAll = async () => {
+  findAll = async (cursor?: number, limit = 10) => {
     try {
-      const clubs = await this._clubRepository.find({
-        where: { deleted_at: undefined },
-        relations: ["categories", "categories.category"],
-      });
-      return clubs.map((club) => ClubConverter.toDto(club));
+      const clubs = await this._clubRepository
+        .createQueryBuilder("club")
+        .leftJoinAndSelect("club.categories", "category")
+        .where("club.deleted_at IS NULL")
+        .andWhere(cursor ? "club.id < :cursor" : "1=1", { cursor })
+        .orderBy("club.created_at", "DESC")
+        .take(limit + 1)
+        .getMany();
+      const next = clubs.length > limit ? clubs[clubs.length - 2].id : null;
+      return {
+        data: clubs.slice(0, limit).map((club) => ClubConverter.toDto(club)),
+        next,
+      };
     } catch (err) {
       throw Errors.InternalServerError;
     }

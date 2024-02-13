@@ -63,7 +63,7 @@ export class UserController implements IUserController {
   ) => {
     try {
       const users = await this._service.findAll(
-        ...QueryParser.getCursorQuery(req)
+        ...QueryParser.getCursorQueries(req)
       );
       res
         .status(200)
@@ -86,7 +86,7 @@ export class UserController implements IUserController {
       const users = await this._service.findAllByClub(
         clubId,
         roles,
-        ...QueryParser.getCursorQuery(req)
+        ...QueryParser.getCursorQueries(req)
       );
       res
         .status(200)

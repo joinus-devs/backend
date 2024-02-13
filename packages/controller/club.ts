@@ -6,7 +6,6 @@ import {
   ErrorResponse,
   IdPathParams,
   Nullable,
-  PageQueryParams,
   QueryParser,
   SuccessResponse,
 } from "../types";
@@ -17,7 +16,7 @@ export interface UserSetRole {
 
 export interface IClubController {
   find: RequestHandler<IdPathParams>;
-  findAll: RequestHandler<PageQueryParams>;
+  findAll: RequestHandler<void, void, void, CursorQueryParams>;
   findAllByUser: RequestHandler<IdPathParams, void, void, CursorQueryParams>;
   findAllByCategory: RequestHandler<
     IdPathParams,
@@ -66,12 +65,14 @@ export class ClubController implements IClubController {
   };
 
   findAll = async (
-    req: Request<PageQueryParams>,
+    req: Request<void, void, void, CursorQueryParams>,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      const clubs = await this._service.findAll();
+      const clubs = await this._service.findAll(
+        ...QueryParser.getCursorQueries(req)
+      );
       res
         .status(200)
         .json(
@@ -92,7 +93,7 @@ export class ClubController implements IClubController {
       const userId = Number(req.params.id);
       const clubs = await this._service.findAllByUser(
         userId,
-        ...QueryParser.getCursorQuery(req)
+        ...QueryParser.getCursorQueries(req)
       );
       res
         .status(200)
@@ -117,7 +118,7 @@ export class ClubController implements IClubController {
       const categoryId = Number(req.params.id);
       const clubs = await this._service.findAllByCategory(
         categoryId,
-        ...QueryParser.getCursorQuery(req)
+        ...QueryParser.getCursorQueries(req)
       );
       res
         .status(200)

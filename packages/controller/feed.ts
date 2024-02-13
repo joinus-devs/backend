@@ -58,7 +58,7 @@ export class FeedController implements IFeedController {
   ) => {
     try {
       const feeds = await this._service.findAll(
-        ...QueryParser.getCursorQuery(req)
+        ...QueryParser.getCursorQueries(req)
       );
       res
         .status(200)
@@ -78,7 +78,7 @@ export class FeedController implements IFeedController {
       const clubId = Number(req.params.id);
       const feeds = await this._service.findAllByClub(
         clubId,
-        ...QueryParser.getCursorQuery(req)
+        ...QueryParser.getCursorQueries(req)
       );
       res
         .status(200)
