@@ -1,8 +1,16 @@
 import { cloneDeep } from "lodash";
 import { Parameter } from "swagger-jsdoc";
 import { UserSetRole } from "../controller";
-import { ClubCreate, ClubDto, ClubScheme, ClubUpdate, Role } from "../models";
+import {
+  ClubCreate,
+  ClubDto,
+  ClubScheme,
+  ClubUpdate,
+  ClubWithUserInfoDto,
+  Role,
+} from "../models";
 import { CoreSchema } from "./common";
+import { userInClubDtoDoc } from "./user";
 
 const clubBase: CoreSchema<ClubDto> = {
   name: { type: "string", example: "name" },
@@ -15,6 +23,14 @@ const clubBase: CoreSchema<ClubDto> = {
 };
 
 export const clubDoc: CoreSchema<ClubScheme> = cloneDeep(clubBase);
+
+export const clubWithUserInfoDoc: CoreSchema<ClubWithUserInfoDto> = {
+  ...cloneDeep(clubBase),
+  user: {
+    type: "object",
+    properties: cloneDeep(userInClubDtoDoc),
+  },
+};
 
 export const clubDtoDoc: CoreSchema<ClubDto> = cloneDeep(clubBase);
 

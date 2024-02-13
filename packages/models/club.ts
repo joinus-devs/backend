@@ -17,6 +17,8 @@ export type ClubDto = ClubScheme & {
   categories: number[];
 };
 
+export type ClubWithUserInfoDto = ClubDto & { user: UserInClub };
+
 export type ClubWithUsersDto = ClubDto & { users: UserInClub[] };
 
 export type ClubCreate = Omit<ClubScheme, keyof IdEntity> & {
@@ -66,6 +68,17 @@ export class ClubConverter {
     const dto = {
       ...club,
       categories: club.categories.map((c) => c.category_id),
+    };
+    return dto;
+  };
+
+  public static toDtoWithUserInfo = (club: Club): ClubWithUserInfoDto => {
+    const { users, ...clubWithoutUsers } = club;
+    const userInfo = users?.[0];
+    const dto = {
+      ...clubWithoutUsers,
+      categories: club.categories.map((c) => c.category_id),
+      user: userInfo,
     };
     return dto;
   };

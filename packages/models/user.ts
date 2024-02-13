@@ -35,6 +35,9 @@ export class User extends IdEntity implements UserScheme {
   social_id: string;
 
   @Column()
+  type: "local" | "google" | "kakao" | "naver";
+
+  @Column()
   name: string;
 
   @Column()

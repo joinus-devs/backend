@@ -2,6 +2,7 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 import { ClubCreate, ClubUpdate, Role } from "../models";
 import { IClubService } from "../services";
 import {
+  CursorQueryParams,
   ErrorResponse,
   IdPathParams,
   Nullable,
@@ -16,7 +17,7 @@ export interface UserSetRole {
 export interface IClubController {
   find: RequestHandler<IdPathParams>;
   findAll: RequestHandler<PageQueryParams>;
-  findAllByUser: RequestHandler<IdPathParams>;
+  findAllByUser: RequestHandler<IdPathParams, void, void, CursorQueryParams>;
   findAllByCategory: RequestHandler<IdPathParams>;
   join: RequestHandler<IdPathParams>;
   setRole: RequestHandler<IdPathParams & { userId: number }, UserSetRole>;
@@ -77,13 +78,17 @@ export class ClubController implements IClubController {
   };
 
   findAllByUser = async (
-    req: Request<IdPathParams>,
+    req: Request<IdPathParams, void, void, CursorQueryParams>,
     res: Response,
     next: NextFunction
   ) => {
     try {
       const userId = Number(req.params.id);
-      const clubs = await this._service.findAllByUser(userId);
+      const clubs = await this._service.findAllByUser(
+        userId,
+        req.query.cursor ? Number(req.query.cursor) : undefined,
+        req.query.limit ? Number(req.query.limit) : undefined
+      );
       res
         .status(200)
         .json(
@@ -132,7 +137,10 @@ export class ClubController implements IClubController {
       res
         .status(200)
         .json(
-          new SuccessResponse(clubId, "유저가 클럽에 가입되었습니다.").toDTO()
+          new SuccessResponse(
+            null,
+            `${userId}번 유저가 ${clubId}번 클럽에 가입되었습니다.`
+          ).toDTO()
         );
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;

@@ -14,7 +14,12 @@ import { CursorDto, ErrorResponse, Nullable } from "../types";
 export interface IUserService {
   find(id: number): Promise<UserDto>;
   findAll(cursor?: number, limit?: number): Promise<CursorDto<UserDto[]>>;
-  findAllByClub(clubId: number, roles?: Role | Role[]): Promise<UserDto[]>;
+  findAllByClub(
+    clubId: number,
+    roles?: Role | Role[],
+    cursor?: number,
+    limit?: number
+  ): Promise<CursorDto<UserDto[]>>;
   create(userCreate: UserCreate): Promise<number>;
   update(id: number, userUpdate: UserUpdate): Promise<number>;
   delete(id: number): Promise<number>;
@@ -79,7 +84,12 @@ export class UserService implements IUserService {
     }
   };
 
-  findAllByClub = async (clubId: number, roles?: Role[]) => {
+  findAllByClub = async (
+    clubId: number,
+    roles?: Role[],
+    cursor?: number,
+    limit = 10
+  ) => {
     try {
       const users = await this._repository
         .createQueryBuilder("user")
@@ -89,8 +99,15 @@ export class UserService implements IUserService {
         .where("club.club_id = :clubId", { clubId })
         .andWhere("user.deleted_at IS NULL")
         .andWhere(roles ? "club.role IN (:...roles)" : "1=1", { roles })
+        .andWhere(cursor ? "user.id < :cursor" : "1=1", { cursor })
+        .orderBy("user.id", "DESC")
+        .take(limit + 1)
         .getMany();
-      return users.map((user) => UserConverter.toInClubDto(user));
+      const next = users.length > limit ? users[users.length - 2].id : null;
+      return {
+        data: users.slice(0, limit).map((user) => UserConverter.toDto(user)),
+        next,
+      };
     } catch (err) {
       console.log(err);
       throw Errors.InternalServerError;

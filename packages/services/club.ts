@@ -8,17 +8,22 @@ import {
   ClubCreate,
   ClubDto,
   ClubUpdate,
+  ClubWithUserInfoDto,
   Role,
   User,
   UserInClub,
 } from "../models";
 import { TransactionManager } from "../modules";
-import { ErrorResponse, Nullable } from "../types";
+import { CursorDto, ErrorResponse, Nullable } from "../types";
 
 export interface IClubService {
   find(id: number): Promise<Nullable<ClubDto>>;
   findAll(): Promise<ClubDto[]>;
-  findAllByUser(userId: number): Promise<ClubDto[]>;
+  findAllByUser(
+    userId: number,
+    cursor?: number,
+    limit?: number
+  ): Promise<CursorDto<ClubWithUserInfoDto[]>>;
   findAllByCategory(categoryId: number): Promise<ClubDto[]>;
   join(userId: number, clubId: number): Promise<number>;
   setRole(
@@ -100,14 +105,25 @@ export class ClubService implements IClubService {
     }
   };
 
-  findAllByUser = async (userId: number) => {
+  findAllByUser = async (userId: number, cursor?: number, limit = 10) => {
     try {
       const clubs = await this._clubRepository
         .createQueryBuilder("club")
-        .leftJoinAndSelect("club.users", "user")
-        .where("user.id = :id", { id: userId, deleted_at: undefined })
+        .leftJoinAndSelect("club.users", "user", "user.deleted_at IS NULL")
+        .leftJoinAndSelect("club.categories", "category")
+        .where("user.user_id = :id", { id: userId })
+        .andWhere("club.deleted_at IS NULL")
+        .andWhere(cursor ? "user.id < :cursor" : "1=1", { cursor })
+        .orderBy("user.created_at", "DESC")
+        .take(limit + 1)
         .getMany();
-      return clubs.map((club) => ClubConverter.toDto(club));
+      const next = clubs.length > limit ? clubs[clubs.length - 2].id : null;
+      return {
+        data: clubs
+          .slice(0, limit)
+          .map((club) => ClubConverter.toDtoWithUserInfo(club)),
+        next,
+      };
     } catch (err) {
       throw Errors.InternalServerError;
     }
@@ -141,6 +157,17 @@ export class ClubService implements IClubService {
     });
     if (!club) {
       throw Errors.ClubNotFound;
+    }
+
+    // 이미 가입한 클럽인지 확인
+    const userInClub = await this._clubRepository
+      .createQueryBuilder("club")
+      .leftJoin("club.users", "user")
+      .where("user.user_id = :id", { id: userId })
+      .andWhere("club.id = :clubId", { clubId })
+      .getOne();
+    if (userInClub) {
+      throw Errors.UserAlreadyJoined;
     }
 
     try {

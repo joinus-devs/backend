@@ -57,7 +57,9 @@ swagger.add({
     get: {
       summary: "Get all clubs of a user",
       tags: ["Users"],
-      responses: { 200: { $ref: "#/components/responses/clubsResponse" } },
+      responses: {
+        200: { $ref: "#/components/responses/clubsWithUserInfoResponse" },
+      },
     },
   },
 });

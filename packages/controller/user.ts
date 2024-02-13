@@ -16,7 +16,12 @@ export interface RoleQueryParams {
 export interface IUserController {
   find: RequestHandler;
   findAll: RequestHandler<unknown, void, void, CursorQueryParams>;
-  findAllByClub: RequestHandler<IdPathParams, void, void, RoleQueryParams>;
+  findAllByClub: RequestHandler<
+    IdPathParams,
+    void,
+    void,
+    CursorQueryParams & RoleQueryParams
+  >;
   update: RequestHandler;
   delete: RequestHandler;
 }
@@ -70,7 +75,7 @@ export class UserController implements IUserController {
   };
 
   findAllByClub = async (
-    req: Request<IdPathParams, void, void, RoleQueryParams>,
+    req: Request<IdPathParams, void, void, CursorQueryParams & RoleQueryParams>,
     res: Response,
     next: NextFunction
   ) => {
@@ -78,7 +83,12 @@ export class UserController implements IUserController {
       const clubId = Number(req.params.id);
       let roles = req.query.roles;
       roles = roles ? (Array.isArray(roles) ? roles : [roles]) : undefined;
-      const users = await this._service.findAllByClub(clubId, roles);
+      const users = await this._service.findAllByClub(
+        clubId,
+        roles,
+        req.query.cursor ? Number(req.query.cursor) : undefined,
+        req.query.limit ? Number(req.query.limit) : undefined
+      );
       res
         .status(200)
         .json(

@@ -11,6 +11,7 @@ import {
   clubDoc,
   clubDtoDoc,
   clubUpdateDoc,
+  clubWithUserInfoDoc,
   roleQueryParamsDoc,
   userSetRoleDoc,
 } from "./club";
@@ -84,6 +85,9 @@ class Docs {
           usersResponse: makeSuccess(makeCursor(userDtoDoc)),
           clubResponse: makeSuccess(makeScheme(clubDtoDoc)),
           clubsResponse: makeSuccess(makeArray(clubDtoDoc)),
+          clubsWithUserInfoResponse: makeSuccess(
+            makeScheme(clubWithUserInfoDoc)
+          ),
           categoryResponse: makeSuccess(makeScheme(categoryDtoDoc)),
           categoriesResponse: makeSuccess(makeArray(categoryDtoDoc)),
           feedResponse: makeSuccess(makeScheme(feedDtoDoc)),
