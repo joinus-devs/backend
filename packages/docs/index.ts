@@ -81,12 +81,12 @@ class Docs {
         responses: {
           signinResponse: makeSuccess(singinResponseDoc),
           userResponse: makeSuccess(makeScheme(userDtoDoc)),
-          userInClubResponse: makeSuccess(makeScheme(userInClubDtoDoc)),
+          userInClubResponse: makeSuccess(makeCursor(userInClubDtoDoc)),
           usersResponse: makeSuccess(makeCursor(userDtoDoc)),
           clubResponse: makeSuccess(makeScheme(clubDtoDoc)),
-          clubsResponse: makeSuccess(makeArray(clubDtoDoc)),
+          clubsResponse: makeSuccess(makeCursor(clubDtoDoc)),
           clubsWithUserInfoResponse: makeSuccess(
-            makeScheme(clubWithUserInfoDoc)
+            makeCursor(clubWithUserInfoDoc)
           ),
           categoryResponse: makeSuccess(makeScheme(categoryDtoDoc)),
           categoriesResponse: makeSuccess(makeArray(categoryDtoDoc)),

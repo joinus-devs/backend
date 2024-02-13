@@ -24,7 +24,11 @@ export interface IClubService {
     cursor?: number,
     limit?: number
   ): Promise<CursorDto<ClubWithUserInfoDto[]>>;
-  findAllByCategory(categoryId: number): Promise<ClubDto[]>;
+  findAllByCategory(
+    categoryId: number,
+    cursor?: number,
+    limit?: number
+  ): Promise<CursorDto<ClubDto[]>>;
   join(userId: number, clubId: number): Promise<number>;
   setRole(
     requesterId: number,
@@ -129,14 +133,30 @@ export class ClubService implements IClubService {
     }
   };
 
-  findAllByCategory = async (categoryId: number) => {
+  findAllByCategory = async (
+    categoryId: number,
+    cursor?: number,
+    limit = 10
+  ) => {
     try {
       const clubs = await this._clubRepository
         .createQueryBuilder("club")
-        .leftJoinAndSelect("club.categories", "category")
-        .where("category.id = :id", { id: categoryId, deleted_at: undefined })
+        .leftJoinAndSelect(
+          "club.categories",
+          "category",
+          "category.deleted_at IS NULL"
+        )
+        .where("category.category_id = :id", { id: categoryId })
+        .andWhere("club.deleted_at IS NULL")
+        .andWhere(cursor ? "club.id < :cursor" : "1=1", { cursor })
+        .orderBy("club.created_at", "DESC")
+        .take(limit + 1)
         .getMany();
-      return clubs.map((club) => ClubConverter.toDto(club));
+      const next = clubs.length > limit ? clubs[clubs.length - 2].id : null;
+      return {
+        data: clubs.slice(0, limit).map((club) => ClubConverter.toDto(club)),
+        next,
+      };
     } catch (err) {
       throw Errors.InternalServerError;
     }

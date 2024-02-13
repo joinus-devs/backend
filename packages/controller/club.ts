@@ -19,7 +19,12 @@ export interface IClubController {
   find: RequestHandler<IdPathParams>;
   findAll: RequestHandler<PageQueryParams>;
   findAllByUser: RequestHandler<IdPathParams, void, void, CursorQueryParams>;
-  findAllByCategory: RequestHandler<IdPathParams>;
+  findAllByCategory: RequestHandler<
+    IdPathParams,
+    void,
+    void,
+    CursorQueryParams
+  >;
   join: RequestHandler<IdPathParams>;
   setRole: RequestHandler<IdPathParams & { userId: number }, UserSetRole>;
   create: RequestHandler<unknown, ClubCreate>;
@@ -104,13 +109,16 @@ export class ClubController implements IClubController {
   };
 
   findAllByCategory = async (
-    req: Request<IdPathParams>,
+    req: Request<IdPathParams, void, void, CursorQueryParams>,
     res: Response,
     next: NextFunction
   ) => {
     try {
       const categoryId = Number(req.params.id);
-      const clubs = await this._service.findAllByCategory(categoryId);
+      const clubs = await this._service.findAllByCategory(
+        categoryId,
+        ...QueryParser.getCursorQuery(req)
+      );
       res
         .status(200)
         .json(
