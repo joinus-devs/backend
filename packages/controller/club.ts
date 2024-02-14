@@ -71,7 +71,7 @@ export class ClubController implements IClubController {
   ) => {
     try {
       const clubs = await this._service.findAll(
-        ...QueryParser.getCursorQueries(req)
+        ...QueryParser.parseCursorQueries(req)
       );
       res
         .status(200)
@@ -93,7 +93,7 @@ export class ClubController implements IClubController {
       const userId = Number(req.params.id);
       const clubs = await this._service.findAllByUser(
         userId,
-        ...QueryParser.getCursorQueries(req)
+        ...QueryParser.parseCursorQueries(req)
       );
       res
         .status(200)
@@ -118,7 +118,7 @@ export class ClubController implements IClubController {
       const categoryId = Number(req.params.id);
       const clubs = await this._service.findAllByCategory(
         categoryId,
-        ...QueryParser.getCursorQueries(req)
+        ...QueryParser.parseCursorQueries(req)
       );
       res
         .status(200)

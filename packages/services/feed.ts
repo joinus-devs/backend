@@ -8,6 +8,7 @@ import {
   FeedDto,
   FeedUpdate,
   User,
+  isMember,
 } from "../models";
 import { TransactionManager } from "../modules";
 import { CursorDto, ErrorResponse, Nullable } from "../types";
@@ -149,6 +150,20 @@ export class FeedService implements IFeedService {
     });
     if (!club) {
       throw Errors.ClubNotFound;
+    }
+
+    // 유저가 클럽에 가입되어 있는지 확인
+    const userInClub = await this._clubRepository
+      .createQueryBuilder("club")
+      .leftJoinAndSelect("club.users", "user")
+      .where("user.user_id = :id", { id: userId })
+      .andWhere("club.id = :clubId", { clubId })
+      .getOne();
+    if (!userInClub) {
+      throw Errors.UserNotInClub;
+    }
+    if (!isMember(userInClub.users[0].role)) {
+      throw Errors.UserNotMember;
     }
 
     try {

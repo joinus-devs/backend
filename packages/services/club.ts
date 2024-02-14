@@ -277,7 +277,7 @@ export class ClubService implements IClubService {
       .getOne();
 
     if (!userInClub) {
-      throw Errors.UserNotJoined;
+      throw Errors.UserNotFoundInClub;
     }
 
     try {

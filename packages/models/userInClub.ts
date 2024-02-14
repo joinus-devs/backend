@@ -16,6 +16,9 @@ export enum Role {
   Banned = "banned",
 }
 
+export const isMember = (role: Role) =>
+  role !== Role.Pending && role !== Role.Banned;
+
 @Entity("users_in_clubs")
 export class UserInClub extends TimesEntity implements UserInClubScheme {
   @PrimaryColumn()

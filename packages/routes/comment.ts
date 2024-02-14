@@ -5,7 +5,6 @@ import Docs from "../docs";
 const commentRoutes = (controller: ICommentController) => {
   const router = Router();
 
-  router.route("/").get(controller.findAll);
   router
     .route("/:id")
     .get(controller.find)
@@ -19,28 +18,21 @@ export default commentRoutes;
 
 const swagger = Docs.getInstance();
 swagger.add({
-  "/feeds": {
+  "/comments/{id}": {
     get: {
-      summary: "Get all feed",
-      tags: ["Feeds"],
-      responses: { 200: { $ref: "#/components/responses/feedsResponse" } },
-    },
-  },
-  "/feeds/{id}": {
-    get: {
-      summary: "Get a feed",
-      tags: ["Feeds"],
-      responses: { 200: { $ref: "#/components/responses/feedResponse" } },
+      summary: "Get a comment",
+      tags: ["Comments"],
+      responses: { 200: { $ref: "#/components/responses/commentResponse" } },
     },
     put: {
-      summary: "Update a feed",
-      tags: ["Feeds"],
-      parameters: [{ $ref: "#/components/parameters/feedUpdate" }],
+      summary: "Update a comment",
+      tags: ["Comments"],
+      parameters: [{ $ref: "#/components/parameters/commentUpdate" }],
       responses: { 200: { $ref: "#/components/responses/numberResponse" } },
     },
     delete: {
-      summary: "Delete a feed",
-      tags: ["Feeds"],
+      summary: "Delete a comment",
+      tags: ["Comments"],
       responses: { 200: { $ref: "#/components/responses/numberResponse" } },
     },
   },

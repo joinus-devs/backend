@@ -14,7 +14,7 @@ import {
   IUserController,
   UserController,
 } from "../controller";
-import { Category, Club, Comment, Feed, User } from "../models";
+import { Category, Club, Feed, User } from "../models";
 import {
   AuthService,
   CategoryService,
@@ -100,10 +100,8 @@ class AppService {
       dataSource.getRepository(Club)
     );
     this._commentService = CommentService.getInstance(
-      transactionManager,
-      dataSource.getRepository(Comment),
-      dataSource.getRepository(Feed),
-      dataSource.getRepository(User)
+      dataSource,
+      transactionManager
     );
     this._categoryService = CategoryService.getInstance(
       transactionManager,

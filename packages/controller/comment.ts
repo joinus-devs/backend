@@ -2,17 +2,17 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 import { CommentCreate } from "../models";
 import { ICommentService } from "../services";
 import {
+  CursorQueryParams,
   ErrorResponse,
   IdPathParams,
   Nullable,
-  PageQueryParams,
+  QueryParser,
   SuccessResponse,
 } from "../types";
 
 export interface ICommentController {
   find: RequestHandler<IdPathParams>;
-  findAll: RequestHandler<PageQueryParams>;
-  findAllByFeed: RequestHandler<IdPathParams>;
+  findAllByFeed: RequestHandler<IdPathParams, void, void, CursorQueryParams>;
   create: RequestHandler<IdPathParams, CommentCreate>;
   update: RequestHandler;
   delete: RequestHandler;
@@ -41,26 +41,12 @@ export class CommentController implements ICommentController {
   ) => {
     try {
       const id = Number(req.params.id);
-      const feed = await this._service.find(id);
+      const comments = await this._service.find(id);
       res
         .status(200)
-        .json(new SuccessResponse(feed, "해당 댓글을 불러왔습니다.").toDTO());
-    } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
-      next(err);
-    }
-  };
-
-  findAll = async (
-    req: Request<PageQueryParams>,
-    res: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const feeds = await this._service.findAll();
-      res
-        .status(200)
-        .json(new SuccessResponse(feeds, "모든 댓글을 불러왔습니다.").toDTO());
+        .json(
+          new SuccessResponse(comments, "해당 댓글을 불러왔습니다.").toDTO()
+        );
     } catch (err) {
       if (!(err instanceof ErrorResponse)) return;
       next(err);
@@ -68,13 +54,16 @@ export class CommentController implements ICommentController {
   };
 
   findAllByFeed = async (
-    req: Request<IdPathParams>,
+    req: Request<IdPathParams, void, void, CursorQueryParams>,
     res: Response,
     next: NextFunction
   ) => {
     try {
       const clubId = Number(req.params.id);
-      const feeds = await this._service.findAllByFeed(clubId);
+      const feeds = await this._service.findAllByFeed(
+        clubId,
+        ...QueryParser.parseCursorQueries(req)
+      );
       res
         .status(200)
         .json(

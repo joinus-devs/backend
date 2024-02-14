@@ -94,7 +94,7 @@ class Docs {
           feedsResponse: makeSuccess(makeCursor(feedDtoDoc)),
           feedsWithClubResponse: makeSuccess(makeCursor(feedWithClubDtoDoc)),
           commentResponse: makeSuccess(makeScheme(commentDtoDoc)),
-          commentsResponse: makeSuccess(makeArray(commentDtoDoc)),
+          commentsResponse: makeSuccess(makeCursor(commentDtoDoc)),
           numberResponse: makeSuccess({
             type: "number",
             example: 1,

@@ -15,7 +15,7 @@ export interface CursorQueryParams {
 }
 
 export class QueryParser {
-  static getCursorQueries(req: Request<any, any, any, CursorQueryParams>) {
+  static parseCursorQueries(req: Request<any, any, any, CursorQueryParams>) {
     return [
       req.query.cursor ? Number(req.query.cursor) : undefined,
       req.query.limit ? Number(req.query.limit) : undefined,

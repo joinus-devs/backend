@@ -1,6 +1,7 @@
-import { Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import Errors from "../constants/errors";
 import {
+  Club,
   Comment,
   CommentConverter,
   CommentCreate,
@@ -8,14 +9,19 @@ import {
   CommentUpdate,
   Feed,
   User,
+  isMember,
 } from "../models";
 import { TransactionManager } from "../modules";
 import { Nullable } from "../types";
+import { CursorDto } from "./../types/response";
 
 export interface ICommentService {
   find(id: number): Promise<Nullable<CommentDto>>;
-  findAll(): Promise<CommentDto[]>;
-  findAllByFeed(feed: number): Promise<CommentDto[]>;
+  findAllByFeed(
+    feed: number,
+    cursor?: number,
+    limit?: number
+  ): Promise<CursorDto<CommentDto[]>>;
   create(
     userId: number,
     feedId: number,
@@ -30,33 +36,26 @@ export class CommentService implements ICommentService {
   private _transactionManager: TransactionManager;
   private _commentRepository: Repository<Comment>;
   private _feedRepository: Repository<Feed>;
+  private _clubRepository: Repository<Club>;
   private _userRepository: Repository<User>;
 
   private constructor(
-    transactionManager: TransactionManager,
-    commentRepository: Repository<Comment>,
-    feedRepository: Repository<Feed>,
-    userRepository: Repository<User>
+    dataSource: DataSource,
+    transactionManager: TransactionManager
   ) {
     this._transactionManager = transactionManager;
-    this._commentRepository = commentRepository;
-    this._feedRepository = feedRepository;
-    this._userRepository = userRepository;
+    this._commentRepository = dataSource.getRepository(Comment);
+    this._feedRepository = dataSource.getRepository(Feed);
+    this._clubRepository = dataSource.getRepository(Club);
+    this._userRepository = dataSource.getRepository(User);
   }
 
   static getInstance(
-    transactionManager: TransactionManager,
-    commentRepository: Repository<Comment>,
-    feedRepository: Repository<Feed>,
-    userRepository: Repository<User>
+    dataSource: DataSource,
+    transactionManager: TransactionManager
   ) {
     if (!this._instance) {
-      this._instance = new CommentService(
-        transactionManager,
-        commentRepository,
-        feedRepository,
-        userRepository
-      );
+      this._instance = new CommentService(dataSource, transactionManager);
     }
 
     return this._instance;
@@ -81,25 +80,26 @@ export class CommentService implements ICommentService {
     return CommentConverter.toDto(comment);
   };
 
-  findAll = async () => {
+  findAllByFeed = async (feedId: number, cursor?: number, limit = 10) => {
     try {
-      const comments = await this._commentRepository.find({
-        where: { deleted_at: undefined },
-        relations: ["user"],
-      });
-      return comments.map((comment) => CommentConverter.toDto(comment));
-    } catch (err) {
-      throw Errors.InternalServerError;
-    }
-  };
+      const comments = await this._commentRepository
+        .createQueryBuilder("comment")
+        .leftJoinAndSelect("comment.user", "user")
+        .where("comment.feed_id = :feedId", { feedId })
+        .andWhere("comment.deleted_at IS NULL")
+        .orderBy("comment.id", "DESC")
+        .skip(cursor)
+        .take(limit + 1)
+        .getMany();
 
-  findAllByFeed = async (feedId: number) => {
-    try {
-      const comments = await this._commentRepository.find({
-        where: { feed_id: feedId, deleted_at: undefined },
-        relations: ["user"],
-      });
-      return comments.map((comment) => CommentConverter.toDto(comment));
+      const next =
+        comments.length > limit ? comments[comments.length - 2].id : null;
+      return {
+        data: comments
+          .slice(0, limit)
+          .map((comment) => CommentConverter.toDto(comment)),
+        next,
+      };
     } catch (err) {
       throw Errors.InternalServerError;
     }
@@ -124,6 +124,22 @@ export class CommentService implements ICommentService {
     });
     if (!feed) {
       throw Errors.FeedNotFound;
+    }
+
+    if (feed.is_private) {
+      // 유저가 클럽에 가입되어 있는지 확인
+      const userInClub = await this._clubRepository
+        .createQueryBuilder("club")
+        .leftJoinAndSelect("club.users", "user")
+        .where("user.user_id = :id", { id: userId })
+        .andWhere("club.id = :clubId", { clubId: feed.club_id })
+        .getOne();
+      if (!userInClub) {
+        throw Errors.UserNotInClub;
+      }
+      if (!isMember(userInClub.users[0].role)) {
+        throw Errors.UserNotMember;
+      }
     }
 
     try {
