@@ -126,10 +126,7 @@ class AppController {
   private _categoryController: ICategoryController;
 
   constructor(appService: AppService) {
-    this._authController = AuthController.getInstance(
-      appService.authService,
-      appService.userService
-    );
+    this._authController = AuthController.getInstance(appService.authService);
     this._userController = UserController.getInstance(appService.userService);
     this._clubController = ClubController.getInstance(appService.clubService);
     this._feedController = FeedController.getInstance(appService.feedService);

@@ -15,14 +15,15 @@ const Errors = {
   FeedNotFound: new Err(404, 40403, "피드를 찾을 수 없습니다."),
   CommentNotFound: new Err(404, 40404, "댓글을 찾을 수 없습니다."),
   UserNotFoundInClub: new Err(404, 40405, "가입된 유저가 아닙니다."),
-  ClubNameAlreadyExists: new Err(409, 40900, "이미 존재하는 그룹명입니다."),
+  UserNameAlreadyExists: new Err(409, 40900, "이미 존재하는 유저명입니다."),
+  ClubNameAlreadyExists: new Err(409, 40901, "이미 존재하는 그룹명입니다."),
   CategoryNameAlreadyExists: new Err(
     409,
-    40901,
+    40902,
     "이미 존재하는 카테고리명입니다."
   ),
-  UserAlreadyJoined: new Err(409, 40902, "이미 가입한 그룹입니다."),
-  UserNotPending: new Err(409, 40903, "가입 대기중인 유저가 아닙니다."),
+  UserAlreadyJoined: new Err(409, 40903, "이미 가입한 그룹입니다."),
+  UserNotPending: new Err(409, 40904, "가입 대기중인 유저가 아닙니다."),
   InternalServerError: new Err(
     500,
     50000,

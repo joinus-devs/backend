@@ -1,15 +1,8 @@
 import { DataSource, Repository } from "typeorm";
 import Errors from "../constants/errors";
-import {
-  Role,
-  User,
-  UserConverter,
-  UserCreate,
-  UserDto,
-  UserUpdate,
-} from "../models";
+import { Role, User, UserConverter, UserDto, UserUpdate } from "../models";
 import { TransactionManager } from "../modules";
-import { CursorDto, ErrorResponse, Nullable } from "../types";
+import { CursorDto, Nullable } from "../types";
 
 export interface IUserService {
   find(id: number): Promise<UserDto>;
@@ -20,7 +13,6 @@ export interface IUserService {
     cursor?: number,
     limit?: number
   ): Promise<CursorDto<UserDto[]>>;
-  create(userCreate: UserCreate): Promise<number>;
   update(id: number, userUpdate: UserUpdate): Promise<number>;
   delete(id: number): Promise<number>;
 }
@@ -110,20 +102,6 @@ export class UserService implements IUserService {
       };
     } catch (err) {
       console.log(err);
-      throw Errors.InternalServerError;
-    }
-  };
-
-  create = async (userCreate: UserCreate) => {
-    try {
-      const result = await this._repository.save(
-        UserConverter.fromCreate(userCreate)
-      );
-      return result.id;
-    } catch (err) {
-      if (err instanceof ErrorResponse) {
-        throw err;
-      }
       throw Errors.InternalServerError;
     }
   };

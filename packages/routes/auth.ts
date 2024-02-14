@@ -2,6 +2,7 @@ import { Router } from "express";
 import { body } from "express-validator";
 import { IAuthController } from "../controller";
 import Docs from "../docs";
+import { validator } from "../middleware";
 
 const authRoutes = (controller: IAuthController) => {
   const router = Router();
@@ -12,18 +13,39 @@ const authRoutes = (controller: IAuthController) => {
     .post(
       body("email").isEmail(),
       body("password").isString(),
+      validator,
       controller.signin
+    );
+  router
+    .route("/signin/social")
+    .post(
+      body("social_id").isString(),
+      body("type").isString(),
+      validator,
+      controller.signinSocial
     );
   router
     .route("/signup")
     .post(
       body("password").isString(),
-      body("social_id").isString(),
       body("name").isString(),
       body("sex").isBoolean(),
       body("phone").isString(),
       body("email").isEmail(),
+      validator,
       controller.signup
+    );
+  router
+    .route("/signup/social")
+    .post(
+      body("social_id").isString(),
+      body("type").isString(),
+      body("name").isString(),
+      body("sex").isBoolean(),
+      body("phone").isString(),
+      body("email").isEmail(),
+      validator,
+      controller.signupSocial
     );
 
   return router;
@@ -53,6 +75,22 @@ swagger.add({
       summary: "Sign up",
       tags: ["Auth"],
       parameters: [{ $ref: "#/components/parameters/signupParams" }],
+      responses: { 200: { $ref: "#/components/responses/numberResponse" } },
+    },
+  },
+  "/auth/signin/social": {
+    post: {
+      summary: "Sign in with social",
+      tags: ["Auth"],
+      parameters: [{ $ref: "#/components/parameters/signinSocialParams" }],
+      responses: { 200: { $ref: "#/components/responses/signinResponse" } },
+    },
+  },
+  "/auth/signup/social": {
+    post: {
+      summary: "Sign up with social",
+      tags: ["Auth"],
+      parameters: [{ $ref: "#/components/parameters/signupSocialParams" }],
       responses: { 200: { $ref: "#/components/responses/numberResponse" } },
     },
   },

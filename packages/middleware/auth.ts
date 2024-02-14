@@ -2,7 +2,12 @@ import jwt from "jsonwebtoken";
 import Errors from "../constants/errors";
 import { MiddelWare } from "../types";
 
-const whiteList = ["/auth/signin", "/auth/signup"];
+const whiteList = [
+  "/auth/signin",
+  "/auth/signup",
+  "/auth/signin/social",
+  "/auth/signup/social",
+];
 
 const authenticator: MiddelWare = (req, res, next) => {
   if (req.originalUrl.includes("docs")) return next();

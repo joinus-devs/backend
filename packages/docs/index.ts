@@ -1,5 +1,11 @@
 import swaggerJSDoc from "swagger-jsdoc";
-import { signinParmasDoc, signupParamsDoc, singinResponseDoc } from "./auth";
+import {
+  signinParmasDoc,
+  signinSocialParamsDoc,
+  signupParamsDoc,
+  signupSocialParamsDoc,
+  singinResponseDoc,
+} from "./auth";
 import {
   categoryCreateDoc,
   categoryDoc,
@@ -66,6 +72,8 @@ class Docs {
           limitParam: { ...limnitParamDoc },
           signinParams: makeBody(signinParmasDoc),
           signupParams: makeBody(signupParamsDoc),
+          signinSocialParams: makeBody(signinSocialParamsDoc),
+          signupSocialParams: makeBody(signupSocialParamsDoc),
           userUpdate: makeBody(userUpdateDoc),
           clubCreate: makeBody(clubCreateDoc),
           clubUpdate: makeBody(clubUpdateDoc),

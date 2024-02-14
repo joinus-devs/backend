@@ -17,7 +17,7 @@ class CreateTables1705433210498 implements MigrationInterface {
       create table users (
         ${idQuery}
         ${timesQuery}
-        social_id varchar(255) not null,
+        social_id varchar(255) null,
         type enum('local', 'google', 'kakao', 'naver') not null,
         name varchar(255) not null,
         sex boolean not null,

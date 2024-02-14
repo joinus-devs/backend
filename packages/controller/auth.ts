@@ -1,29 +1,34 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import jwt from "jsonwebtoken";
 import Errors from "../constants/errors";
-import { SigninParams, UserCreate } from "../models";
-import { IAuthService, IUserService } from "../services";
+import {
+  SigninParams,
+  SigninSocialParams,
+  SignupParams,
+  SignupSocialParams,
+} from "../models";
+import { IAuthService } from "../services";
 import { ErrorResponse, Nullable, SuccessResponse } from "../types";
 
 export interface IAuthController {
   me: RequestHandler;
   signin: RequestHandler<{}, any, SigninParams>;
-  signup: RequestHandler<{}, any, UserCreate>;
+  signinSocial: RequestHandler<{}, any, SigninSocialParams>;
+  signup: RequestHandler<{}, any, SignupParams>;
+  signupSocial: RequestHandler<{}, any, SignupSocialParams>;
 }
 
 export class AuthController implements IAuthController {
   private static _instance: Nullable<AuthController> = null;
   private _authService: IAuthService;
-  private _userService: IUserService;
 
-  private constructor(authService: IAuthService, userService: IUserService) {
+  private constructor(authService: IAuthService) {
     this._authService = authService;
-    this._userService = userService;
   }
 
-  static getInstance(authService: IAuthService, userService: IUserService) {
+  static getInstance(authService: IAuthService) {
     if (!this._instance) {
-      this._instance = new AuthController(authService, userService);
+      this._instance = new AuthController(authService);
     }
 
     return this._instance;
@@ -66,14 +71,56 @@ export class AuthController implements IAuthController {
     }
   };
 
-  signup = async (
-    req: Request<{}, any, UserCreate>,
+  signinSocial = async (
+    req: Request<{}, any, SigninSocialParams>,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      const userCreate = req.body;
-      const userId = await this._userService.create(userCreate);
+      const signinSocialParams = req.body;
+      const user = await this._authService.signinSocial(signinSocialParams);
+      let token;
+      try {
+        token = jwt.sign({ id: user.id }, process.env.JWT_SECRET!, {
+          expiresIn: "1h",
+        });
+      } catch (err) {
+        throw Errors.InternalServerError;
+      }
+      res
+        .status(201)
+        .json(new SuccessResponse({ token }, "로그인에 성공했습니다.").toDTO());
+    } catch (err) {
+      if (!(err instanceof ErrorResponse)) return;
+      next(err);
+    }
+  };
+
+  signup = async (
+    req: Request<{}, any, SignupParams>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const signupParams = req.body;
+      const userId = await this._authService.signup(signupParams);
+      res
+        .status(201)
+        .json(new SuccessResponse(userId, "회원가입에 성공했습니다.").toDTO());
+    } catch (err) {
+      if (!(err instanceof ErrorResponse)) return;
+      next(err);
+    }
+  };
+
+  signupSocial = async (
+    req: Request<{}, any, SignupSocialParams>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const signupSocialParams = req.body;
+      const userId = await this._authService.signupSocial(signupSocialParams);
       res
         .status(201)
         .json(new SuccessResponse(userId, "회원가입에 성공했습니다.").toDTO());

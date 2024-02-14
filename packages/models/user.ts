@@ -1,4 +1,5 @@
 import { Column, Entity, OneToMany } from "typeorm";
+import { SignupParams, SignupSocialParams } from "./auth";
 import { Comment } from "./comment";
 import { IdEntity } from "./common";
 import { Feed } from "./feed";
@@ -7,6 +8,7 @@ import { Role, UserInClub } from "./userInClub";
 export interface UserScheme extends IdEntity {
   password: string;
   social_id: string;
+  type: "local" | "google" | "kakao" | "naver";
   name: string;
   sex: boolean;
   phone: string;
@@ -22,16 +24,17 @@ export type UserInClubDto = UserDto & {
 
 export type UserWithClubsDto = UserDto & { clubs: UserInClub[] };
 
-export type UserCreate = Omit<UserScheme, keyof IdEntity>;
-
-export type UserUpdate = UserCreate;
+export type UserUpdate = Omit<
+  UserScheme,
+  keyof IdEntity | "social_id" | "password"
+>;
 
 @Entity("users")
 export class User extends IdEntity implements UserScheme {
   @Column()
   password: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: true })
   social_id: string;
 
   @Column()
@@ -93,8 +96,14 @@ export class UserConverter {
     return dto;
   };
 
-  public static fromCreate = (dto: UserCreate): User => {
+  public static fromSignup = (dto: SignupParams): User => {
     const user = new User();
+    return Object.assign(user, dto);
+  };
+
+  public static fromSignupSocial = (dto: SignupSocialParams): User => {
+    const user = new User();
+    user.password = "";
     return Object.assign(user, dto);
   };
 

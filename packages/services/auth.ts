@@ -1,12 +1,22 @@
-import { DataSource, Repository } from "typeorm";
+import { DataSource, QueryFailedError, Repository } from "typeorm";
 import Errors from "../constants/errors";
-import { SigninParams, User } from "../models";
+import {
+  SigninParams,
+  SigninSocialParams,
+  SignupParams,
+  SignupSocialParams,
+  User,
+  UserConverter,
+} from "../models";
 import { TransactionManager } from "../modules";
 import { Nullable } from "../types";
 
 export interface IAuthService {
   me: (id: number) => Promise<User>;
   signin(params: SigninParams): Promise<User>;
+  signup(userCreate: SignupParams): Promise<number>;
+  signinSocial(params: SigninSocialParams): Promise<User>;
+  signupSocial(params: SignupSocialParams): Promise<number>;
 }
 
 export class AuthService implements IAuthService {
@@ -64,5 +74,50 @@ export class AuthService implements IAuthService {
     }
 
     return user;
+  };
+
+  signup = async (userCreate: SignupParams) => {
+    try {
+      const result = await this._repository.save(
+        UserConverter.fromSignup(userCreate)
+      );
+      return result.id;
+    } catch (err) {
+      if (err instanceof QueryFailedError && err.driverError.errno === 1062) {
+        throw Errors.UserNameAlreadyExists;
+      }
+      throw Errors.InternalServerError;
+    }
+  };
+
+  signinSocial = async (params: SigninSocialParams) => {
+    let user;
+    try {
+      user = await this._repository.findOne({
+        where: { social_id: params.social_id, type: params.type },
+      });
+    } catch (err) {
+      throw Errors.InternalServerError;
+    }
+
+    if (!user) {
+      throw Errors.UserNotFound;
+    }
+
+    return user;
+  };
+
+  signupSocial = async (params: SignupSocialParams) => {
+    try {
+      const result = await this._repository.save(
+        UserConverter.fromSignupSocial(params)
+      );
+      return result.id;
+    } catch (err) {
+      if (err instanceof QueryFailedError && err.driverError.errno === 1062) {
+        throw Errors.UserNameAlreadyExists;
+      }
+      throw Errors.InternalServerError;
+    }
   };
 }

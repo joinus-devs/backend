@@ -4,6 +4,7 @@ import { CoreSchema } from "./common";
 
 const userBase: CoreSchema<UserDto> = {
   social_id: { type: "string", example: "1234" },
+  type: { type: "string", example: "google" },
   name: { type: "string", example: "John Doe" },
   sex: { type: "boolean", example: true },
   phone: { type: "string", example: "01012341234" },
