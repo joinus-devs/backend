@@ -30,6 +30,7 @@ export interface IClubService {
     limit?: number
   ): Promise<CursorDto<ClubDto[]>>;
   join(userId: number, clubId: number): Promise<number>;
+  reject(requesterId: number, clubId: number, userId: number): Promise<number>;
   setRole(
     requesterId: number,
     clubId: number,
@@ -201,6 +202,76 @@ export class ClubService implements IClubService {
       if (err instanceof ErrorResponse) {
         throw err;
       }
+      throw Errors.InternalServerError;
+    }
+  };
+
+  reject = async (requesterId: number, clubId: number, userId: number) => {
+    if (requesterId === userId) {
+      throw Errors.BadRequest;
+    }
+
+    const requester = await this._userRepository
+      .createQueryBuilder("user")
+      .leftJoin("user.clubs", "club")
+      .addSelect("club.role", "user_role")
+      .where("user.id = :id", { id: requesterId })
+      .andWhere("club.club_id = :clubId", { clubId })
+      .andWhere("club.role = :role", { role: Role.Admin })
+      .getOne();
+
+    // 요청자가 존재하는지 확인
+    if (!requester) {
+      throw Errors.NotAdmin;
+    }
+
+    // 요청자의 권한 확인
+    if (requester.role !== Role.Admin && requester.role !== Role.Staff) {
+      throw Errors.NotStaff;
+    }
+
+    // 유저가 존재하는지 확인
+    const user = await this._userRepository.findOne({
+      where: { id: userId, deleted_at: undefined },
+    });
+    if (!user) {
+      throw Errors.UserNotFound;
+    }
+
+    // 클럽이 존재하는지 확인
+    const club = await this._clubRepository.findOne({
+      where: { id: clubId, deleted_at: undefined },
+    });
+    if (!club) {
+      throw Errors.ClubNotFound;
+    }
+
+    // 유저가 클럽에 가입되어 있는지 확인
+    const userInClub = await this._clubRepository
+      .createQueryBuilder("club")
+      .leftJoinAndSelect("club.users", "user")
+      .where("user.user_id = :id", { id: userId })
+      .andWhere("club.id = :clubId", { clubId })
+      .getOne();
+    if (!userInClub) {
+      throw Errors.UserNotFoundInClub;
+    }
+    if (userInClub.users[0].role !== Role.Pending) {
+      throw Errors.UserNotPending;
+    }
+
+    try {
+      return this._transactionManager.withTransaction(async (manager) => {
+        await manager
+          .getRepository(UserInClub)
+          .createQueryBuilder()
+          .delete()
+          .where("user_id = :userId", { userId })
+          .andWhere("club_id = :clubId", { clubId })
+          .execute();
+        return userId;
+      });
+    } catch (err) {
       throw Errors.InternalServerError;
     }
   };

@@ -22,6 +22,7 @@ const Errors = {
     "이미 존재하는 카테고리명입니다."
   ),
   UserAlreadyJoined: new Err(409, 40902, "이미 가입한 그룹입니다."),
+  UserNotPending: new Err(409, 40903, "가입 대기중인 유저가 아닙니다."),
   InternalServerError: new Err(
     500,
     50000,

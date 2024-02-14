@@ -6,8 +6,8 @@ import {
   IUserController,
 } from "../controller";
 import Docs from "../docs";
-import { Role } from "../models";
 import { validator } from "../middleware";
+import { Role } from "../models";
 
 const clubRoutes = (
   clubController: IClubController,
@@ -44,7 +44,8 @@ const clubRoutes = (
       body("role").isIn(Object.values(Role)),
       validator,
       clubController.setRole
-    );
+    )
+    .delete(clubController.reject);
   router
     .route("/:id/feeds")
     .get(feedController.findAllByClub)
@@ -112,6 +113,11 @@ swagger.add({
       summary: "Set role of a user in a club",
       tags: ["Clubs"],
       parameters: [{ $ref: "#/components/parameters/userSetRole" }],
+      responses: { 200: { $ref: "#/components/responses/numberResponse" } },
+    },
+    delete: {
+      summary: "Reject a user from a club",
+      tags: ["Clubs"],
       responses: { 200: { $ref: "#/components/responses/numberResponse" } },
     },
   },

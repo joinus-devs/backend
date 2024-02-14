@@ -25,6 +25,7 @@ export interface IClubController {
     CursorQueryParams
   >;
   join: RequestHandler<IdPathParams>;
+  reject: RequestHandler<IdPathParams & { userId: number }>;
   setRole: RequestHandler<IdPathParams & { userId: number }, UserSetRole>;
   create: RequestHandler<unknown, ClubCreate>;
   update: RequestHandler<IdPathParams, ClubUpdate>;
@@ -149,6 +150,30 @@ export class ClubController implements IClubController {
           new SuccessResponse(
             null,
             `${userId}번 유저가 ${clubId}번 클럽에 가입되었습니다.`
+          ).toDTO()
+        );
+    } catch (err) {
+      if (!(err instanceof ErrorResponse)) return;
+      next(err);
+    }
+  };
+
+  reject = async (
+    req: Request<IdPathParams & { userId: number }>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const requesterId = (req as any)?.decoded?.id;
+      const clubId = Number(req.params.id);
+      const userId = Number(req.params.userId);
+      await this._service.reject(requesterId, clubId, userId);
+      res
+        .status(200)
+        .json(
+          new SuccessResponse(
+            null,
+            `${userId}번 유저의 ${clubId}번 클럽 가입 요청이 거절되었습니다.`
           ).toDTO()
         );
     } catch (err) {
