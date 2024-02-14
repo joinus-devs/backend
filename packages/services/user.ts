@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import Errors from "../constants/errors";
 import {
   Role,
@@ -31,19 +31,19 @@ export class UserService implements IUserService {
   private _transactionManager: TransactionManager;
 
   private constructor(
-    transactionManager: TransactionManager,
-    repository: Repository<User>
+    dataSoruce: DataSource,
+    transactionManager: TransactionManager
   ) {
-    this._repository = repository;
     this._transactionManager = transactionManager;
+    this._repository = dataSoruce.getRepository(User);
   }
 
   static getInstance(
-    transactionManager: TransactionManager,
-    repository: Repository<User>
+    dataSoruce: DataSource,
+    transactionManager: TransactionManager
   ) {
     if (!this._instance) {
-      this._instance = new UserService(transactionManager, repository);
+      this._instance = new UserService(dataSoruce, transactionManager);
     }
 
     return this._instance;

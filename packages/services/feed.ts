@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import Errors from "../constants/errors";
 import {
   Club,
@@ -38,30 +38,21 @@ export class FeedService implements IFeedService {
   private _clubRepository: Repository<Club>;
 
   private constructor(
-    transactionManager: TransactionManager,
-    feedRepository: Repository<Feed>,
-    userRepository: Repository<User>,
-    clubRepository: Repository<Club>
+    dataSoruce: DataSource,
+    transactionManager: TransactionManager
   ) {
     this._transactionManager = transactionManager;
-    this._feedRepository = feedRepository;
-    this._userRepository = userRepository;
-    this._clubRepository = clubRepository;
+    this._feedRepository = dataSoruce.getRepository(Feed);
+    this._userRepository = dataSoruce.getRepository(User);
+    this._clubRepository = dataSoruce.getRepository(Club);
   }
 
   static getInstance(
-    transactionManager: TransactionManager,
-    feedRepository: Repository<Feed>,
-    userRepository: Repository<User>,
-    clubRepository: Repository<Club>
+    dataSoruce: DataSource,
+    transactionManager: TransactionManager
   ) {
     if (!this._instance) {
-      this._instance = new FeedService(
-        transactionManager,
-        feedRepository,
-        userRepository,
-        clubRepository
-      );
+      this._instance = new FeedService(dataSoruce, transactionManager);
     }
 
     return this._instance;

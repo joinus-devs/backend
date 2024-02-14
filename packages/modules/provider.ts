@@ -14,7 +14,6 @@ import {
   IUserController,
   UserController,
 } from "../controller";
-import { Category, Club, Feed, User } from "../models";
 import {
   AuthService,
   CategoryService,
@@ -79,33 +78,17 @@ class AppService {
   private _categoryService: ICategoryService;
 
   constructor(transactionManager: TransactionManager, dataSource: DataSource) {
-    this._authService = AuthService.getInstance(
-      transactionManager,
-      dataSource.getRepository(User)
-    );
-    this._userService = UserService.getInstance(
-      transactionManager,
-      dataSource.getRepository(User)
-    );
-    this._clubService = ClubService.getInstance(
-      transactionManager,
-      dataSource.getRepository(Club),
-      dataSource.getRepository(User),
-      dataSource.getRepository(Category)
-    );
-    this._feedService = FeedService.getInstance(
-      transactionManager,
-      dataSource.getRepository(Feed),
-      dataSource.getRepository(User),
-      dataSource.getRepository(Club)
-    );
+    this._authService = AuthService.getInstance(dataSource, transactionManager);
+    this._userService = UserService.getInstance(dataSource, transactionManager);
+    this._clubService = ClubService.getInstance(dataSource, transactionManager);
+    this._feedService = FeedService.getInstance(dataSource, transactionManager);
     this._commentService = CommentService.getInstance(
       dataSource,
       transactionManager
     );
     this._categoryService = CategoryService.getInstance(
-      transactionManager,
-      dataSource.getRepository(Category)
+      dataSource,
+      transactionManager
     );
   }
 

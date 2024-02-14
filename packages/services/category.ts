@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import Errors from "../constants/errors";
 import {
   Category,
@@ -24,22 +24,19 @@ export class CategoryService implements ICategoryService {
   private _categoryRepository: Repository<Category>;
 
   private constructor(
-    transactionManager: TransactionManager,
-    categoryRepository: Repository<Category>
+    dataSoruce: DataSource,
+    transactionManager: TransactionManager
   ) {
     this._transactionManager = transactionManager;
-    this._categoryRepository = categoryRepository;
+    this._categoryRepository = dataSoruce.getRepository(Category);
   }
 
   static getInstance(
-    transactionManager: TransactionManager,
-    categoryRepository: Repository<Category>
+    dataSoruce: DataSource,
+    transactionManager: TransactionManager
   ) {
     if (!this._instance) {
-      this._instance = new CategoryService(
-        transactionManager,
-        categoryRepository
-      );
+      this._instance = new CategoryService(dataSoruce, transactionManager);
     }
 
     return this._instance;

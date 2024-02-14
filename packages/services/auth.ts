@@ -1,4 +1,4 @@
-import { Repository } from "typeorm";
+import { DataSource, Repository } from "typeorm";
 import Errors from "../constants/errors";
 import { SigninParams, User } from "../models";
 import { TransactionManager } from "../modules";
@@ -15,19 +15,19 @@ export class AuthService implements IAuthService {
   private _repository: Repository<User>;
 
   private constructor(
-    transactionManager: TransactionManager,
-    repository: Repository<User>
+    dataSoruce: DataSource,
+    transactionManager: TransactionManager
   ) {
-    this._repository = repository;
     this._transactionManager = transactionManager;
+    this._repository = dataSoruce.getRepository(User);
   }
 
   static getInstance(
-    transactionManager: TransactionManager,
-    repository: Repository<User>
+    dataSoruce: DataSource,
+    transactionManager: TransactionManager
   ) {
     if (!this._instance) {
-      this._instance = new AuthService(transactionManager, repository);
+      this._instance = new AuthService(dataSoruce, transactionManager);
     }
 
     return this._instance;

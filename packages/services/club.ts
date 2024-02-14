@@ -1,4 +1,4 @@
-import { QueryFailedError, Repository } from "typeorm";
+import { DataSource, QueryFailedError, Repository } from "typeorm";
 import Errors from "../constants/errors";
 import {
   Category,
@@ -49,30 +49,21 @@ export class ClubService implements IClubService {
   private _categoryRepository: Repository<Category>;
 
   private constructor(
-    transactionManager: TransactionManager,
-    clubRepository: Repository<Club>,
-    userRepository: Repository<User>,
-    categoryRepository: Repository<Category>
+    dataSoruce: DataSource,
+    transactionManager: TransactionManager
   ) {
     this._transactionManager = transactionManager;
-    this._clubRepository = clubRepository;
-    this._userRepository = userRepository;
-    this._categoryRepository = categoryRepository;
+    this._clubRepository = dataSoruce.getRepository(Club);
+    this._userRepository = dataSoruce.getRepository(User);
+    this._categoryRepository = dataSoruce.getRepository(Category);
   }
 
   static getInstance(
-    transactionManager: TransactionManager,
-    clubRepository: Repository<Club>,
-    userRepository: Repository<User>,
-    categoryRepository: Repository<Category>
+    dataSoruce: DataSource,
+    transactionManager: TransactionManager
   ) {
     if (!this._instance) {
-      this._instance = new ClubService(
-        transactionManager,
-        clubRepository,
-        userRepository,
-        categoryRepository
-      );
+      this._instance = new ClubService(dataSoruce, transactionManager);
     }
 
     return this._instance;
