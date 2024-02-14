@@ -239,7 +239,7 @@ export class ClubService implements IClubService {
 
     // 요청자가 존재하는지 확인
     if (!requester) {
-      throw Errors.UserNotFound;
+      throw Errors.NotAdmin;
     }
 
     // 요청자의 권한 확인
@@ -266,6 +266,18 @@ export class ClubService implements IClubService {
     });
     if (!club) {
       throw Errors.ClubNotFound;
+    }
+
+    // 유저가 클럽에 가입되어 있는지 확인
+    const userInClub = await this._clubRepository
+      .createQueryBuilder("club")
+      .leftJoin("club.users", "user")
+      .where("user.user_id = :id", { id: userId })
+      .andWhere("club.id = :clubId", { clubId })
+      .getOne();
+
+    if (!userInClub) {
+      throw Errors.UserNotJoined;
     }
 
     try {
