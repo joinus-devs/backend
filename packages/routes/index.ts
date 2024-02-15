@@ -5,11 +5,16 @@ import categoryRoutes from "./category";
 import clubRoutes from "./club";
 import commentRoutes from "./comment";
 import feedRoutes from "./feed";
+import storageRoutes from "./storage";
 import userRoutes from "./user";
 
 const initRoutes = (appManager: AppProvider) => {
   const router = Router();
 
+  router.use(
+    "/storage",
+    storageRoutes(appManager.appController.storageController)
+  );
   router.use("/auth", authRoutes(appManager.appController.authController));
   router.use(
     "/users",

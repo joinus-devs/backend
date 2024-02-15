@@ -51,7 +51,6 @@ export class UserController implements IUserController {
         .status(200)
         .json(new SuccessResponse(user, "유저를 불러왔습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -69,7 +68,6 @@ export class UserController implements IUserController {
         .status(200)
         .json(new SuccessResponse(users, "모든 유저를 불러왔습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -97,7 +95,6 @@ export class UserController implements IUserController {
           ).toDTO()
         );
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -113,7 +110,6 @@ export class UserController implements IUserController {
           new SuccessResponse(userId, "유저 정보가 수정되었습니다.").toDTO()
         );
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -126,7 +122,6 @@ export class UserController implements IUserController {
         .status(200)
         .json(new SuccessResponse(deletedId, "유저가 삭제되었습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };

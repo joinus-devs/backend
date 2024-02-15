@@ -3,7 +3,6 @@ import { CommentCreate } from "../models";
 import { ICommentService } from "../services";
 import {
   CursorQueryParams,
-  ErrorResponse,
   IdPathParams,
   Nullable,
   QueryParser,
@@ -48,7 +47,6 @@ export class CommentController implements ICommentController {
           new SuccessResponse(comments, "해당 댓글을 불러왔습니다.").toDTO()
         );
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -73,7 +71,6 @@ export class CommentController implements ICommentController {
           ).toDTO()
         );
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -96,7 +93,6 @@ export class CommentController implements ICommentController {
         .status(201)
         .json(new SuccessResponse(commentId, "댓글이 등록되었습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -110,7 +106,6 @@ export class CommentController implements ICommentController {
         .status(200)
         .json(new SuccessResponse(commentId, "댓글이 수정되었습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -123,7 +118,6 @@ export class CommentController implements ICommentController {
         .status(200)
         .json(new SuccessResponse(deletedId, "댓글이 삭제되었습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };

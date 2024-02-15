@@ -1,6 +1,7 @@
 import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
+import multer from "multer";
 import "reflect-metadata";
 import swaggerUi from "swagger-ui-express";
 import Docs from "./packages/docs";
@@ -33,7 +34,7 @@ const main = async () => {
 
   await connectDB();
   const appManager = AppProvider.getInstance(DataSource);
-  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
   app.use(cors());
   app.use(logger);

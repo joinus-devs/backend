@@ -2,6 +2,8 @@ import { ErrorResponse as Err } from "../types";
 
 const Errors = {
   BadRequest: new Err(400, 40000, "잘못된 요청입니다."),
+  FileNotExists: new Err(400, 40001, "파일이 없습니다."),
+  InvalidCategory: new Err(400, 40002, "유효하지 않은 카테고리입니다."),
   PasswordNotMatch: new Err(401, 40100, "비밀번호가 일치하지 않습니다."),
   InvalidToken: new Err(401, 40101, "유효하지 않은 토큰입니다."),
   NotAdmin: new Err(403, 40300, "클럽 어드민이 아닙니다."),

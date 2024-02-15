@@ -46,7 +46,6 @@ export class CategoryController implements ICategoryController {
           new SuccessResponse(feed, "해당 카테고리를 불러왔습니다.").toDTO()
         );
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -64,7 +63,6 @@ export class CategoryController implements ICategoryController {
           new SuccessResponse(feeds, "모든 카테고리를 불러왔습니다.").toDTO()
         );
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -79,7 +77,6 @@ export class CategoryController implements ICategoryController {
           new SuccessResponse(categoryId, "카테고리가 생성되었습니다.").toDTO()
         );
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -95,7 +92,6 @@ export class CategoryController implements ICategoryController {
           new SuccessResponse(categoryId, "카테고리가 수정되었습니다.").toDTO()
         );
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -110,7 +106,6 @@ export class CategoryController implements ICategoryController {
           new SuccessResponse(deletedId, "카테고리가 삭제되었습니다.").toDTO()
         );
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };

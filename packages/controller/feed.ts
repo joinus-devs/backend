@@ -46,7 +46,6 @@ export class FeedController implements IFeedController {
         .status(200)
         .json(new SuccessResponse(feed, "해당 피드를 불러왔습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -64,7 +63,6 @@ export class FeedController implements IFeedController {
         .status(200)
         .json(new SuccessResponse(feeds, "모든 피드를 불러왔습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -89,7 +87,6 @@ export class FeedController implements IFeedController {
           ).toDTO()
         );
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -104,7 +101,6 @@ export class FeedController implements IFeedController {
         .status(201)
         .json(new SuccessResponse(feedId, "피드가 생성되었습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -118,7 +114,6 @@ export class FeedController implements IFeedController {
         .status(200)
         .json(new SuccessResponse(feedId, "피드가 수정되었습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -131,7 +126,6 @@ export class FeedController implements IFeedController {
         .status(200)
         .json(new SuccessResponse(deletedId, "피드가 삭제되었습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };

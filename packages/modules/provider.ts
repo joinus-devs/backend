@@ -14,6 +14,7 @@ import {
   IUserController,
   UserController,
 } from "../controller";
+import { IStorageController, StorageController } from "../controller/storage";
 import {
   AuthService,
   CategoryService,
@@ -28,6 +29,7 @@ import {
   IUserService,
   UserService,
 } from "../services";
+import { IStorageService, StorageService } from "../services/storage";
 import { Nullable } from "../types";
 
 class AppProvider {
@@ -70,6 +72,7 @@ class AppProvider {
 }
 
 class AppService {
+  private _storageService: IStorageService;
   private _authService: IAuthService;
   private _userService: IUserService;
   private _clubService: IClubService;
@@ -78,6 +81,7 @@ class AppService {
   private _categoryService: ICategoryService;
 
   constructor(transactionManager: TransactionManager, dataSource: DataSource) {
+    this._storageService = StorageService.getInstance();
     this._authService = AuthService.getInstance(dataSource, transactionManager);
     this._userService = UserService.getInstance(dataSource, transactionManager);
     this._clubService = ClubService.getInstance(dataSource, transactionManager);
@@ -90,6 +94,10 @@ class AppService {
       dataSource,
       transactionManager
     );
+  }
+
+  get storageService() {
+    return this._storageService;
   }
 
   get authService() {
@@ -118,6 +126,7 @@ class AppService {
 }
 
 class AppController {
+  private _storageController: IStorageController;
   private _authController: IAuthController;
   private _userController: IUserController;
   private _clubController: IClubController;
@@ -126,6 +135,9 @@ class AppController {
   private _categoryController: ICategoryController;
 
   constructor(appService: AppService) {
+    this._storageController = StorageController.getInstance(
+      appService.storageService
+    );
     this._authController = AuthController.getInstance(appService.authService);
     this._userController = UserController.getInstance(appService.userService);
     this._clubController = ClubController.getInstance(appService.clubService);
@@ -136,6 +148,10 @@ class AppController {
     this._categoryController = CategoryController.getInstance(
       appService.categoryService
     );
+  }
+
+  get storageController() {
+    return this._storageController;
   }
 
   get authController() {

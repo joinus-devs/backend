@@ -41,6 +41,7 @@ import {
   feedUpdateDoc,
   feedWithClubDtoDoc,
 } from "./feed";
+import { uploadParamsDoc } from "./storage";
 import { userDoc, userDtoDoc, userInClubDtoDoc, userUpdateDoc } from "./user";
 
 class Docs {
@@ -106,6 +107,10 @@ class Docs {
           numberResponse: makeSuccess({
             type: "number",
             example: 1,
+          }),
+          stringResponse: makeSuccess({
+            type: "string",
+            example: "string",
           }),
         },
       },

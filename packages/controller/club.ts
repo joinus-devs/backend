@@ -60,7 +60,6 @@ export class ClubController implements IClubController {
         .status(200)
         .json(new SuccessResponse(club, "해당 클럽을 불러왔습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -80,7 +79,6 @@ export class ClubController implements IClubController {
           new SuccessResponse(clubs, "모든 클럽들을 불러왔습니다.").toDTO()
         );
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -105,7 +103,6 @@ export class ClubController implements IClubController {
           ).toDTO()
         );
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -130,7 +127,6 @@ export class ClubController implements IClubController {
           ).toDTO()
         );
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -153,7 +149,6 @@ export class ClubController implements IClubController {
           ).toDTO()
         );
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -177,7 +172,6 @@ export class ClubController implements IClubController {
           ).toDTO()
         );
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -199,7 +193,6 @@ export class ClubController implements IClubController {
           new SuccessResponse(userId, "유저의 역할이 변경되었습니다.").toDTO()
         );
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -217,7 +210,6 @@ export class ClubController implements IClubController {
         .status(201)
         .json(new SuccessResponse(clubId, "클럽이 생성되었습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -235,7 +227,6 @@ export class ClubController implements IClubController {
         .status(200)
         .json(new SuccessResponse(clubId, "클럽이 수정되었습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -252,7 +243,6 @@ export class ClubController implements IClubController {
         .status(200)
         .json(new SuccessResponse(deletedId, "클럽이 삭제되었습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };

@@ -41,7 +41,6 @@ export class AuthController implements IAuthController {
         .status(200)
         .json(new SuccessResponse(user, "내 정보를 불러왔습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -66,7 +65,6 @@ export class AuthController implements IAuthController {
         .status(201)
         .json(new SuccessResponse({ token }, "로그인에 성공했습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -91,7 +89,6 @@ export class AuthController implements IAuthController {
         .status(201)
         .json(new SuccessResponse({ token }, "로그인에 성공했습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -108,7 +105,6 @@ export class AuthController implements IAuthController {
         .status(201)
         .json(new SuccessResponse(userId, "회원가입에 성공했습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };
@@ -125,7 +121,6 @@ export class AuthController implements IAuthController {
         .status(201)
         .json(new SuccessResponse(userId, "회원가입에 성공했습니다.").toDTO());
     } catch (err) {
-      if (!(err instanceof ErrorResponse)) return;
       next(err);
     }
   };

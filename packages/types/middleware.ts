@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import { ErrorResponse } from "./response";
 
 export type MiddelWare = (
   req: Request<any>,
@@ -8,7 +7,7 @@ export type MiddelWare = (
 ) => void;
 
 export type ErrorMiddelWare = (
-  err: ErrorResponse,
+  err: Error,
   req: Request<any>,
   res: Response<any>,
   next: NextFunction
