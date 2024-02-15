@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany } from "typeorm";
 import { ClubCategory } from "./clubCategory";
+import { ClubImage } from "./clubImage";
 import { IdEntity } from "./common";
 import { Feed } from "./feed";
 import { UserInClub } from "./userInClub";
@@ -15,14 +16,14 @@ export interface ClubScheme extends IdEntity {
 
 export type ClubDto = ClubScheme & {
   categories: number[];
+  images: Pick<ClubImage, "url" | "type">[];
 };
 
 export type ClubWithUserInfoDto = ClubDto & { user: UserInClub };
 
-export type ClubWithUsersDto = ClubDto & { users: UserInClub[] };
-
 export type ClubCreate = Omit<ClubScheme, keyof IdEntity> & {
   categories: number[];
+  images: Pick<ClubImage, "url" | "type">[];
 };
 
 export type ClubUpdate = ClubCreate;
@@ -61,6 +62,11 @@ export class Club extends IdEntity implements ClubScheme {
     cascade: true,
   })
   public categories: ClubCategory[];
+
+  @OneToMany(() => ClubImage, (clubImage) => clubImage.club, {
+    cascade: true,
+  })
+  public images: ClubImage[];
 }
 
 export class ClubConverter {
@@ -68,6 +74,7 @@ export class ClubConverter {
     const dto = {
       ...club,
       categories: club.categories.map((c) => c.category_id),
+      images: club.images.map((i) => ({ url: i.url, type: i.type })),
     };
     return dto;
   };
@@ -78,15 +85,8 @@ export class ClubConverter {
     const dto = {
       ...clubWithoutUsers,
       categories: club.categories.map((c) => c.category_id),
+      images: club.images.map((i) => ({ url: i.url, type: i.type })),
       user: userInfo,
-    };
-    return dto;
-  };
-
-  public static toDtoWithUsers = (club: Club): ClubWithUsersDto => {
-    const dto = {
-      ...club,
-      categories: club.categories.map((c) => c.category_id),
     };
     return dto;
   };

@@ -20,6 +20,20 @@ const clubBase: CoreSchema<ClubDto> = {
   minimum_age: { type: "number", example: 1 },
   maximum_age: { type: "number", example: 1 },
   categories: { type: "array", items: { type: "number", example: 1 } },
+  images: {
+    type: "array",
+    items: {
+      type: "object",
+      properties: {
+        url: {
+          type: "string",
+          example:
+            "https://kr.object.ncloudstorage.com/joinus/image/profile.png",
+        },
+        type: { type: "string", example: "main" },
+      },
+    },
+  },
 };
 
 export const clubDoc: CoreSchema<ClubScheme> = cloneDeep(clubBase);

@@ -10,6 +10,7 @@ export interface UserScheme extends IdEntity {
   social_id: string;
   type: "local" | "google" | "kakao" | "naver";
   name: string;
+  profile: string;
   sex: boolean;
   phone: string;
   email: string;
@@ -42,6 +43,9 @@ export class User extends IdEntity implements UserScheme {
 
   @Column()
   name: string;
+
+  @Column()
+  profile: string;
 
   @Column()
   sex: boolean;

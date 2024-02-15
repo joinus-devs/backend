@@ -13,6 +13,7 @@ import {
   User,
   UserInClub,
 } from "../models";
+import { ClubImage } from "../models/clubImage";
 import { TransactionManager } from "../modules";
 import { CursorDto, ErrorResponse, Nullable } from "../types";
 
@@ -94,6 +95,7 @@ export class ClubService implements IClubService {
       const clubs = await this._clubRepository
         .createQueryBuilder("club")
         .leftJoinAndSelect("club.categories", "category")
+        .leftJoinAndSelect("club.images", "image")
         .where("club.deleted_at IS NULL")
         .andWhere(cursor ? "club.id < :cursor" : "1=1", { cursor })
         .orderBy("club.created_at", "DESC")
@@ -115,6 +117,7 @@ export class ClubService implements IClubService {
         .createQueryBuilder("club")
         .leftJoinAndSelect("club.users", "user", "user.deleted_at IS NULL")
         .leftJoinAndSelect("club.categories", "category")
+        .leftJoinAndSelect("club.images", "image")
         .where("user.user_id = :id", { id: userId })
         .andWhere("club.deleted_at IS NULL")
         .andWhere(cursor ? "user.id < :cursor" : "1=1", { cursor })
@@ -382,6 +385,12 @@ export class ClubService implements IClubService {
         userInClub.club = club;
         userInClub.role = Role.Admin;
         club.users = [userInClub];
+        club.images = clubCreate.images.map((image) => {
+          const clubImage = new ClubImage();
+          clubImage.url = image.url;
+          clubImage.type = image.type;
+          return clubImage;
+        });
         const clubCategory = new ClubCategory();
         clubCategory.club = club;
         clubCategory.category = category;

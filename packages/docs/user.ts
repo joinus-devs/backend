@@ -6,6 +6,10 @@ const userBase: CoreSchema<UserDto> = {
   social_id: { type: "string", example: "1234" },
   type: { type: "string", example: "google" },
   name: { type: "string", example: "John Doe" },
+  profile: {
+    type: "string",
+    example: "https://kr.object.ncloudstorage.com/joinus/image/profile.png",
+  },
   sex: { type: "boolean", example: true },
   phone: { type: "string", example: "01012341234" },
   email: { type: "string", example: "john@gmail.com" },

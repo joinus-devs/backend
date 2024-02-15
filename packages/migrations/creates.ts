@@ -20,6 +20,7 @@ class CreateTables1705433210498 implements MigrationInterface {
         social_id varchar(255) null,
         type enum('local', 'google', 'kakao', 'naver') not null,
         name varchar(255) not null,
+        profile varchar(255) not null,
         sex boolean not null,
         phone varchar(255) not null,
         email varchar(255) not null,
@@ -40,6 +41,17 @@ class CreateTables1705433210498 implements MigrationInterface {
         minimum_age int not null,
         maximum_age int not null,
         unique (name)
+      );
+    `);
+
+    await queryRunner.query(`
+      create table clubs_images (
+        ${idQuery}
+        ${timesQuery}
+        club_id int not null,
+        url varchar(255) not null,
+        type enum('main', 'sub') not null,
+        foreign key (club_id) references clubs(id)
       );
     `);
 
@@ -108,6 +120,7 @@ class CreateTables1705433210498 implements MigrationInterface {
     await queryRunner.query(`drop table clubs_categories;`);
     await queryRunner.query(`drop table categories;`);
     await queryRunner.query(`drop table users_in_clubs;`);
+    await queryRunner.query(`drop table clubs_images;`);
     await queryRunner.query(`drop table clubs;`);
     await queryRunner.query(`drop table users;`);
   }

@@ -9,6 +9,7 @@ import {
   User,
   UserInClub,
 } from "../models";
+import { ClubImage } from "../models/clubImage";
 import CreateTables1705433210498 from "./creates";
 
 dotenv.config();
@@ -22,7 +23,16 @@ export default new DataSource({
   database: process.env.DB_NAME,
   synchronize: false,
   // logging: true,
-  entities: [User, UserInClub, Club, Category, ClubCategory, Feed, Comment],
+  entities: [
+    User,
+    UserInClub,
+    Club,
+    ClubImage,
+    Category,
+    ClubCategory,
+    Feed,
+    Comment,
+  ],
   migrations: [CreateTables1705433210498],
   migrationsRun: true,
 });

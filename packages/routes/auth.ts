@@ -29,6 +29,7 @@ const authRoutes = (controller: IAuthController) => {
     .post(
       body("password").isString(),
       body("name").isString(),
+      body("profile").isString(),
       body("sex").isBoolean(),
       body("phone").isString(),
       body("email").isEmail(),
@@ -41,6 +42,7 @@ const authRoutes = (controller: IAuthController) => {
       body("social_id").isString(),
       body("type").isString(),
       body("name").isString(),
+      body("profile").isString(),
       body("sex").isBoolean(),
       body("phone").isString(),
       body("email").isEmail(),
