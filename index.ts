@@ -31,6 +31,8 @@ const main = async () => {
   const app = express();
   const port = 8000;
 
+  console.log(`Database ${process.env.DB_NAME} connecting...`);
+
   await connectDB();
 
   console.log(`Database ${process.env.DB_NAME} connected successfully`);
