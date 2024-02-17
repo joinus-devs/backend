@@ -12,7 +12,11 @@ import {
 import { ClubImage } from "../models/clubImage";
 import CreateTables1705433210498 from "./creates";
 
-dotenv.config();
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config({ path: ".env.local" });
+} else {
+  dotenv.config();
+}
 
 export default new DataSource({
   type: "mysql",
