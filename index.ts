@@ -1,7 +1,6 @@
 import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
-import multer from "multer";
 import "reflect-metadata";
 import swaggerUi from "swagger-ui-express";
 import Docs from "./packages/docs";
@@ -33,6 +32,9 @@ const main = async () => {
   const port = 8000;
 
   await connectDB();
+
+  console.log(`Database ${process.env.DB_NAME} connected successfully`);
+
   const appManager = AppProvider.getInstance(DataSource);
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
