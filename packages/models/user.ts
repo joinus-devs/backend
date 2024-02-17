@@ -44,7 +44,7 @@ export class User extends IdEntity implements UserScheme {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   profile: string;
 
   @Column()
@@ -107,7 +107,6 @@ export class UserConverter {
 
   public static fromSignupSocial = (dto: SignupSocialParams): User => {
     const user = new User();
-    user.password = "";
     return Object.assign(user, dto);
   };
 

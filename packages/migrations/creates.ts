@@ -20,13 +20,15 @@ class CreateTables1705433210498 implements MigrationInterface {
         social_id varchar(255) null,
         type enum('local', 'google', 'kakao', 'naver') not null,
         name varchar(255) not null,
-        profile varchar(255) not null,
+        profile varchar(255),
         sex boolean not null,
         phone varchar(255) not null,
         email varchar(255) not null,
-        password varchar(255) not null,
+        password varchar(255),
         unique (social_id),
-        unique (email)
+        unique (email),
+        check((type = 'local' and social_id is null) or (type != 'local' and social_id is not null)),
+        check((type = 'local' and password is not null and length(password) >= 8) or (type != 'local' and password is null))
       );
     `);
 

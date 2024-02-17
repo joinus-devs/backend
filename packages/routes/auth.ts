@@ -12,7 +12,7 @@ const authRoutes = (controller: IAuthController) => {
     .route("/signin")
     .post(
       body("email").isEmail(),
-      body("password").isString(),
+      body("password").isString().isLength({ min: 8 }),
       validator,
       controller.signin
     );
@@ -29,7 +29,6 @@ const authRoutes = (controller: IAuthController) => {
     .post(
       body("password").isString(),
       body("name").isString(),
-      body("profile").isString(),
       body("sex").isBoolean(),
       body("phone").isString(),
       body("email").isEmail(),
@@ -42,7 +41,6 @@ const authRoutes = (controller: IAuthController) => {
       body("social_id").isString(),
       body("type").isString(),
       body("name").isString(),
-      body("profile").isString(),
       body("sex").isBoolean(),
       body("phone").isString(),
       body("email").isEmail(),
