@@ -18,14 +18,14 @@ services:
     ports:
       - "80:8000"
     environment:
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-      - JWT_SECRET=${JWT_SECRET}
-      - NCLOUD_ACCESS_KEY=${NCLOUD_ACCESS_KEY}
-      - NCLOUD_SECRET_KEY=${NCLOUD_SECRET_KEY}
+      - DB_HOST="${DB_HOST}"
+      - DB_PORT="${DB_PORT}"
+      - DB_USER="${DB_USER}"
+      - DB_PASSWORD="${DB_PASSWORD}"
+      - DB_NAME="${DB_NAME}"
+      - JWT_SECRET="${JWT_SECRET}"
+      - NCLOUD_ACCESS_KEY="${NCLOUD_ACCESS_KEY}"
+      - NCLOUD_SECRET_KEY="${NCLOUD_SECRET_KEY}"
     networks:
       - backend
 
