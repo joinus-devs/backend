@@ -27,7 +27,7 @@ const authRoutes = (controller: IAuthController) => {
   router
     .route("/signup")
     .post(
-      body("password").isString(),
+      body("password").isString().isLength({ min: 8 }),
       body("name").isString(),
       body("sex").isBoolean(),
       body("phone").isString(),
