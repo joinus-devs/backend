@@ -76,7 +76,7 @@ export class ClubService implements IClubService {
     try {
       club = await this._clubRepository.findOne({
         where: { id, deleted_at: undefined },
-        relations: ["categories", "categories.category"],
+        relations: ["categories", "categories.category", "images"],
       });
     } catch (err) {
       throw Errors.InternalServerError;
