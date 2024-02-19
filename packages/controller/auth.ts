@@ -8,7 +8,7 @@ import {
   SignupSocialParams,
 } from "../models";
 import { IAuthService } from "../services";
-import { ErrorResponse, Nullable, SuccessResponse } from "../types";
+import { Nullable, SuccessResponse } from "../types";
 
 export interface IAuthController {
   me: RequestHandler;
@@ -62,7 +62,7 @@ export class AuthController implements IAuthController {
         throw Errors.InternalServerError;
       }
       res
-        .status(201)
+        .status(200)
         .json(new SuccessResponse({ token }, "로그인에 성공했습니다.").toDTO());
     } catch (err) {
       next(err);
@@ -86,7 +86,7 @@ export class AuthController implements IAuthController {
         throw Errors.InternalServerError;
       }
       res
-        .status(201)
+        .status(200)
         .json(new SuccessResponse({ token }, "로그인에 성공했습니다.").toDTO());
     } catch (err) {
       next(err);
@@ -102,7 +102,7 @@ export class AuthController implements IAuthController {
       const signupParams = req.body;
       const userId = await this._authService.signup(signupParams);
       res
-        .status(201)
+        .status(200)
         .json(new SuccessResponse(userId, "회원가입에 성공했습니다.").toDTO());
     } catch (err) {
       next(err);
@@ -118,7 +118,7 @@ export class AuthController implements IAuthController {
       const signupSocialParams = req.body;
       const userId = await this._authService.signupSocial(signupSocialParams);
       res
-        .status(201)
+        .status(200)
         .json(new SuccessResponse(userId, "회원가입에 성공했습니다.").toDTO());
     } catch (err) {
       next(err);

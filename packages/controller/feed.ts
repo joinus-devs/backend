@@ -98,7 +98,7 @@ export class FeedController implements IFeedController {
       const feedCreate = req.body;
       const feedId = await this._service.create(userId, clubId, feedCreate);
       res
-        .status(201)
+        .status(200)
         .json(new SuccessResponse(feedId, "피드가 생성되었습니다.").toDTO());
     } catch (err) {
       next(err);

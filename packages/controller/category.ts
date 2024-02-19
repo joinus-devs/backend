@@ -72,7 +72,7 @@ export class CategoryController implements ICategoryController {
       const categoryCreate = req.body;
       const categoryId = await this._service.create(categoryCreate);
       res
-        .status(201)
+        .status(200)
         .json(
           new SuccessResponse(categoryId, "카테고리가 생성되었습니다.").toDTO()
         );

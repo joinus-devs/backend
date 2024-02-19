@@ -207,7 +207,7 @@ export class ClubController implements IClubController {
       const clubCreate = req.body;
       const clubId = await this._service.create(userId, clubCreate);
       res
-        .status(201)
+        .status(200)
         .json(new SuccessResponse(clubId, "클럽이 생성되었습니다.").toDTO());
     } catch (err) {
       next(err);

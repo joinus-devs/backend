@@ -90,7 +90,7 @@ export class CommentController implements ICommentController {
         commentCreate
       );
       res
-        .status(201)
+        .status(200)
         .json(new SuccessResponse(commentId, "댓글이 등록되었습니다.").toDTO());
     } catch (err) {
       next(err);

@@ -61,10 +61,16 @@ export class FeedService implements IFeedService {
   find = async (id: number) => {
     let feed;
     try {
-      feed = await this._feedRepository.findOne({
-        where: { id: id, deleted_at: undefined },
-        relations: ["user"],
-      });
+      feed = await this._feedRepository
+        .createQueryBuilder("feed")
+        .leftJoinAndSelect("feed.user", "user")
+        .leftJoinAndSelect("feed.club", "club")
+        .leftJoin("feed.comments", "comment")
+        .addSelect("COUNT(comment.id)", "feed_comment_count")
+        .where("feed.id = :id", { id })
+        .andWhere("feed.deleted_at IS NULL")
+        .groupBy("feed.id")
+        .getOne();
     } catch (err) {
       throw Errors.InternalServerError;
     }
