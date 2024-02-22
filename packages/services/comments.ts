@@ -87,8 +87,8 @@ export class CommentService implements ICommentService {
         .leftJoinAndSelect("comment.user", "user")
         .where("comment.feed_id = :feedId", { feedId })
         .andWhere("comment.deleted_at IS NULL")
+        .andWhere(cursor ? "comment.id < :cursor" : "1=1", { cursor })
         .orderBy("comment.id", "DESC")
-        .skip(cursor)
         .take(limit + 1)
         .getMany();
 

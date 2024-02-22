@@ -58,7 +58,7 @@ export class CommentController implements ICommentController {
   ) => {
     try {
       const clubId = Number(req.params.id);
-      const feeds = await this._service.findAllByFeed(
+      const comments = await this._service.findAllByFeed(
         clubId,
         ...QueryParser.parseCursorQueries(req)
       );
@@ -66,7 +66,7 @@ export class CommentController implements ICommentController {
         .status(200)
         .json(
           new SuccessResponse(
-            feeds,
+            comments,
             "해당 피드의 모든 댓글을 불러왔습니다."
           ).toDTO()
         );
