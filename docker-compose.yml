@@ -9,6 +9,7 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       - MYSQL_ROOT_PASSWORD=root
+    restart: always
     networks:
       - backend
 
