@@ -11,7 +11,6 @@ const errorHandler: ErrorMiddelWare = (err, req, res, next) => {
     res.status(unknownErr.status).json(unknownErr.toDTO());
     next();
   } else {
-    console.log(err);
     res.status(err.status).json(err.toDTO());
     next();
   }

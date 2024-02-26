@@ -86,7 +86,7 @@ export class AuthService implements IAuthService {
       if (err instanceof QueryFailedError && err.driverError.errno === 1062) {
         throw Errors.UserNameAlreadyExists;
       }
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 

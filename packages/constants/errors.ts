@@ -31,6 +31,17 @@ const Errors = {
     50000,
     "서버 내부 오류입니다. 관리자에게 문의하세요."
   ),
+
+  makeInternalServerError: (err: unknown) => {
+    if (err instanceof Error) {
+      return new Err(
+        500,
+        50000,
+        `"서버 내부 오류입니다. 관리자에게 문의하세요." ${err.message}`
+      );
+    }
+    return Errors.InternalServerError;
+  },
 };
 
 export default Errors;
