@@ -10,17 +10,17 @@ import { clubDtoDoc } from "./club";
 import { CoreSchema, makeScheme } from "./common";
 import { userDtoDoc } from "./user";
 
-const feedBase: CoreSchema<Omit<FeedScheme, "user_id" | "club_id">> = {
+const feedBase: CoreSchema<FeedCreate> = {
   title: { type: "string", example: "title" },
   content: { type: "string", example: "content" },
   is_private: { type: "boolean", example: true },
-  comment_count: { type: "number", example: 1 },
 };
 
 export const feedDoc: CoreSchema<FeedScheme> = {
   ...cloneDeep(feedBase),
   user_id: { type: "number", example: 1 },
   club_id: { type: "number", example: 1 },
+  comment_count: { type: "number", example: 1 },
 };
 
 export const feedDtoDoc: CoreSchema<FeedDto> = {

@@ -23,7 +23,7 @@ export type FeedWithClubDto = FeedDto & {
 
 export type FeedCreate = Omit<
   FeedScheme,
-  keyof IdEntity | "user_id" | "club_id"
+  keyof IdEntity | "user_id" | "club_id" | "comment_count"
 >;
 
 export type FeedUpdate = FeedCreate;
@@ -73,7 +73,13 @@ export class FeedConverter {
   };
 
   public static toWithClubDto = (feed: Feed): FeedWithClubDto => {
-    return { ...feed };
+    if (feed.club?.categories) {
+      (feed.club.categories as any) = feed.club.categories.map(
+        (category) => category.category_id
+      );
+    }
+    const { password, ...user } = feed.user;
+    return { ...feed, user };
   };
 
   public static fromCreate = (dto: FeedCreate): Feed => {

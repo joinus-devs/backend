@@ -65,11 +65,14 @@ export class FeedService implements IFeedService {
         .createQueryBuilder("feed")
         .leftJoinAndSelect("feed.user", "user")
         .leftJoinAndSelect("feed.club", "club")
+        .leftJoinAndSelect("club.categories", "club_category")
         .leftJoin("feed.comments", "comment")
         .addSelect("COUNT(comment.id)", "feed_comment_count")
         .where("feed.id = :id", { id })
         .andWhere("feed.deleted_at IS NULL")
         .groupBy("feed.id")
+        .addGroupBy("club.id")
+        .addGroupBy("club_category.category_id")
         .getOne();
     } catch (err) {
       throw Errors.InternalServerError;
@@ -80,7 +83,7 @@ export class FeedService implements IFeedService {
       throw Errors.FeedNotFound;
     }
 
-    return FeedConverter.toDto(feed);
+    return FeedConverter.toWithClubDto(feed);
   };
 
   findAll = async (cursor?: number, limit = 10) => {
@@ -89,18 +92,23 @@ export class FeedService implements IFeedService {
         .createQueryBuilder("feed")
         .leftJoinAndSelect("feed.user", "user")
         .leftJoinAndSelect("feed.club", "club")
+        .leftJoinAndSelect("club.categories", "club_category")
         .leftJoin("feed.comments", "comment")
         .addSelect("COUNT(comment.id)", "feed_comment_count")
         .where("feed.is_private = false")
         .andWhere("feed.deleted_at IS NULL")
         .andWhere(cursor ? "feed.id < :cursor" : "1=1", { cursor })
         .groupBy("feed.id")
+        .addGroupBy("club.id")
+        .addGroupBy("club_category.category_id")
         .orderBy("feed.id", "DESC")
         .take(limit + 1)
         .getMany();
       const next = feeds.length > limit ? feeds[feeds.length - 2].id : null;
       return {
-        data: feeds.slice(0, limit).map((feed) => FeedConverter.toDto(feed)),
+        data: feeds
+          .slice(0, limit)
+          .map((feed) => FeedConverter.toWithClubDto(feed)),
         next,
       };
     } catch (err) {
@@ -128,6 +136,7 @@ export class FeedService implements IFeedService {
         next,
       };
     } catch (err) {
+      console.log(err);
       throw Errors.InternalServerError;
     }
   };
