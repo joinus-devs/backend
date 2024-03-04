@@ -10,6 +10,7 @@ import {
 } from "../models";
 import { TransactionManager } from "../modules";
 import { Nullable } from "../types";
+import { CheckEmailParams } from "./../models/auth";
 
 export interface IAuthService {
   me: (id: number) => Promise<User>;
@@ -17,6 +18,7 @@ export interface IAuthService {
   signup(userCreate: SignupParams): Promise<number>;
   signinSocial(params: SigninSocialParams): Promise<User>;
   signupSocial(params: SignupSocialParams): Promise<number>;
+  checkEmail(email: CheckEmailParams): Promise<boolean>;
 }
 
 export class AuthService implements IAuthService {
@@ -119,5 +121,20 @@ export class AuthService implements IAuthService {
       }
       throw Errors.InternalServerError;
     }
+  };
+
+  checkEmail = async ({ email }: CheckEmailParams) => {
+    let user;
+    try {
+      user = await this._repository.findOne({ where: { email } });
+    } catch (err) {
+      throw Errors.InternalServerError;
+    }
+
+    if (!user) {
+      return true;
+    }
+
+    throw Errors.UserEmailAlreadyExists;
   };
 }

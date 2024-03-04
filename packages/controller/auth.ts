@@ -2,6 +2,7 @@ import { NextFunction, Request, RequestHandler, Response } from "express";
 import jwt from "jsonwebtoken";
 import Errors from "../constants/errors";
 import {
+  CheckEmailParams,
   SigninParams,
   SigninSocialParams,
   SignupParams,
@@ -16,6 +17,7 @@ export interface IAuthController {
   signinSocial: RequestHandler<{}, any, SigninSocialParams>;
   signup: RequestHandler<{}, any, SignupParams>;
   signupSocial: RequestHandler<{}, any, SignupSocialParams>;
+  checkEmail: RequestHandler<{}, any, CheckEmailParams>;
 }
 
 export class AuthController implements IAuthController {
@@ -120,6 +122,24 @@ export class AuthController implements IAuthController {
       res
         .status(200)
         .json(new SuccessResponse(userId, "회원가입에 성공했습니다.").toDTO());
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  checkEmail = async (
+    req: Request<{}, any, CheckEmailParams>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const checkEmailParams = req.body;
+      const checked = await this._authService.checkEmail(checkEmailParams);
+      res
+        .status(200)
+        .json(
+          new SuccessResponse(checked, "이메일 중복을 확인했습니다.").toDTO()
+        );
     } catch (err) {
       next(err);
     }

@@ -22,6 +22,7 @@ class CreateTables1705433210498 implements MigrationInterface {
         name varchar(255) not null,
         profile varchar(255),
         sex boolean not null,
+        birth date not null,
         phone varchar(255) not null,
         email varchar(255) not null,
         password varchar(255),

@@ -30,6 +30,7 @@ const authRoutes = (controller: IAuthController) => {
       body("password").isString().isLength({ min: 8 }),
       body("name").isString(),
       body("sex").isBoolean(),
+      body("birth").isString(),
       body("phone").isString(),
       body("email").isEmail(),
       validator,
@@ -42,11 +43,15 @@ const authRoutes = (controller: IAuthController) => {
       body("type").isString(),
       body("name").isString(),
       body("sex").isBoolean(),
+      body("birth").isString(),
       body("phone").isString(),
       body("email").isEmail(),
       validator,
       controller.signupSocial
     );
+  router
+    .route("/check-email")
+    .post(body("email").isEmail(), validator, controller.checkEmail);
 
   return router;
 };
@@ -92,6 +97,14 @@ swagger.add({
       tags: ["Auth"],
       parameters: [{ $ref: "#/components/parameters/signupSocialParams" }],
       responses: { 200: { $ref: "#/components/responses/numberResponse" } },
+    },
+  },
+  "/auth/check-email": {
+    post: {
+      summary: "Check email",
+      tags: ["Auth"],
+      parameters: [{ $ref: "#/components/parameters/checkEmailParams" }],
+      responses: { 200: { $ref: "#/components/responses/booleanResponse" } },
     },
   },
 });

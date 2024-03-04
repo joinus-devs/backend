@@ -17,3 +17,5 @@ export type SignupParams = Omit<
 >;
 
 export type SignupSocialParams = Omit<UserScheme, keyof IdEntity | "password">;
+
+export type CheckEmailParams = Pick<UserScheme, "email">;

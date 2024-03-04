@@ -1,4 +1,5 @@
 import {
+  CheckEmailParams,
   SigninParams,
   SigninSocialParams,
   SignupParams,
@@ -14,6 +15,7 @@ export const signupParamsDoc: CoreSchema<SignupParams> = {
     example: "https://kr.object.ncloudstorage.com/joinus/image/profile.png",
   },
   sex: { type: "boolean", example: true },
+  birth: { type: "string", example: "1999-01-01" },
   phone: { type: "string", example: "01012341234" },
   email: { type: "string", example: "john@gmail.com" },
 };
@@ -32,6 +34,7 @@ export const signupSocialParamsDoc: CoreSchema<SignupSocialParams> = {
     example: "https://kr.object.ncloudstorage.com/joinus/image/profile.png",
   },
   sex: { type: "boolean", example: true },
+  birth: { type: "string", example: "1999-01-01" },
   phone: { type: "string", example: "01012341234" },
   email: { type: "string", example: "john@gmail.com" },
 };
@@ -43,4 +46,8 @@ export const signinSocialParamsDoc: CoreSchema<SigninSocialParams> = {
 
 export const singinResponseDoc = {
   token: { type: "string", example: "token" },
+};
+
+export const checkEmailParamsDoc: CoreSchema<CheckEmailParams> = {
+  email: { type: "string", example: "john@gmail.com" },
 };

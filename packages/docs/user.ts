@@ -11,6 +11,7 @@ const userBase: CoreSchema<UserDto> = {
     example: "https://kr.object.ncloudstorage.com/joinus/image/profile.png",
   },
   sex: { type: "boolean", example: true },
+  birth: { type: "string", example: "1999-01-01" },
   phone: { type: "string", example: "01012341234" },
   email: { type: "string", example: "john@gmail.com" },
 };

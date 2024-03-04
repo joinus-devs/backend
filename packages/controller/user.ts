@@ -3,7 +3,6 @@ import { Role } from "../models";
 import { IUserService } from "../services";
 import {
   CursorQueryParams,
-  ErrorResponse,
   IdPathParams,
   Nullable,
   QueryParser,

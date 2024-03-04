@@ -7,6 +7,7 @@ const whiteList = [
   "/auth/signup",
   "/auth/signin/social",
   "/auth/signup/social",
+  "/auth/check-email",
 ];
 
 const authenticator: MiddelWare = (req, res, next) => {

@@ -26,6 +26,7 @@ const Errors = {
   ),
   UserAlreadyJoined: new Err(409, 40903, "이미 가입한 그룹입니다."),
   UserNotPending: new Err(409, 40904, "가입 대기중인 유저가 아닙니다."),
+  UserEmailAlreadyExists: new Err(409, 40905, "이미 존재하는 이메일입니다."),
   InternalServerError: new Err(
     500,
     50000,

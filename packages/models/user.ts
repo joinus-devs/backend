@@ -12,6 +12,7 @@ export interface UserScheme extends IdEntity {
   name: string;
   profile: string;
   sex: boolean;
+  birth: Date;
   phone: string;
   email: string;
 }
@@ -49,6 +50,9 @@ export class User extends IdEntity implements UserScheme {
 
   @Column()
   sex: boolean;
+
+  @Column()
+  birth: Date;
 
   @Column()
   phone: string;

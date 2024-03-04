@@ -1,5 +1,6 @@
 import swaggerJSDoc from "swagger-jsdoc";
 import {
+  checkEmailParamsDoc,
   signinParmasDoc,
   signinSocialParamsDoc,
   signupParamsDoc,
@@ -41,7 +42,6 @@ import {
   feedUpdateDoc,
   feedWithClubDtoDoc,
 } from "./feed";
-import { uploadParamsDoc } from "./storage";
 import { userDoc, userDtoDoc, userInClubDtoDoc, userUpdateDoc } from "./user";
 
 class Docs {
@@ -75,6 +75,7 @@ class Docs {
           signupParams: makeBody(signupParamsDoc),
           signinSocialParams: makeBody(signinSocialParamsDoc),
           signupSocialParams: makeBody(signupSocialParamsDoc),
+          checkEmailParams: makeBody(checkEmailParamsDoc),
           userUpdate: makeBody(userUpdateDoc),
           clubCreate: makeBody(clubCreateDoc),
           clubUpdate: makeBody(clubUpdateDoc),
@@ -111,6 +112,10 @@ class Docs {
           stringResponse: makeSuccess({
             type: "string",
             example: "string",
+          }),
+          booleanResponse: makeSuccess({
+            type: "boolean",
+            example: true,
           }),
         },
       },
