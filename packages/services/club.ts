@@ -1,4 +1,4 @@
-import { DataSource, QueryFailedError, Repository } from "typeorm";
+import { DataSource, In, QueryFailedError, Repository } from "typeorm";
 import Errors from "../constants/errors";
 import {
   Category,
@@ -414,11 +414,50 @@ export class ClubService implements IClubService {
   };
 
   update = async (id: number, clubUpdate: ClubUpdate) => {
+    const club = await this._clubRepository.findOne({
+      where: { id, deleted_at: undefined },
+    });
+
+    if (!club) {
+      throw Errors.ClubNotFound;
+    }
+
+    const findedCategories = await this._categoryRepository.findBy({
+      id: In(clubUpdate.categories),
+    });
+
+    if (findedCategories.length === 0) {
+      throw Errors.CategoryRequired;
+    }
+
     try {
       return this._transactionManager.withTransaction(async (manager) => {
-        const result = await manager
-          .getRepository(Club)
-          .save(ClubConverter.fromUpdate(id, clubUpdate));
+        const club = ClubConverter.fromUpdate(id, clubUpdate);
+        const { categories, images, ...rest } = club;
+        const result = await manager.getRepository(Club).save(rest);
+
+        await manager.getRepository(ClubCategory).delete({ club_id: id });
+        await manager.getRepository(ClubImage).delete({ club_id: id });
+
+        const clubCategories = findedCategories.map((category) => {
+          const clubCategory = new ClubCategory();
+          clubCategory.club = club;
+          clubCategory.category = category;
+          return clubCategory;
+        });
+
+        await manager.getRepository(ClubCategory).save(clubCategories);
+
+        const clubImages = clubUpdate.images.map((image) => {
+          const clubImage = new ClubImage();
+          clubImage.club = club;
+          clubImage.url = image.url;
+          clubImage.type = image.type;
+          return clubImage;
+        });
+
+        await manager.getRepository(ClubImage).save(clubImages);
+
         return result.id;
       });
     } catch (err) {
