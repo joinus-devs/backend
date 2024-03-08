@@ -41,11 +41,12 @@ export class StorageService implements IStorageService {
   }
 
   async upload(category: ContentCategory, buffer: Buffer) {
+    const filename = `${Date.now()}.jpg`;
     try {
       await this._storage
         .putObject({
           Bucket: bucket,
-          Key: `${category}/${Date.now()}.jpg`,
+          Key: `${category}/${filename}`,
           ACL: "public-read",
           Body: buffer,
           ContentType: getContentType(category),
@@ -56,6 +57,6 @@ export class StorageService implements IStorageService {
       throw error;
     }
 
-    return `${endpoint.href}${bucket}/${category}/${Date.now()}.jpg`;
+    return `${endpoint.href}${bucket}/${category}/${filename}`;
   }
 }
