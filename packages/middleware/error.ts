@@ -2,7 +2,7 @@ import { ErrorMiddelWare, ErrorResponse } from "../types";
 
 const errorHandler: ErrorMiddelWare = (err, req, res, next) => {
   if (!(err instanceof ErrorResponse)) {
-    console.log("Unknown error occurred");
+    console.log("Unknown error occurred", err.message);
     const unknownErr = new ErrorResponse(
       500,
       50000,
