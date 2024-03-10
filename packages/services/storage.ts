@@ -1,4 +1,5 @@
 import AWS from "aws-sdk";
+import Errors from "../constants/errors";
 import { Nullable } from "../types";
 
 export type ContentCategory = "image";
@@ -52,9 +53,8 @@ export class StorageService implements IStorageService {
           ContentType: getContentType(category),
         })
         .promise();
-    } catch (error) {
-      console.log(error);
-      throw error;
+    } catch (err) {
+      throw Errors.makeInternalServerError(err);
     }
 
     return `${endpoint.href}${bucket}/${category}/${filename}`;

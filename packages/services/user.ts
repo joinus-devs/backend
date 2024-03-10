@@ -46,12 +46,12 @@ export class UserService implements IUserService {
     try {
       user = await this._repository.findOne({ where: { id } });
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
 
     // 유저가 없을 경우
     if (!user) {
-      throw Errors.UserNotFound;
+      throw Errors.UserNotFound.clone();
     }
 
     return UserConverter.toDto(user);
@@ -72,7 +72,7 @@ export class UserService implements IUserService {
         next,
       };
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -101,8 +101,7 @@ export class UserService implements IUserService {
         next,
       };
     } catch (err) {
-      console.log(err);
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -113,7 +112,7 @@ export class UserService implements IUserService {
       );
       return result.id;
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -122,7 +121,7 @@ export class UserService implements IUserService {
       await this._repository.update(id, { deleted_at: new Date() });
       return id;
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 }

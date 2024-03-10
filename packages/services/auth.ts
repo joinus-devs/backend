@@ -50,11 +50,11 @@ export class AuthService implements IAuthService {
     try {
       user = await this._repository.findOne({ where: { id } });
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
 
     if (!user) {
-      throw Errors.UserNotFound;
+      throw Errors.UserNotFound.clone();
     }
 
     return user;
@@ -65,14 +65,14 @@ export class AuthService implements IAuthService {
     try {
       user = await this._repository.findOne({ where: { email: params.email } });
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
 
     if (!user) {
-      throw Errors.UserNotFound;
+      throw Errors.UserNotFound.clone();
     }
     if (user.password !== params.password) {
-      throw Errors.PasswordNotMatch;
+      throw Errors.PasswordNotMatch.clone();
     }
 
     return user;
@@ -86,7 +86,7 @@ export class AuthService implements IAuthService {
       return result.id;
     } catch (err) {
       if (err instanceof QueryFailedError && err.driverError.errno === 1062) {
-        throw Errors.UserNameAlreadyExists;
+        throw Errors.UserNameAlreadyExists.clone();
       }
       throw Errors.makeInternalServerError(err);
     }
@@ -99,11 +99,11 @@ export class AuthService implements IAuthService {
         where: { social_id: params.social_id, type: params.type },
       });
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
 
     if (!user) {
-      throw Errors.UserNotFound;
+      throw Errors.UserNotFound.clone();
     }
 
     return user;
@@ -117,9 +117,9 @@ export class AuthService implements IAuthService {
       return result.id;
     } catch (err) {
       if (err instanceof QueryFailedError && err.driverError.errno === 1062) {
-        throw Errors.UserNameAlreadyExists;
+        throw Errors.UserNameAlreadyExists.clone();
       }
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -128,13 +128,13 @@ export class AuthService implements IAuthService {
     try {
       user = await this._repository.findOne({ where: { email } });
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
 
     if (!user) {
       return true;
     }
 
-    throw Errors.UserEmailAlreadyExists;
+    throw Errors.UserEmailAlreadyExists.clone();
   };
 }

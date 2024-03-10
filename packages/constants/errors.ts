@@ -12,12 +12,13 @@ const Errors = {
   UserNotInClub: new Err(403, 40302, "클럽에 가입되지 않은 유저입니다."),
   UserNotMember: new Err(403, 40303, "클럽 멤버가 아닙니다."),
   TokenExpired: new Err(419, 41900, "토큰이 만료되었습니다."),
-  UserNotFound: new Err(404, 40400, "유저를 찾을 수 없습니다."),
-  ClubNotFound: new Err(404, 40401, "그룹을 찾을 수 없습니다."),
-  CategoryNotFound: new Err(404, 40402, "카테고리를 찾을 수 없습니다."),
-  FeedNotFound: new Err(404, 40403, "피드를 찾을 수 없습니다."),
-  CommentNotFound: new Err(404, 40404, "댓글을 찾을 수 없습니다."),
-  UserNotFoundInClub: new Err(404, 40405, "가입된 유저가 아닙니다."),
+  RequestNotFound: new Err(404, 40400, "요청을 찾을 수 없습니다."),
+  UserNotFound: new Err(404, 40401, "유저를 찾을 수 없습니다."),
+  ClubNotFound: new Err(404, 40402, "그룹을 찾을 수 없습니다."),
+  CategoryNotFound: new Err(404, 40403, "카테고리를 찾을 수 없습니다."),
+  FeedNotFound: new Err(404, 40404, "피드를 찾을 수 없습니다."),
+  CommentNotFound: new Err(404, 40405, "댓글을 찾을 수 없습니다."),
+  UserNotFoundInClub: new Err(404, 40406, "가입된 유저가 아닙니다."),
   UserNameAlreadyExists: new Err(409, 40900, "이미 존재하는 유저명입니다."),
   ClubNameAlreadyExists: new Err(409, 40901, "이미 존재하는 그룹명입니다."),
   CategoryNameAlreadyExists: new Err(
@@ -42,7 +43,7 @@ const Errors = {
         `"서버 내부 오류입니다. 관리자에게 문의하세요." ${err.message}`
       );
     }
-    return Errors.InternalServerError;
+    return Errors.InternalServerError.clone();
   },
 };
 

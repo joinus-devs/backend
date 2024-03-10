@@ -69,12 +69,12 @@ export class CommentService implements ICommentService {
         relations: ["user"],
       });
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
 
     // 댓글이 없을 경우
     if (!comment) {
-      throw Errors.CommentNotFound;
+      throw Errors.CommentNotFound.clone();
     }
 
     return CommentConverter.toDto(comment);
@@ -101,7 +101,7 @@ export class CommentService implements ICommentService {
         next,
       };
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -115,7 +115,7 @@ export class CommentService implements ICommentService {
       where: { id: userId, deleted_at: undefined },
     });
     if (!user) {
-      throw Errors.UserNotFound;
+      throw Errors.UserNotFound.clone();
     }
 
     // 피드가 존재하는지 확인
@@ -123,7 +123,7 @@ export class CommentService implements ICommentService {
       where: { id: feedId, deleted_at: undefined },
     });
     if (!feed) {
-      throw Errors.FeedNotFound;
+      throw Errors.FeedNotFound.clone();
     }
 
     if (feed.is_private) {
@@ -135,10 +135,10 @@ export class CommentService implements ICommentService {
         .andWhere("club.id = :clubId", { clubId: feed.club_id })
         .getOne();
       if (!userInClub) {
-        throw Errors.UserNotInClub;
+        throw Errors.UserNotInClub.clone();
       }
       if (!isMember(userInClub.users[0].role)) {
-        throw Errors.UserNotMember;
+        throw Errors.UserNotMember.clone();
       }
     }
 
@@ -151,7 +151,7 @@ export class CommentService implements ICommentService {
         return result.id;
       });
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -162,7 +162,7 @@ export class CommentService implements ICommentService {
       );
       return result.id;
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -173,7 +173,7 @@ export class CommentService implements ICommentService {
       });
       return id;
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 }

@@ -79,12 +79,12 @@ export class ClubService implements IClubService {
         relations: ["categories", "categories.category", "images"],
       });
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
 
     // 클럽이 없을 경우
     if (!club) {
-      throw Errors.ClubNotFound;
+      throw Errors.ClubNotFound.clone();
     }
 
     return ClubConverter.toDto(club);
@@ -107,7 +107,7 @@ export class ClubService implements IClubService {
         next,
       };
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -132,7 +132,7 @@ export class ClubService implements IClubService {
         next,
       };
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -161,7 +161,7 @@ export class ClubService implements IClubService {
         next,
       };
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -171,7 +171,7 @@ export class ClubService implements IClubService {
       where: { id: userId, deleted_at: undefined },
     });
     if (!user) {
-      throw Errors.UserNotFound;
+      throw Errors.UserNotFound.clone();
     }
 
     // 클럽이 존재하는지 확인
@@ -179,7 +179,7 @@ export class ClubService implements IClubService {
       where: { id: clubId, deleted_at: undefined },
     });
     if (!club) {
-      throw Errors.ClubNotFound;
+      throw Errors.ClubNotFound.clone();
     }
 
     // 이미 가입한 클럽인지 확인
@@ -190,7 +190,7 @@ export class ClubService implements IClubService {
       .andWhere("club.id = :clubId", { clubId })
       .getOne();
     if (userInClub) {
-      throw Errors.UserAlreadyJoined;
+      throw Errors.UserAlreadyJoined.clone();
     }
 
     try {
@@ -205,7 +205,7 @@ export class ClubService implements IClubService {
       if (err instanceof ErrorResponse) {
         throw err;
       }
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -225,12 +225,12 @@ export class ClubService implements IClubService {
 
     // 요청자가 존재하는지 확인
     if (!requester) {
-      throw Errors.NotAdmin;
+      throw Errors.NotAdmin.clone();
     }
 
     // 요청자의 권한 확인
     if (requester.role !== Role.Admin && requester.role !== Role.Staff) {
-      throw Errors.NotStaff;
+      throw Errors.NotStaff.clone();
     }
 
     // 유저가 존재하는지 확인
@@ -238,7 +238,7 @@ export class ClubService implements IClubService {
       where: { id: userId, deleted_at: undefined },
     });
     if (!user) {
-      throw Errors.UserNotFound;
+      throw Errors.UserNotFound.clone();
     }
 
     // 클럽이 존재하는지 확인
@@ -246,7 +246,7 @@ export class ClubService implements IClubService {
       where: { id: clubId, deleted_at: undefined },
     });
     if (!club) {
-      throw Errors.ClubNotFound;
+      throw Errors.ClubNotFound.clone();
     }
 
     // 유저가 클럽에 가입되어 있는지 확인
@@ -257,10 +257,10 @@ export class ClubService implements IClubService {
       .andWhere("club.id = :clubId", { clubId })
       .getOne();
     if (!userInClub) {
-      throw Errors.UserNotFoundInClub;
+      throw Errors.UserNotFoundInClub.clone();
     }
     if (userInClub.users[0].role !== Role.Pending) {
-      throw Errors.UserNotPending;
+      throw Errors.UserNotPending.clone();
     }
 
     try {
@@ -275,7 +275,7 @@ export class ClubService implements IClubService {
         return userId;
       });
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -286,11 +286,11 @@ export class ClubService implements IClubService {
     role: Role
   ) => {
     if (requesterId === userId) {
-      throw Errors.BadRequest;
+      throw Errors.BadRequest.clone();
     }
 
     if (role === Role.Admin) {
-      throw Errors.BadRequest;
+      throw Errors.BadRequest.clone();
     }
 
     const requester = await this._userRepository
@@ -304,17 +304,17 @@ export class ClubService implements IClubService {
 
     // 요청자가 존재하는지 확인
     if (!requester) {
-      throw Errors.NotAdmin;
+      throw Errors.NotAdmin.clone();
     }
 
     // 요청자의 권한 확인
     if (requester.role !== Role.Admin && role === Role.Staff) {
-      throw Errors.NotAdmin;
+      throw Errors.NotAdmin.clone();
     }
 
     // 요청자의 권한 확인
     if (requester.role !== Role.Admin && requester.role !== Role.Staff) {
-      throw Errors.NotStaff;
+      throw Errors.NotStaff.clone();
     }
 
     // 유저가 존재하는지 확인
@@ -322,7 +322,7 @@ export class ClubService implements IClubService {
       where: { id: userId, deleted_at: undefined },
     });
     if (!user) {
-      throw Errors.UserNotFound;
+      throw Errors.UserNotFound.clone();
     }
 
     // 클럽이 존재하는지 확인
@@ -330,7 +330,7 @@ export class ClubService implements IClubService {
       where: { id: clubId, deleted_at: undefined },
     });
     if (!club) {
-      throw Errors.ClubNotFound;
+      throw Errors.ClubNotFound.clone();
     }
 
     // 유저가 클럽에 가입되어 있는지 확인
@@ -342,7 +342,7 @@ export class ClubService implements IClubService {
       .getOne();
 
     if (!userInClub) {
-      throw Errors.UserNotFoundInClub;
+      throw Errors.UserNotFoundInClub.clone();
     }
 
     try {
@@ -358,7 +358,7 @@ export class ClubService implements IClubService {
         return userId;
       });
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.InternalServerError.clone();
     }
   };
 
@@ -366,7 +366,7 @@ export class ClubService implements IClubService {
     // 유저가 존재하는지 확인
     const user = await this._userRepository.findOne({ where: { id: userId } });
     if (!user) {
-      throw Errors.UserNotFound;
+      throw Errors.UserNotFound.clone();
     }
 
     // 카테고리가 존재하는지 확인
@@ -374,7 +374,7 @@ export class ClubService implements IClubService {
       where: { id: clubCreate.categories[0] },
     });
     if (!category) {
-      throw Errors.CategoryNotFound;
+      throw Errors.CategoryNotFound.clone();
     }
 
     try {
@@ -403,13 +403,13 @@ export class ClubService implements IClubService {
             err instanceof QueryFailedError &&
             err.driverError.errno === 1062
           ) {
-            throw Errors.ClubNameAlreadyExists;
+            throw Errors.ClubNameAlreadyExists.clone();
           }
           throw err;
         }
       });
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -419,7 +419,7 @@ export class ClubService implements IClubService {
     });
 
     if (!club) {
-      throw Errors.ClubNotFound;
+      throw Errors.ClubNotFound.clone();
     }
 
     const findedCategories = await this._categoryRepository.findBy({
@@ -427,7 +427,7 @@ export class ClubService implements IClubService {
     });
 
     if (findedCategories.length === 0) {
-      throw Errors.CategoryRequired;
+      throw Errors.CategoryRequired.clone();
     }
 
     try {
@@ -461,7 +461,7 @@ export class ClubService implements IClubService {
         return result.id;
       });
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -470,7 +470,7 @@ export class ClubService implements IClubService {
       await this._clubRepository.update(id, { deleted_at: new Date() });
       return id;
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 }

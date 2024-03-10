@@ -49,12 +49,12 @@ export class CategoryService implements ICategoryService {
         where: { id, deleted_at: undefined },
       });
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
 
     // 카테고리가 없을 경우
     if (!category) {
-      throw Errors.CategoryNotFound;
+      throw Errors.CategoryNotFound.clone();
     }
 
     return CategoryConverter.toDto(category);
@@ -67,7 +67,7 @@ export class CategoryService implements ICategoryService {
       });
       return categories.map((category) => CategoryConverter.toDto(category));
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -76,7 +76,7 @@ export class CategoryService implements ICategoryService {
       where: { name: categoryCreate.name, deleted_at: undefined },
     });
     if (category) {
-      throw Errors.CategoryNameAlreadyExists;
+      throw Errors.CategoryNameAlreadyExists.clone();
     }
 
     try {
@@ -86,7 +86,7 @@ export class CategoryService implements ICategoryService {
         return result.id;
       });
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -97,7 +97,7 @@ export class CategoryService implements ICategoryService {
       );
       return result.id;
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -106,7 +106,7 @@ export class CategoryService implements ICategoryService {
       await this._categoryRepository.delete(id);
       return id;
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 }

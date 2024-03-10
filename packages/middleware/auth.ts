@@ -20,12 +20,12 @@ const authenticator: MiddelWare = (req, res, next) => {
     return next();
   } catch (err) {
     if (err instanceof jwt.JsonWebTokenError) {
-      next(Errors.InvalidToken);
+      next(Errors.InvalidToken.clone());
+    } else if (err instanceof jwt.TokenExpiredError) {
+      next(Errors.TokenExpired.clone());
+    } else {
+      next(Errors.InternalServerError.clone());
     }
-    if (err instanceof jwt.TokenExpiredError) {
-      next(Errors.TokenExpired);
-    }
-    next(Errors.InternalServerError);
   }
 };
 

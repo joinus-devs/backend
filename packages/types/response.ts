@@ -29,7 +29,12 @@ export class ErrorResponse extends Error {
   private _data: Nullable<object> = null;
   private _message: string;
 
-  constructor(status: number, code: number, message: string, data?: object) {
+  constructor(
+    status: number,
+    code: number,
+    message: string,
+    data?: Nullable<object>
+  ) {
     super(message);
     this._status = status;
     this._code = code;
@@ -39,6 +44,15 @@ export class ErrorResponse extends Error {
 
   get status() {
     return this._status;
+  }
+
+  clone(message?: string) {
+    return new ErrorResponse(
+      this._status,
+      this._code,
+      `${this._message} ${message ?? ""}`,
+      this._data
+    );
   }
 
   toDTO() {

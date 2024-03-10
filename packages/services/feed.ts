@@ -75,12 +75,12 @@ export class FeedService implements IFeedService {
         .addGroupBy("club_category.category_id")
         .getOne();
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
 
     // 피드가 없을 경우
     if (!feed) {
-      throw Errors.FeedNotFound;
+      throw Errors.FeedNotFound.clone();
     }
 
     return FeedConverter.toWithClubDto(feed);
@@ -112,7 +112,7 @@ export class FeedService implements IFeedService {
         next,
       };
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -136,8 +136,7 @@ export class FeedService implements IFeedService {
         next,
       };
     } catch (err) {
-      console.log(err);
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -147,7 +146,7 @@ export class FeedService implements IFeedService {
       where: { id: userId, deleted_at: undefined },
     });
     if (!user) {
-      throw Errors.UserNotFound;
+      throw Errors.UserNotFound.clone();
     }
 
     // 클럽이 존재하는지 확인
@@ -155,7 +154,7 @@ export class FeedService implements IFeedService {
       where: { id: clubId, deleted_at: undefined },
     });
     if (!club) {
-      throw Errors.ClubNotFound;
+      throw Errors.ClubNotFound.clone();
     }
 
     // 유저가 클럽에 가입되어 있는지 확인
@@ -166,10 +165,10 @@ export class FeedService implements IFeedService {
       .andWhere("club.id = :clubId", { clubId })
       .getOne();
     if (!userInClub) {
-      throw Errors.UserNotInClub;
+      throw Errors.UserNotInClub.clone();
     }
     if (!isMember(userInClub.users[0].role)) {
-      throw Errors.UserNotMember;
+      throw Errors.UserNotMember.clone();
     }
 
     try {
@@ -184,7 +183,7 @@ export class FeedService implements IFeedService {
       if (err instanceof ErrorResponse) {
         throw err;
       }
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -197,7 +196,7 @@ export class FeedService implements IFeedService {
         return result.id;
       });
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 
@@ -206,7 +205,7 @@ export class FeedService implements IFeedService {
       await this._feedRepository.update(id, { deleted_at: new Date() });
       return id;
     } catch (err) {
-      throw Errors.InternalServerError;
+      throw Errors.makeInternalServerError(err);
     }
   };
 }
