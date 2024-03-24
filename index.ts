@@ -9,6 +9,7 @@ import { authenticator, errorHandler, logger } from "./packages/middleware";
 import { DataSource } from "./packages/migrations";
 import { AppProvider } from "./packages/modules";
 import initRoutes from "./packages/routes";
+import SocketProvider from "./packages/socket/socket";
 
 let retries = 10;
 
@@ -49,9 +50,11 @@ const main = async () => {
   app.use((req, res, next) => next(Errors.RequestNotFound));
   app.use(errorHandler);
 
-  app.listen(port, function () {
+  const server = app.listen(port, function () {
     console.log(`Server is listening on port ${port}`);
   });
+
+  SocketProvider.getInstance(server);
 };
 
 main();

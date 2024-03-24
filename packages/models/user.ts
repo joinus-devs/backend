@@ -28,7 +28,7 @@ export type UserWithClubsDto = UserDto & { clubs: UserInClub[] };
 
 export type UserUpdate = Omit<
   UserScheme,
-  keyof IdEntity | "social_id" | "password"
+  keyof IdEntity | "social_id" | "type"
 >;
 
 @Entity("users")
