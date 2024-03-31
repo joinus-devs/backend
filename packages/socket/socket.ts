@@ -25,7 +25,13 @@ const makeMessage = <T extends "success" | "error">({
   user,
   users,
 }: MessageToClient<T>): string => {
-  return JSON.stringify({ status, method, body, user, users });
+  return JSON.stringify({
+    status,
+    method,
+    body: { message: body, timestamp: Date.now() },
+    user,
+    users,
+  });
 };
 
 class SocketProvider {
@@ -117,6 +123,7 @@ class SocketProvider {
   }
 
   public addMember = (room: number, user: number, ws: ws) => {
+    console.log(SocketProvider.roomMembers);
     if (SocketProvider.roomMembers.has(room)) {
       SocketProvider.roomMembers.get(room)!.push(user);
       ws.send(
