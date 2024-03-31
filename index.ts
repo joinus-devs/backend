@@ -54,7 +54,7 @@ const main = async () => {
     console.log(`Server is listening on port ${port}`);
   });
 
-  SocketProvider.getInstance(server);
+  SocketProvider.getInstance(DataSource, server);
 };
 
 main();

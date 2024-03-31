@@ -1,5 +1,7 @@
 import { Server } from "http";
+import { DataSource, Repository } from "typeorm";
 import ws from "ws";
+import { ClubChat } from "../models";
 
 interface MessageFromClient {
   method: "join" | "leave" | "broadcast";
@@ -30,10 +32,12 @@ class SocketProvider {
   static instance: SocketProvider;
   static rooms: Map<number, ws[]> = new Map();
   static roomMembers = new Map<number, number[]>();
+  private _repository: Repository<ClubChat>;
 
-  private constructor(server: Server) {
+  private constructor(dataSource: DataSource, server: Server) {
+    this._repository = dataSource.getRepository(ClubChat);
+
     const wss = new ws.Server({ server });
-
     wss.on("connection", (ws, req) => {
       const ip = req.headers["x-forwarded-for"];
       console.log(`New connection from ${ip}`);
@@ -52,8 +56,8 @@ class SocketProvider {
               );
               return;
             }
-            SocketProvider.joinRoom(room, ws);
-            SocketProvider.addMember(room, user, ws);
+            this.joinRoom(room, ws);
+            this.addMember(room, user, ws);
             break;
           case "leave":
             if (!room) {
@@ -66,8 +70,8 @@ class SocketProvider {
               );
               return;
             }
-            SocketProvider.removeMember(room, user, ws);
-            SocketProvider.leaveRoom(room, ws);
+            this.removeMember(room, user, ws);
+            this.leaveRoom(room, ws);
             break;
           case "broadcast":
             if (!room) {
@@ -80,7 +84,7 @@ class SocketProvider {
               );
               return;
             }
-            SocketProvider.broadcast(room, user, body, ws);
+            this.broadcast(room, user, body, ws);
             break;
           default:
             ws.send(
@@ -104,7 +108,7 @@ class SocketProvider {
     });
   }
 
-  static joinRoom(room: number, ws: ws) {
+  public joinRoom(room: number, ws: ws) {
     if (SocketProvider.rooms.has(room)) {
       SocketProvider.rooms.get(room)!.push(ws);
     } else {
@@ -112,7 +116,7 @@ class SocketProvider {
     }
   }
 
-  static addMember = (room: number, user: number, ws: ws) => {
+  public addMember = (room: number, user: number, ws: ws) => {
     if (SocketProvider.roomMembers.has(room)) {
       SocketProvider.roomMembers.get(room)!.push(user);
       ws.send(
@@ -136,7 +140,7 @@ class SocketProvider {
     }
   };
 
-  static leaveRoom = (room: number, ws: ws) => {
+  public leaveRoom = (room: number, ws: ws) => {
     if (SocketProvider.rooms.has(room)) {
       const index = SocketProvider.rooms.get(room)!.indexOf(ws);
       if (index > -1) {
@@ -154,7 +158,7 @@ class SocketProvider {
     }
   };
 
-  static removeMember = (room: number, user: number, ws: ws) => {
+  public removeMember = (room: number, user: number, ws: ws) => {
     if (SocketProvider.roomMembers.has(room)) {
       const index = SocketProvider.roomMembers.get(room)!.indexOf(user);
       if (index > -1) {
@@ -191,7 +195,7 @@ class SocketProvider {
     }
   };
 
-  static broadcast = (room: number, user: number, message: string, ws: ws) => {
+  public broadcast = (room: number, user: number, message: string, ws: ws) => {
     if (SocketProvider.rooms.has(room)) {
       if (SocketProvider.roomMembers.get(room)!.indexOf(user) === -1) {
         ws.send(
@@ -212,6 +216,11 @@ class SocketProvider {
             user,
           })
         );
+        const chat = new ClubChat();
+        chat.user_id = user;
+        chat.club_id = room;
+        chat.message = message;
+        this._repository.save(chat);
       });
     } else {
       ws.send(
@@ -224,9 +233,9 @@ class SocketProvider {
     }
   };
 
-  static getInstance(server: Server) {
+  static getInstance(dataSource: DataSource, server: Server) {
     if (!SocketProvider.instance) {
-      SocketProvider.instance = new SocketProvider(server);
+      SocketProvider.instance = new SocketProvider(dataSource, server);
     }
 
     return SocketProvider.instance;

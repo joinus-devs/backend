@@ -48,6 +48,18 @@ class CreateTables1705433210498 implements MigrationInterface {
     `);
 
     await queryRunner.query(`
+      create table clubs_chats (
+        ${idQuery}
+        ${timesQuery}
+        user_id int not null,
+        club_id int not null,
+        message text not null,
+        foreign key (user_id) references users(id),
+        foreign key (club_id) references clubs(id)
+      )
+    `);
+
+    await queryRunner.query(`
       create table clubs_images (
         ${idQuery}
         ${timesQuery}

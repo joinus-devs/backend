@@ -22,6 +22,7 @@ import {
   roleQueryParamsDoc,
   userSetRoleDoc,
 } from "./club";
+import { clubChatDoc } from "./clubChat";
 import { commentCreateDoc, commentDtoDoc, commentUpdateDoc } from "./comment";
 import {
   cursorParamDoc,
@@ -67,6 +68,7 @@ class Docs {
           club: makeScheme(clubDoc),
           category: makeScheme(categoryDoc),
           feed: makeScheme(feedDoc),
+          clubChat: makeScheme(clubChatDoc),
         },
         parameters: {
           cursorParam: { ...cursorParamDoc },
@@ -105,6 +107,8 @@ class Docs {
           feedsWithClubResponse: makeSuccess(makeCursor(feedWithClubDtoDoc)),
           commentResponse: makeSuccess(makeScheme(commentDtoDoc)),
           commentsResponse: makeSuccess(makeCursor(commentDtoDoc)),
+          clubChatResponse: makeSuccess(makeScheme(clubChatDoc)),
+          clubChatsResponse: makeSuccess(makeCursor(clubChatDoc)),
           numberResponse: makeSuccess({
             type: "number",
             example: 1,

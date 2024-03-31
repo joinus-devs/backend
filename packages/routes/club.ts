@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { body } from "express-validator";
 import {
+  IClubChatController,
   IClubController,
   IFeedController,
   IUserController,
@@ -12,7 +13,8 @@ import { Role } from "../models";
 const clubRoutes = (
   clubController: IClubController,
   userController: IUserController,
-  feedController: IFeedController
+  feedController: IFeedController,
+  clubChatController: IClubChatController
 ) => {
   const router = Router();
 
@@ -56,6 +58,7 @@ const clubRoutes = (
       validator,
       feedController.create
     );
+  router.route("/:id/chats").get(clubChatController.findAllByClub);
 
   return router;
 };
@@ -136,6 +139,17 @@ swagger.add({
       tags: ["Clubs"],
       parameters: [{ $ref: "#/components/parameters/feedCreate" }],
       responses: { 200: { $ref: "#/components/responses/numberResponse" } },
+    },
+  },
+  "/clubs/{id}/chats": {
+    get: {
+      summary: "Get all chat of a club",
+      tags: ["Clubs"],
+      parameters: [
+        { $ref: "#/components/parameters/cursorParam" },
+        { $ref: "#/components/parameters/limitParam" },
+      ],
+      responses: { 200: { $ref: "#/components/responses/chatsResponse" } },
     },
   },
 });
