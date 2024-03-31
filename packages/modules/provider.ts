@@ -3,11 +3,13 @@ import { TransactionManager } from ".";
 import {
   AuthController,
   CategoryController,
+  ClubChatController,
   ClubController,
   CommentController,
   FeedController,
   IAuthController,
   ICategoryController,
+  IClubChatController,
   IClubController,
   ICommentController,
   IFeedController,
@@ -18,11 +20,13 @@ import { IStorageController, StorageController } from "../controller/storage";
 import {
   AuthService,
   CategoryService,
+  ClubChatService,
   ClubService,
   CommentService,
   FeedService,
   IAuthService,
   ICategoryService,
+  IClubChatService,
   IClubService,
   ICommentService,
   IFeedService,
@@ -79,6 +83,7 @@ class AppService {
   private _feedService: IFeedService;
   private _commentService: ICommentService;
   private _categoryService: ICategoryService;
+  private _clubChatService: IClubChatService;
 
   constructor(transactionManager: TransactionManager, dataSource: DataSource) {
     this._storageService = StorageService.getInstance();
@@ -91,6 +96,10 @@ class AppService {
       transactionManager
     );
     this._categoryService = CategoryService.getInstance(
+      dataSource,
+      transactionManager
+    );
+    this._clubChatService = ClubChatService.getInstance(
       dataSource,
       transactionManager
     );
@@ -123,6 +132,10 @@ class AppService {
   get categoryService() {
     return this._categoryService;
   }
+
+  get clubChatService() {
+    return this._clubChatService;
+  }
 }
 
 class AppController {
@@ -133,6 +146,7 @@ class AppController {
   private _feedController: IFeedController;
   private _commentController: ICommentController;
   private _categoryController: ICategoryController;
+  private _clubChatController: IClubChatController;
 
   constructor(appService: AppService) {
     this._storageController = StorageController.getInstance(
@@ -147,6 +161,9 @@ class AppController {
     );
     this._categoryController = CategoryController.getInstance(
       appService.categoryService
+    );
+    this._clubChatController = ClubChatController.getInstance(
+      appService.clubChatService
     );
   }
 
@@ -176,6 +193,10 @@ class AppController {
 
   get categoryController() {
     return this._categoryController;
+  }
+
+  get clubChatController() {
+    return this._clubChatController;
   }
 }
 

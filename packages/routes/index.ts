@@ -28,7 +28,8 @@ const initRoutes = (appManager: AppProvider) => {
     clubRoutes(
       appManager.appController.clubController,
       appManager.appController.userController,
-      appManager.appController.feedController
+      appManager.appController.feedController,
+      appManager.appController.clubChatController
     )
   );
   router.use(
