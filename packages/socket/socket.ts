@@ -8,12 +8,22 @@ interface MessageFromClient {
   user: number;
 }
 
-const makeMessage = (
-  status: "success" | "error",
-  body: string,
-  user?: number
-): string => {
-  return JSON.stringify({ status, body, user });
+interface MessageToClient<T extends "success" | "error"> {
+  method: T extends "success" ? "join" | "leave" | "broadcast" : null;
+  status: T;
+  body: string;
+  user?: number;
+  users?: number[];
+}
+
+const makeMessage = <T extends "success" | "error">({
+  status,
+  method,
+  body,
+  user,
+  users,
+}: MessageToClient<T>): string => {
+  return JSON.stringify({ status, method, body, user, users });
 };
 
 class SocketProvider {
@@ -33,7 +43,13 @@ class SocketProvider {
         switch (method) {
           case "join":
             if (!room) {
-              ws.send(makeMessage("error", "Room is required"));
+              ws.send(
+                makeMessage({
+                  status: "error",
+                  method: null,
+                  body: "Room is required",
+                })
+              );
               return;
             }
             SocketProvider.joinRoom(room, ws);
@@ -41,7 +57,13 @@ class SocketProvider {
             break;
           case "leave":
             if (!room) {
-              ws.send(makeMessage("error", "Room is required"));
+              ws.send(
+                makeMessage({
+                  status: "error",
+                  method: null,
+                  body: "Room is required",
+                })
+              );
               return;
             }
             SocketProvider.removeMember(room, user, ws);
@@ -49,13 +71,25 @@ class SocketProvider {
             break;
           case "broadcast":
             if (!room) {
-              ws.send(makeMessage("error", "Room is required"));
+              ws.send(
+                makeMessage({
+                  status: "error",
+                  method: null,
+                  body: "Room is required",
+                })
+              );
               return;
             }
             SocketProvider.broadcast(room, user, body, ws);
             break;
           default:
-            ws.send(makeMessage("error", "Invalid method"));
+            ws.send(
+              makeMessage({
+                status: "error",
+                method: null,
+                body: "Invalid method",
+              })
+            );
             return;
         }
 
@@ -73,21 +107,31 @@ class SocketProvider {
   static joinRoom(room: number, ws: ws) {
     if (SocketProvider.rooms.has(room)) {
       SocketProvider.rooms.get(room)!.push(ws);
-      ws.send(makeMessage("success", `Joined room ${room}`));
     } else {
       SocketProvider.rooms.set(room, [ws]);
-      ws.send(makeMessage("success", `Created room ${room}`));
     }
   }
 
   static addMember = (room: number, user: number, ws: ws) => {
     if (SocketProvider.roomMembers.has(room)) {
       SocketProvider.roomMembers.get(room)!.push(user);
-      ws.send(makeMessage("success", `Added member ${user} to room ${room}`));
+      ws.send(
+        makeMessage({
+          status: "success",
+          method: "join",
+          body: `Added member ${user} to room ${room}`,
+          users: SocketProvider.roomMembers.get(room),
+        })
+      );
     } else {
       SocketProvider.roomMembers.set(room, [user]);
       ws.send(
-        makeMessage("success", `Added member ${user} to new room ${room}`)
+        makeMessage({
+          status: "success",
+          method: "join",
+          body: `Added member ${user} to new room ${room}`,
+          users: SocketProvider.roomMembers.get(room),
+        })
       );
     }
   };
@@ -97,18 +141,16 @@ class SocketProvider {
       const index = SocketProvider.rooms.get(room)!.indexOf(ws);
       if (index > -1) {
         SocketProvider.rooms.get(room)!.splice(index, 1);
-        ws.send(makeMessage("success", `Left room ${room}`));
       } else {
-        ws.send(makeMessage("error", `You are not in room ${room}`));
+        // ws.send(makeMessage({status:"error", method:null, body: `You are not in room ${room}`}));
       }
 
       // If room is empty, delete it.
       if (SocketProvider.rooms.get(room)!.length === 0) {
         SocketProvider.rooms.delete(room);
-        ws.send(makeMessage("success", `Room ${room} deleted`));
       }
     } else {
-      ws.send(makeMessage("error", `Room ${room} does not exist`));
+      // ws.send(makeMessage({status:"error", method:null, body:`Room ${room} does not exist`}));
     }
   };
 
@@ -118,27 +160,67 @@ class SocketProvider {
       if (index > -1) {
         SocketProvider.roomMembers.get(room)!.splice(index, 1);
         ws.send(
-          makeMessage("success", `Member ${user} removed from room ${room}`)
+          makeMessage({
+            status: "success",
+            method: "leave",
+            body: `Member ${user} removed from room ${room}`,
+            users: SocketProvider.roomMembers.get(room),
+          })
         );
       } else {
-        ws.send(makeMessage("error", `Member ${user} is not in room ${room}`));
+        ws.send(
+          makeMessage({
+            status: "error",
+            method: null,
+            body: `Member ${user} is not in room ${room}`,
+          })
+        );
+      }
+
+      if (SocketProvider.roomMembers.get(room)!.length === 0) {
+        SocketProvider.roomMembers.delete(room);
       }
     } else {
-      ws.send(makeMessage("error", `Room ${room} does not exist`));
+      ws.send(
+        makeMessage({
+          status: "error",
+          method: null,
+          body: `Room ${room} does not exist`,
+        })
+      );
     }
   };
 
   static broadcast = (room: number, user: number, message: string, ws: ws) => {
     if (SocketProvider.rooms.has(room)) {
       if (SocketProvider.roomMembers.get(room)!.indexOf(user) === -1) {
-        ws.send(makeMessage("error", "You are not a member of this room"));
+        ws.send(
+          makeMessage({
+            status: "error",
+            method: null,
+            body: "You are not a member of this room",
+          })
+        );
         return;
       }
       SocketProvider.rooms.get(room)!.forEach((client) => {
-        client.send(makeMessage("success", message, user));
+        client.send(
+          makeMessage({
+            status: "success",
+            method: "broadcast",
+            body: message,
+            user,
+          })
+        );
       });
     } else {
-      ws.send(makeMessage("error", "Room does not exist"));
+      ws.send(
+        makeMessage({
+          status: "error",
+          method: null,
+          body: "Room does not exist",
+        })
+      );
     }
   };
 
