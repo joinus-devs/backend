@@ -149,7 +149,7 @@ swagger.add({
         { $ref: "#/components/parameters/cursorParam" },
         { $ref: "#/components/parameters/limitParam" },
       ],
-      responses: { 200: { $ref: "#/components/responses/chatsResponse" } },
+      responses: { 200: { $ref: "#/components/responses/clubChatsResponse" } },
     },
   },
 });
