@@ -2,241 +2,160 @@ import { Server } from "http";
 import { DataSource, Repository } from "typeorm";
 import ws from "ws";
 import { ClubChat } from "../models";
-
-interface MessageFromClient {
-  method: "join" | "leave" | "broadcast";
-  body: string;
-  room: number;
-  user: number;
-}
-
-interface MessageToClient<T extends "success" | "error"> {
-  method: T extends "success" ? "join" | "leave" | "broadcast" : null;
-  status: T;
-  body: string;
-  user?: number;
-  users?: number[];
-}
-
-const makeMessage = <T extends "success" | "error">({
-  status,
-  method,
-  body,
-  user,
-  users,
-}: MessageToClient<T>): string => {
-  return JSON.stringify({
-    status,
-    method,
-    body: { message: body, timestamp: Date.now() },
-    user,
-    users,
-  });
-};
+import { SocketConnection, SocketMember } from "./conn";
+import { MessageFromClient, error, success } from "./utils";
 
 class SocketProvider {
   static instance: SocketProvider;
-  static rooms: Map<number, ws[]> = new Map();
-  static roomMembers = new Map<number, number[]>();
   private _repository: Repository<ClubChat>;
+  private _rooms = new Map<number, SocketMember[]>();
 
   private constructor(dataSource: DataSource, server: Server) {
     this._repository = dataSource.getRepository(ClubChat);
 
     const wss = new ws.Server({ server });
-    wss.on("connection", (ws, req) => {
-      const ip = req.headers["x-forwarded-for"];
-      console.log(`New connection from ${ip}`);
+    wss.on("connection", (ws: SocketConnection) => {
       ws.on("message", (message: string) => {
         const parsedMessage: MessageFromClient = JSON.parse(message);
         const { method, body, room, user } = parsedMessage;
+        if (!room || !user) {
+          ws.send(error({ body: "Invalid request" }));
+          return;
+        }
         switch (method) {
           case "join":
-            if (!room) {
-              ws.send(
-                makeMessage({
-                  status: "error",
-                  method: null,
-                  body: "Room is required",
-                })
-              );
-              return;
-            }
-            this.joinRoom(room, ws);
-            this.addMember(room, user, ws);
+            this.join(room, user, ws);
+            ws.room = room;
+            ws.user = user;
             break;
           case "leave":
-            if (!room) {
-              ws.send(
-                makeMessage({
-                  status: "error",
-                  method: null,
-                  body: "Room is required",
-                })
-              );
-              return;
-            }
-            this.removeMember(room, user, ws);
-            this.leaveRoom(room, ws);
+            this.leave(room, user, ws);
             break;
           case "broadcast":
-            if (!room) {
-              ws.send(
-                makeMessage({
-                  status: "error",
-                  method: null,
-                  body: "Room is required",
-                })
-              );
-              return;
-            }
             this.broadcast(room, user, body, ws);
             break;
           default:
-            ws.send(
-              makeMessage({
-                status: "error",
-                method: null,
-                body: "Invalid method",
-              })
-            );
+            ws.send(error({ body: "Invalid method" }));
             return;
         }
-
-        console.log(`Received message => ${parsedMessage}`);
       });
       ws.on("error", (error) => {
-        console.log(`Error => ${error}`);
+        console.log(`Socket error: ${error}`);
       });
       ws.on("close", () => {
-        console.log("Connection closed");
+        if (!ws.room || !ws.user) return;
+        this.leave(ws.room, ws.user, ws);
+        console.log("Connection closed", ws.user);
       });
     });
   }
 
-  public joinRoom(room: number, ws: ws) {
-    if (SocketProvider.rooms.has(room)) {
-      SocketProvider.rooms.get(room)!.push(ws);
-    } else {
-      SocketProvider.rooms.set(room, [ws]);
-    }
-  }
+  private createRoom = (room: number) => {
+    this._rooms.set(room, []);
+  };
 
-  public addMember = (room: number, user: number, ws: ws) => {
-    console.log(SocketProvider.roomMembers);
-    if (SocketProvider.roomMembers.has(room)) {
-      SocketProvider.roomMembers.get(room)!.push(user);
-      ws.send(
-        makeMessage({
-          status: "success",
+  private getRoom = (room: number) => {
+    return this._rooms.get(room);
+  };
+
+  private deleteRoom = (room: number) => {
+    this._rooms.delete(room);
+  };
+
+  private isMember = (room: number, user: number) => {
+    return (
+      this._rooms.get(room)?.findIndex((member) => member.user === user) !== -1
+    );
+  };
+
+  private getMembers = (room: SocketMember[]) => {
+    return room.map((member) => member.user);
+  };
+
+  private join = (room: number, user: number, conn: SocketConnection) => {
+    const myRoom = this.getRoom(room);
+    if (myRoom) {
+      if (this.isMember(room, user)) {
+        conn.send(error({ body: `You are already in room ${room}` }));
+        return;
+      }
+      myRoom.push({ user, conn });
+      conn.send(
+        success({
           method: "join",
-          body: `Added member ${user} to room ${room}`,
-          users: SocketProvider.roomMembers.get(room),
+          body: `Joined room ${room}`,
+          user,
+          users: this.getMembers(myRoom),
         })
       );
+      return { user, conn };
     } else {
-      SocketProvider.roomMembers.set(room, [user]);
-      ws.send(
-        makeMessage({
-          status: "success",
-          method: "join",
-          body: `Added member ${user} to new room ${room}`,
-          users: SocketProvider.roomMembers.get(room),
-        })
-      );
+      this.createRoom(room);
+      this.join(room, user, conn);
     }
   };
 
-  public leaveRoom = (room: number, ws: ws) => {
-    if (SocketProvider.rooms.has(room)) {
-      const index = SocketProvider.rooms.get(room)!.indexOf(ws);
+  private leave = (room: number, user: number, conn: SocketConnection) => {
+    const myRoom = this.getRoom(room);
+    if (myRoom) {
+      const index = myRoom.findIndex((member) => member.user === user);
       if (index > -1) {
-        SocketProvider.rooms.get(room)!.splice(index, 1);
+        myRoom.splice(index, 1);
+        conn.send(
+          success({
+            method: "leave",
+            body: `Left room ${room}`,
+            user,
+            users: this.getMembers(myRoom),
+          })
+        );
       } else {
-        // ws.send(makeMessage({status:"error", method:null, body: `You are not in room ${room}`}));
+        conn.send(error({ body: `You are not in room ${room}` }));
       }
 
       // If room is empty, delete it.
-      if (SocketProvider.rooms.get(room)!.length === 0) {
-        SocketProvider.rooms.delete(room);
+      if (myRoom.length === 0) {
+        this.deleteRoom(room);
       }
     } else {
-      // ws.send(makeMessage({status:"error", method:null, body:`Room ${room} does not exist`}));
+      conn.send(error({ body: `Room ${room} does not exist` }));
     }
   };
 
-  public removeMember = (room: number, user: number, ws: ws) => {
-    if (SocketProvider.roomMembers.has(room)) {
-      const index = SocketProvider.roomMembers.get(room)!.indexOf(user);
-      if (index > -1) {
-        SocketProvider.roomMembers.get(room)!.splice(index, 1);
-        ws.send(
-          makeMessage({
-            status: "success",
-            method: "leave",
-            body: `Member ${user} removed from room ${room}`,
-            users: SocketProvider.roomMembers.get(room),
-          })
-        );
+  private saveChat = (room: number, user: number, message: string) => {
+    const chat = new ClubChat();
+    chat.user_id = user;
+    chat.club_id = room;
+    chat.message = message;
+    this._repository.save(chat);
+  };
+
+  private broadcast = (
+    room: number,
+    user: number,
+    message: string,
+    conn: ws
+  ) => {
+    const myRoom = this._rooms.get(room);
+    if (myRoom) {
+      if (this.isMember(room, user)) {
+        myRoom.forEach((member) => {
+          if (!member.conn.OPEN) return;
+          member.conn.send(
+            success({
+              method: "broadcast",
+              body: message,
+              user,
+              users: this.getMembers(myRoom),
+            })
+          );
+        });
+        this.saveChat(room, user, message);
       } else {
-        ws.send(
-          makeMessage({
-            status: "error",
-            method: null,
-            body: `Member ${user} is not in room ${room}`,
-          })
-        );
-      }
-
-      if (SocketProvider.roomMembers.get(room)!.length === 0) {
-        SocketProvider.roomMembers.delete(room);
+        conn.send(error({ body: "You are not a member of this room" }));
       }
     } else {
-      ws.send(
-        makeMessage({
-          status: "error",
-          method: null,
-          body: `Room ${room} does not exist`,
-        })
-      );
-    }
-  };
-
-  public broadcast = (room: number, user: number, message: string, ws: ws) => {
-    if (SocketProvider.rooms.has(room)) {
-      if (SocketProvider.roomMembers.get(room)!.indexOf(user) === -1) {
-        ws.send(
-          makeMessage({
-            status: "error",
-            method: null,
-            body: "You are not a member of this room",
-          })
-        );
-        return;
-      }
-      SocketProvider.rooms.get(room)!.forEach((client) => {
-        client.send(
-          makeMessage({
-            status: "success",
-            method: "broadcast",
-            body: message,
-            user,
-          })
-        );
-        const chat = new ClubChat();
-        chat.user_id = user;
-        chat.club_id = room;
-        chat.message = message;
-        this._repository.save(chat);
-      });
-    } else {
-      ws.send(
-        makeMessage({
-          status: "error",
-          method: null,
-          body: "Room does not exist",
-        })
-      );
+      conn.send(error({ body: `Room ${room} does not exist` }));
     }
   };
 

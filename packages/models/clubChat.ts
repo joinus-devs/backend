@@ -14,7 +14,7 @@ export interface ClubChatDto extends ClubChatScheme {
   club: Club;
 }
 
-@Entity("users_in_clubs")
+@Entity("clubs_chats")
 export class ClubChat extends IdEntity implements ClubChatScheme {
   @PrimaryColumn()
   user_id: number;
