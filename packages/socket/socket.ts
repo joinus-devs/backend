@@ -80,14 +80,17 @@ class SocketProvider {
         return;
       }
       myRoom.push({ user, conn });
-      conn.send(
-        success({
-          method: "join",
-          body: `Joined room ${room}`,
-          user,
-          users: this.getMembers(myRoom),
-        })
-      );
+      myRoom.forEach((member) => {
+        if (!member.conn.OPEN) return;
+        member.conn.send(
+          success({
+            method: "join",
+            body: `Joined room ${room}`,
+            user,
+            users: this.getMembers(myRoom),
+          })
+        );
+      });
       return { user, conn };
     } else {
       this.createRoom(room);
@@ -101,14 +104,17 @@ class SocketProvider {
       const index = myRoom.findIndex((member) => member.user === user);
       if (index > -1) {
         myRoom.splice(index, 1);
-        conn.send(
-          success({
-            method: "leave",
-            body: `Left room ${room}`,
-            user,
-            users: this.getMembers(myRoom),
-          })
-        );
+        myRoom.forEach((member) => {
+          if (!member.conn.OPEN) return;
+          member.conn.send(
+            success({
+              method: "leave",
+              body: `Left room ${room}`,
+              user,
+              users: this.getMembers(myRoom),
+            })
+          );
+        });
       } else {
         conn.send(error({ body: `You are not in room ${room}` }));
       }
