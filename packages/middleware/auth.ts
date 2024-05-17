@@ -3,11 +3,15 @@ import Errors from "../constants/errors";
 import { MiddelWare } from "../types";
 
 const whiteList = [
+  "/",
   "/auth/signin",
   "/auth/signup",
   "/auth/signin/social",
   "/auth/signup/social",
   "/auth/check-email",
+  "/clubs",
+  "/feed",
+  "/users",
 ];
 
 const authenticator: MiddelWare = (req, res, next) => {
