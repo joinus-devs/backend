@@ -1,8 +1,6 @@
 import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
-import fs from "fs";
-import https from "https";
 import "reflect-metadata";
 import swaggerUi from "swagger-ui-express";
 import Errors from "./packages/constants/errors";
@@ -33,15 +31,6 @@ const connectDB = async () => {
 
 const main = async () => {
   const app = express();
-  const server = https.createServer(
-    {
-      key: fs.readFileSync(__dirname + "/ssl.key"),
-      cert: fs.readFileSync(__dirname + "/cert.crt"),
-      ca: fs.readFileSync(__dirname + "/cert.csr"),
-    },
-    app
-  );
-
   const port = 8000;
 
   console.log(`Database ${process.env.DB_NAME} connecting...`);
@@ -61,7 +50,7 @@ const main = async () => {
   app.use((req, res, next) => next(Errors.RequestNotFound));
   app.use(errorHandler);
 
-  server.listen(port, function () {
+  const server = app.listen(port, function () {
     console.log(`Server is listening on port ${port}`);
   });
 
