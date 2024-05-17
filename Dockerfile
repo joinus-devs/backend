@@ -18,12 +18,12 @@ RUN yarn build
 
 FROM base AS runner
 WORKDIR /app
-COPY ./cert.crt ./cert.crt
-COPY ./cert.csr ./cert.csr
-COPY ./ssl.key ./ssl.key
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/build ./build
+COPY ./cert.crt /app/build/cert.crt
+COPY ./cert.csr /app/build/cert.csr
+COPY ./ssl.key /app/build/ssl.key
 
 EXPOSE 3000
 
