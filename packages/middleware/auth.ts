@@ -11,12 +11,13 @@ const whiteList = [
   "/auth/signup/social",
   "/auth/check-email",
   "/clubs/:id?",
-  "/feed/:id?",
+  "/feeds/:id?",
   "/users/:id?",
 ];
 
 const authenticator: MiddelWare = (req, res, next) => {
   if (req.originalUrl.includes("docs")) return next();
+
   if (match(whiteList)(req.originalUrl)) return next();
 
   const key = process.env.JWT_SECRET!;
