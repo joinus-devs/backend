@@ -18,13 +18,12 @@ const whiteList = [
 const authenticator: MiddelWare = (req, res, next) => {
   if (req.originalUrl.includes("docs")) return next();
 
-  if (match(whiteList)(req.originalUrl)) return next();
-
   const key = process.env.JWT_SECRET!;
   try {
     (req as any).decoded = jwt.verify(req.headers.authorization!, key);
     return next();
   } catch (err) {
+    if (match(whiteList)(req.originalUrl)) return next();
     if (err instanceof jwt.JsonWebTokenError) {
       next(Errors.InvalidToken.clone());
     } else if (err instanceof jwt.TokenExpiredError) {
