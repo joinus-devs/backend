@@ -73,8 +73,8 @@ export class ClubConverter {
   public static toDto = (club: Club): ClubDto => {
     const dto = {
       ...club,
-      categories: club.categories.map((c) => c.category_id),
-      images: club.images.map((i) => ({ url: i.url, type: i.type })),
+      categories: club.categories?.map((c) => c.category_id) ?? [],
+      images: club.images?.map((i) => ({ url: i.url, type: i.type })) ?? [],
     };
     return dto;
   };

@@ -37,7 +37,6 @@ export class StorageController implements IStorageController {
     res: Response,
     next: NextFunction
   ) => {
-    console.log(req.params.category);
     if (!req.file) {
       return next(Errors.FileNotExists);
     }

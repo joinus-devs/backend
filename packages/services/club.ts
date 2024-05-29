@@ -120,7 +120,7 @@ export class ClubService implements IClubService {
         .leftJoinAndSelect("club.images", "image")
         .where("user.user_id = :id", { id: userId })
         .andWhere("club.deleted_at IS NULL")
-        .andWhere(cursor ? "user.id < :cursor" : "1=1", { cursor })
+        .andWhere(cursor ? "club.id < :cursor" : "1=1", { cursor })
         .orderBy("user.created_at", "DESC")
         .take(limit + 1)
         .getMany();
@@ -149,6 +149,7 @@ export class ClubService implements IClubService {
           "category",
           "category.deleted_at IS NULL"
         )
+        .leftJoinAndSelect("club.images", "image")
         .where("category.category_id = :id", { id: categoryId })
         .andWhere("club.deleted_at IS NULL")
         .andWhere(cursor ? "club.id < :cursor" : "1=1", { cursor })

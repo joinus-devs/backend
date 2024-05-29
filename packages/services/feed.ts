@@ -93,6 +93,7 @@ export class FeedService implements IFeedService {
         .leftJoinAndSelect("feed.user", "user")
         .leftJoinAndSelect("feed.club", "club")
         .leftJoinAndSelect("club.categories", "club_category")
+        .leftJoinAndSelect("club.images", "image")
         .leftJoin("feed.comments", "comment")
         .addSelect("COUNT(comment.id)", "feed_comment_count")
         .where("feed.is_private = false")
@@ -101,6 +102,7 @@ export class FeedService implements IFeedService {
         .groupBy("feed.id")
         .addGroupBy("club.id")
         .addGroupBy("club_category.category_id")
+        .addGroupBy("image.id")
         .orderBy("feed.id", "DESC")
         .take(limit + 1)
         .getMany();
