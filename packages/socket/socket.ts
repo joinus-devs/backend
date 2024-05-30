@@ -13,7 +13,7 @@ class SocketProvider {
   private constructor(dataSource: DataSource, server: Server) {
     this._repository = dataSource.getRepository(ClubChat);
 
-    const wss = new ws.Server({ server });
+    const wss = new ws.Server({ server, path: "/chats" });
     wss.on("connection", (ws: SocketConnection) => {
       ws.on("message", (message: string) => {
         const parsedMessage: MessageFromClient = JSON.parse(message);
