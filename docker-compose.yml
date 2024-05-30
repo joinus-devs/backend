@@ -28,6 +28,12 @@ services:
       - NCLOUD_ACCESS_KEY=${NCLOUD_ACCESS_KEY}
       - NCLOUD_SECRET_KEY=${NCLOUD_SECRET_KEY}
     restart: always
+    networks:
+      - backend
+
 
 volumes:
   db-data:
+
+networks:
+  backend:
