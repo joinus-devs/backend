@@ -17,7 +17,7 @@ services:
     build:
       context: .
     ports:
-      - "8000:8000"
+      - "80:8000"
     environment:
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
@@ -28,22 +28,6 @@ services:
       - NCLOUD_ACCESS_KEY=${NCLOUD_ACCESS_KEY}
       - NCLOUD_SECRET_KEY=${NCLOUD_SECRET_KEY}
     restart: always
-    networks:
-      - backend
-
-  nginx:
-    image: nginx:latest
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-    restart: always
-    networks:
-      - backend
 
 volumes:
   db-data:
-
-networks:
-  backend:
