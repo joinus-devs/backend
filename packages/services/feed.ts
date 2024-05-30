@@ -74,6 +74,7 @@ export class FeedService implements IFeedService {
         .groupBy("feed.id")
         .addGroupBy("club.id")
         .addGroupBy("club_category.category_id")
+        .addGroupBy("image.id")
         .getOne();
     } catch (err) {
       throw Errors.makeInternalServerError(err);
