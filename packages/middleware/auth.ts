@@ -13,6 +13,7 @@ const whiteList = [
   "/clubs/:id?",
   "/feeds/:id?",
   "/users/:id?",
+  "/chats",
 ];
 
 const authenticator: MiddelWare = (req, res, next) => {
